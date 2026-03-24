@@ -84,6 +84,12 @@ export default function AiChatPage() {
         purrAudioRef.current.pause();
       }
     }
+
+    // Cleanup on unmount — stop all audio
+    return () => {
+      if (purrAudioRef.current) { purrAudioRef.current.pause(); purrAudioRef.current = null; }
+      if (catAudioRef.current) { catAudioRef.current.pause(); catAudioRef.current = null; }
+    };
   }, [catState, muted]);
 
   // Play think audio once, then switch to silent think video
