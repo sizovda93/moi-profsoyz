@@ -250,6 +250,25 @@ export default function AgentAboutPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle className="text-base">Заместители председателя (на общественных началах)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <User className="h-4.5 w-4.5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Ралко Наталья Александровна</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Председатель первичной профсоюзной организации «Саратовские тепловые сети»
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* ==================== Tab 2: Мероприятия ==================== */}
