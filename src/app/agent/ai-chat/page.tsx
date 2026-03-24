@@ -142,17 +142,15 @@ export default function AiChatPage() {
   // Handle input typing → cat peeks
   const handleInputChange = (value: string) => {
     setInput(value);
-    if (!sending) {
-      if (value.trim()) {
-        setCatState("peek");
-        // Reset timeout
-        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-        typingTimeoutRef.current = setTimeout(() => {
-          if (!sending) setCatState("sleep");
-        }, 3000);
-      } else {
+    if (sending) return; // don't change cat while AI is thinking
+    if (value.trim()) {
+      setCatState("peek");
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
         setCatState("sleep");
-      }
+      }, 3000);
+    } else {
+      setCatState("sleep");
     }
   };
 
@@ -205,10 +203,10 @@ export default function AiChatPage() {
       }]);
     } finally {
       setSending(false);
-      // Cat goes back to sleep after answer
-      setCatState("sleep");
-      // Stop audio
+      // Stop voice audio, but keep think video running
       if (catAudioRef.current) catAudioRef.current.pause();
+      // Cat stays in think — will switch to peek when user types, or sleep after timeout
+      setCatState("think");
     }
   };
 
