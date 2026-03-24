@@ -49,6 +49,7 @@ interface UnionDocument {
   fileName: string | null;
   fileUrl: string;
   fileSize: number | null;
+  section: string | null;
   createdAt: string;
 }
 
@@ -104,6 +105,8 @@ export default function AgentAboutPage() {
 
   /* --- faq state --- */
   const [expandedFaqId, setExpandedFaqId] = useState<string | null>(null);
+  const [expandedActivity, setExpandedActivity] = useState<string | null>(null);
+  const [activityDocs, setActivityDocs] = useState<UnionDocument[]>([]);
 
   /* ---------- fetch events ---------- */
 
@@ -122,7 +125,11 @@ export default function AgentAboutPage() {
     setDocsLoading(true);
     fetch("/api/union-documents")
       .then((r) => r.json())
-      .then((data) => setDocuments(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const all = Array.isArray(data) ? data : [];
+        setDocuments(all.filter((d: UnionDocument) => !d.section));
+        setActivityDocs(all.filter((d: UnionDocument) => !!d.section));
+      })
       .catch(() => setDocuments([]))
       .finally(() => setDocsLoading(false));
   }, []);
@@ -188,6 +195,10 @@ export default function AgentAboutPage() {
           <TabsTrigger value="faq" className="gap-1.5">
             <HelpCircle className="h-3.5 w-3.5" />
             Частые вопросы
+          </TabsTrigger>
+          <TabsTrigger value="activity" className="gap-1.5">
+            <Briefcase className="h-3.5 w-3.5" />
+            Деятельность
           </TabsTrigger>
           <TabsTrigger value="documents" className="gap-1.5">
             <FolderOpen className="h-3.5 w-3.5" />
@@ -421,6 +432,140 @@ export default function AgentAboutPage() {
         </TabsContent>
 
         {/* ==================== Tab 5: Документы ==================== */}
+        {/* ==================== Tab 6: Деятельность ==================== */}
+        <TabsContent value="activity">
+          <div className="space-y-3">
+            {/* Правовая работа */}
+            {(() => {
+              const sections = [
+                {
+                  id: "legal_work",
+                  title: "Правовая работа",
+                  content: (
+                    <div className="text-sm leading-relaxed space-y-3">
+                      <p>Соглашение Федерации профобъединения с инспекцией по труду.</p>
+                      <p>О порядке принятия решений работодателем с учетом мотивированного мнения профсоюзного комитета в соответствии со статьей 371 ТК РФ.</p>
+                    </div>
+                  ),
+                  sectionKey: "legal_work",
+                },
+                {
+                  id: "organizational",
+                  title: "Организационно-уставная деятельность",
+                  content: (
+                    <div className="text-sm leading-relaxed space-y-4">
+                      <h4 className="font-semibold text-foreground">Порядок вступления в Профсоюз</h4>
+                      <div className="space-y-3 pl-1">
+                        <div className="flex gap-3">
+                          <span className="shrink-0 h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">1</span>
+                          <p>Работник, изъявивший желание реализовать своё конституционное право на объединение, обращается с заявлением в действующую на предприятии первичную профсоюзную организацию ВЭП.</p>
+                        </div>
+                        <div className="flex gap-3">
+                          <span className="shrink-0 h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">2</span>
+                          <p>После принятия решения выборным коллегиальным органом ППО работник письменно обращается к руководителю организации-работодателя об удержании из заработной платы членских профсоюзных взносов. Заявление оформляется в двух экземплярах.</p>
+                        </div>
+                      </div>
+
+                      <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                        <p className="text-xs font-semibold text-muted-foreground">Из Устава ВЭП — Статья 9 «Приём в члены Профсоюза»</p>
+                        <ul className="text-xs space-y-1.5 text-muted-foreground list-disc pl-4">
+                          <li>Членство в Профсоюзе является добровольным.</li>
+                          <li>Приём производится в индивидуальном порядке по личному заявлению. Решение принимается профкомом ППО.</li>
+                          <li>При отсутствии ППО решение принимает территориальный профорган или Президиум Профсоюза.</li>
+                          <li>Членство исчисляется со дня принятия решения о приёме.</li>
+                        </ul>
+                      </div>
+
+                      <h4 className="font-semibold text-foreground pt-2">Порядок создания первичной профсоюзной организации ВЭП</h4>
+                      <div className="space-y-3 pl-1">
+                        <div className="flex gap-3">
+                          <span className="shrink-0 h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">1</span>
+                          <p>Найти не менее трёх единомышленников и обратиться с заявлениями о вступлении в члены профсоюза ВЭП в действующую территориальную организацию.</p>
+                        </div>
+                        <div className="flex gap-3">
+                          <span className="shrink-0 h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">2</span>
+                          <p>Провести учредительное собрание и оформить его протоколом по решению территориальной организации ВЭП.</p>
+                        </div>
+                      </div>
+
+                      <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                        <p className="text-xs font-semibold text-muted-foreground">Из Устава ВЭП — Статья 20 «Первичная профсоюзная организация»</p>
+                        <p className="text-xs text-muted-foreground">Решение о создании ППО принимается по инициативе не менее трёх членов Профсоюза учредительным собранием и выборным руководящим органом соответствующей территориальной организации.</p>
+                      </div>
+                    </div>
+                  ),
+                  sectionKey: "organizational",
+                },
+                {
+                  id: "social_partnership",
+                  title: "Социальное партнерство",
+                  content: (
+                    <p className="text-sm text-muted-foreground">Соглашения и документы представлены ниже.</p>
+                  ),
+                  sectionKey: "social_partnership",
+                },
+                {
+                  id: "finance",
+                  title: "Финансы и учет",
+                  content: (
+                    <p className="text-sm text-muted-foreground">Нормативные документы по финансовой деятельности профсоюзной организации.</p>
+                  ),
+                  sectionKey: "finance",
+                },
+                {
+                  id: "youth",
+                  title: "Молодежная политика",
+                  content: (
+                    <p className="text-sm text-muted-foreground">Конкурсы, положения и мероприятия для молодых членов профсоюза.</p>
+                  ),
+                  sectionKey: "youth",
+                },
+              ];
+
+              return sections.map((section) => {
+                const isOpen = expandedActivity === section.id;
+                const sectionDocs = activityDocs.filter((d) => d.section === section.sectionKey);
+                return (
+                  <Card key={section.id}>
+                    <button
+                      className="w-full text-left p-5 flex items-center justify-between"
+                      onClick={() => setExpandedActivity(isOpen ? null : section.id)}
+                    >
+                      <h3 className="text-sm font-semibold">{section.title}</h3>
+                      {isOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                    </button>
+                    {isOpen && (
+                      <div className="px-5 pb-5 pt-0 border-t border-border">
+                        <div className="mt-4">{section.content}</div>
+                        {sectionDocs.length > 0 && (
+                          <div className="mt-4 pt-4 border-t border-border">
+                            <p className="text-xs font-semibold text-muted-foreground mb-3">Документы</p>
+                            <div className="space-y-2">
+                              {sectionDocs.map((doc) => (
+                                <a
+                                  key={doc.id}
+                                  href={doc.fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors"
+                                >
+                                  <FileText className="h-4 w-4 text-primary shrink-0" />
+                                  <span className="text-sm flex-1">{doc.title}</span>
+                                  <Download className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </Card>
+                );
+              });
+            })()}
+          </div>
+        </TabsContent>
+
         <TabsContent value="documents">
           {docsLoading ? (
             <div className="space-y-4">
