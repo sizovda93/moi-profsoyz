@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Menu, LogOut, ChevronDown } from "lucide-react";
+import { Bell, Menu, LogOut, ChevronDown, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "@/types";
@@ -8,6 +8,7 @@ import { getInitials } from "@/lib/utils";
 import { getRoleLabel } from "@/lib/navigation";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTheme } from "@/hooks/use-theme";
 
 interface AppHeaderProps {
   user: User;
@@ -17,6 +18,7 @@ interface AppHeaderProps {
 export function AppHeader({ user, onMenuToggle }: AppHeaderProps) {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
+  const { theme, toggleTheme, mounted } = useTheme();
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -35,6 +37,13 @@ export function AppHeader({ user, onMenuToggle }: AppHeaderProps) {
 
         {/* Right */}
         <div className="flex items-center gap-3">
+          {/* Theme toggle */}
+          {mounted && (
+            <Button variant="ghost" size="icon" onClick={toggleTheme} title={theme === "dark" ? "Светлая тема" : "Тёмная тема"}>
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+          )}
+
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
