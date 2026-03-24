@@ -27,11 +27,12 @@ const quickQuestions = [
 
 const CAT_SLEEP = "/ai-cat/sleep.mp4";
 const CAT_PEEK = "/ai-cat/peek.mp4";
+const CAT_TALK = "/ai-cat/talk.mp4";
 const CAT_THINK = "/ai-cat/think.mp4";
 const CAT_THINK_VOICE = "/ai-cat/think-voice.mp3";
 const CAT_PURR = "/ai-cat/purr.mp3";
 
-type CatState = "sleep" | "peek" | "think";
+type CatState = "sleep" | "peek" | "talk" | "think";
 
 export default function AiChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -63,12 +64,13 @@ export default function AiChatPage() {
   // Switch cat video + purr sound when state changes
   useEffect(() => {
     if (!catVideoRef.current) return;
-    const src = catState === "think" ? CAT_THINK : catState === "peek" ? CAT_PEEK : CAT_SLEEP;
-    if (catVideoRef.current.src !== window.location.origin + src) {
-      catVideoRef.current.src = src;
-      catVideoRef.current.loop = true;
-      catVideoRef.current.play().catch(() => {});
-    }
+    const srcMap: Record<CatState, string> = { sleep: CAT_SLEEP, peek: CAT_PEEK, talk: CAT_TALK, think: CAT_THINK };
+    const src = srcMap[catState];
+    const shouldLoop = catState !== "talk"; // talk plays once
+
+    catVideoRef.current.src = src;
+    catVideoRef.current.loop = shouldLoop;
+    catVideoRef.current.play().catch(() => {});
 
     // Purr: play when sleeping, stop otherwise
     if (catState === "sleep" && !muted) {
@@ -92,19 +94,37 @@ export default function AiChatPage() {
     };
   }, [catState, muted]);
 
-  // Play think audio once, then switch to silent think video
+  // Stop purr when browser tab is hidden
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (purrAudioRef.current) purrAudioRef.current.pause();
+        if (catAudioRef.current) catAudioRef.current.pause();
+      } else {
+        if (catState === "sleep" && !muted && purrAudioRef.current) {
+          purrAudioRef.current.play().catch(() => {});
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [catState, muted]);
+
+  // Sequence: talk video + voice → then think video silently
   const playCatThinkSequence = useCallback(() => {
     // Stop purr
     if (purrAudioRef.current) purrAudioRef.current.pause();
 
-    // First: play voice with current video (sleep/peek → acts as "speaking" pose)
+    // Switch to talk video (plays once)
+    setCatState("talk");
+
     if (!muted) {
       try {
         if (catAudioRef.current) catAudioRef.current.pause();
         const audio = new Audio(CAT_THINK_VOICE);
         catAudioRef.current = audio;
         audio.addEventListener("ended", () => {
-          // After voice ends → switch to think video (silent loop)
+          // Voice done → switch to think video (silent loop)
           setCatState("think");
         }, { once: true });
         audio.play().catch(() => {
@@ -114,8 +134,8 @@ export default function AiChatPage() {
         setCatState("think");
       }
     } else {
-      // Muted → go straight to think
-      setCatState("think");
+      // Muted → show talk video briefly, then think
+      setTimeout(() => setCatState("think"), 3000);
     }
   }, [muted]);
 
@@ -246,6 +266,7 @@ export default function AiChatPage() {
                 <div className="absolute bottom-2 left-2 px-2 py-1 rounded-full bg-black/50 text-[10px] text-white">
                   {catState === "sleep" && "💤 Дремлет..."}
                   {catState === "peek" && "👀 Подсматривает..."}
+                  {catState === "talk" && "💬 Говорит..."}
                   {catState === "think" && "🤔 Думает..."}
                 </div>
               </div>
