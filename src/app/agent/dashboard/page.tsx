@@ -155,10 +155,7 @@ export default function AgentDashboard() {
             <Link href="/agent/marketing" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
               <BookOpen className="h-3.5 w-3.5" /> Материалы
             </Link>
-            <Link href="/agent/referral" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
-              <Share2 className="h-3.5 w-3.5" /> Пригласить коллегу
-            </Link>
-            <Link href="/agent/learning" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
+<Link href="/agent/learning" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
               <GraduationCap className="h-3.5 w-3.5" /> Обучение
             </Link>
             <Link href="/agent/messages" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
