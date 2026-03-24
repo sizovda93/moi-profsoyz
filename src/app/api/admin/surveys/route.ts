@@ -67,6 +67,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Notify target audience about new survey
+    if (st === "published") {
+      const roleCondition = tr === "all" ? "('agent', 'manager')" : tr === "agent" ? "('agent')" : "('manager')";
+      pool.query(
+        `INSERT INTO notifications (user_id, title, message, type)
+         SELECT id, 'Новый опрос', $1, 'warning'
+         FROM profiles WHERE status = 'active' AND role IN ${roleCondition}`,
+        [`${title.trim()} — пройдите опрос`]
+      ).catch(() => {});
+    }
+
     return Response.json(toCamelCase(rows[0]), { status: 201 });
   } catch (err) {
     console.error("POST /api/admin/surveys error:", err);

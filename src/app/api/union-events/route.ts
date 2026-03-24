@@ -44,6 +44,16 @@ export async function POST(request: NextRequest) {
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
       [title.trim(), excerpt?.trim() || null, content.trim(), eventDate || null, mt, mediaUrl || null, st, user.id, pubAt]
     );
+    // Notify all active members about new event
+    if (st === "published") {
+      pool.query(
+        `INSERT INTO notifications (user_id, title, message, type)
+         SELECT id, 'Новое мероприятие', $1, 'success'
+         FROM profiles WHERE status = 'active' AND role IN ('agent', 'manager')`,
+        [`${title.trim()}`]
+      ).catch(() => {});
+    }
+
     return Response.json(toCamelCase(rows[0]), { status: 201 });
   } catch (err) {
     console.error("POST /api/union-events error:", err);
