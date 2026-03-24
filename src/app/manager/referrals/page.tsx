@@ -61,7 +61,7 @@ export default function ManagerReferralsPage() {
       ) : (
         <DataTable
           columns={[
-            { key: "fullName", title: "Член профсоюза", render: (row) => row.fullName },
+            { key: "fullName", title: "Участник профсоюза", render: (row) => row.fullName },
             { key: "refCode", title: "Код", render: (row) => <span className="font-mono text-xs">{row.refCode}</span> },
             { key: "uniqueClicks", title: "Переходы", render: (row) => row.uniqueClicks },
             { key: "referralLeads", title: "Регистрации", render: (row) => (

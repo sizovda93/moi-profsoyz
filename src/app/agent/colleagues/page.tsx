@@ -36,11 +36,14 @@ export default function AgentColleaguesPage() {
   // Colleagues
   const [colleagues, setColleagues] = useState<any[]>([]);
   const [colleaguesLoading, setColleaguesLoading] = useState(true);
+  // Manager
+  const [manager, setManager] = useState<{ id: string; name: string; conversationId: string } | null>(null);
   // Chats
   const [chats, setChats] = useState<any[]>([]);
   const [chatsLoading, setChatsLoading] = useState(true);
   // Active chat
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [activeChatType, setActiveChatType] = useState<"direct" | "conversation">("direct");
   const [messages, setMessages] = useState<any[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [contactName, setContactName] = useState("");
@@ -50,7 +53,7 @@ export default function AgentColleaguesPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Load colleagues and chats on mount
+  // Load colleagues, manager, and chats on mount
   useEffect(() => {
     fetch("/api/colleagues")
       .then((r) => r.json())
@@ -63,6 +66,21 @@ export default function AgentColleaguesPage() {
       .then((data) => setChats(Array.isArray(data) ? data : []))
       .catch(() => {})
       .finally(() => setChatsLoading(false));
+
+    // Load manager from conversations
+    fetch("/api/conversations")
+      .then((r) => r.json())
+      .then((data) => {
+        const convs = Array.isArray(data) ? data : [];
+        if (convs.length > 0) {
+          setManager({
+            id: convs[0].managerId,
+            name: convs[0].managerName || "Руководитель",
+            conversationId: convs[0].id,
+          });
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Scroll to bottom when messages change
@@ -70,15 +88,17 @@ export default function AgentColleaguesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const loadChat = async (chatId: string) => {
+  const loadChat = async (chatId: string, type: "direct" | "conversation" = "direct") => {
     setActiveChatId(chatId);
+    setActiveChatType(type);
     setChatLoading(true);
     try {
-      const res = await fetch(`/api/direct-chats/${chatId}`);
+      const endpoint = type === "conversation" ? `/api/conversations/${chatId}` : `/api/direct-chats/${chatId}`;
+      const res = await fetch(endpoint);
       if (res.ok) {
         const data = await res.json();
         setMessages(data.messages || []);
-        setContactName(data.contactName || "");
+        setContactName(type === "conversation" ? (data.managerName || "Руководитель") : (data.contactName || ""));
       }
     } finally {
       setChatLoading(false);
@@ -89,19 +109,18 @@ export default function AgentColleaguesPage() {
     if (!activeChatId || !messageText.trim()) return;
     setSending(true);
     try {
-      const res = await fetch(`/api/direct-chats/${activeChatId}`, {
+      const endpoint = activeChatType === "conversation" ? `/api/conversations/${activeChatId}` : `/api/direct-chats/${activeChatId}`;
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: messageText }),
       });
       if (res.ok) {
         setMessageText("");
-        loadChat(activeChatId);
-        // Refresh chat list
-        fetch("/api/direct-chats")
-          .then((r) => r.json())
-          .then(setChats)
-          .catch(() => {});
+        loadChat(activeChatId, activeChatType);
+        if (activeChatType === "direct") {
+          fetch("/api/direct-chats").then((r) => r.json()).then(setChats).catch(() => {});
+        }
       }
     } finally {
       setSending(false);
@@ -130,31 +149,55 @@ export default function AgentColleaguesPage() {
   return (
     <div>
       <PageHeader
-        title="Коллеги"
-        description="Общение с коллегами из вашего профсоюза"
+        title="Корпоративные чаты"
+        description="Общение с руководителем и коллегами из вашего профсоюза"
         breadcrumbs={[
           { title: "О платформе", href: "/agent/dashboard" },
-          { title: "Коллеги" },
+          { title: "Корпоративные чаты" },
         ]}
       />
+      <div className="-mt-6 mb-6">
+        <span className="inline-block px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
+          Корпоративные чаты
+        </span>
+      </div>
 
       <div
         className="grid grid-cols-1 lg:grid-cols-12 gap-0 rounded-xl border border-border overflow-hidden"
         style={{ height: 600 }}
       >
-        {/* Colleagues panel - 3 cols */}
+        {/* Contacts panel - 3 cols */}
         <div className="lg:col-span-3 border-r border-border overflow-y-auto">
           <div className="sticky top-0 z-10 bg-card px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-muted-foreground" />
-              <h3 className="text-sm font-semibold">Коллеги</h3>
-              {colleagues.length > 0 && (
+              <h3 className="text-sm font-semibold">Контакты</h3>
+              {(colleagues.length + (manager ? 1 : 0)) > 0 && (
                 <Badge variant="secondary" className="ml-auto">
-                  {colleagues.length}
+                  {colleagues.length + (manager ? 1 : 0)}
                 </Badge>
               )}
             </div>
           </div>
+
+          {/* Manager — highlighted at top */}
+          {manager && (
+            <div
+              className="flex items-center gap-3 px-4 py-3 bg-primary/5 border-b-2 border-primary/20 hover:bg-primary/10 transition-colors cursor-pointer"
+              onClick={() => loadChat(manager.conversationId, "conversation")}
+            >
+              <Avatar className="h-9 w-9 shrink-0 ring-2 ring-primary">
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                  {getInit(manager.name)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{manager.name}</p>
+                <p className="text-[11px] text-primary truncate">Руководитель</p>
+              </div>
+              <MessageSquare className="h-4 w-4 text-primary shrink-0" />
+            </div>
+          )}
 
           {colleaguesLoading ? (
             <div className="p-4 space-y-3">
@@ -168,11 +211,11 @@ export default function AgentColleaguesPage() {
                 </div>
               ))}
             </div>
-          ) : colleagues.length === 0 ? (
+          ) : colleagues.length === 0 && !manager ? (
             <div className="flex flex-col items-center justify-center h-[calc(100%-49px)] text-center px-4">
               <UserRound className="h-8 w-8 text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">
-                Нет коллег в профсоюзе
+                Нет контактов
               </p>
             </div>
           ) : (
@@ -191,9 +234,9 @@ export default function AgentColleaguesPage() {
                     <p className="text-sm font-medium truncate">
                       {colleague.fullName}
                     </p>
-                    {colleague.profession && (
+                    {colleague.divisionName && (
                       <p className="text-xs text-muted-foreground truncate">
-                        {colleague.profession}
+                        {colleague.divisionName}
                       </p>
                     )}
                   </div>
@@ -212,76 +255,8 @@ export default function AgentColleaguesPage() {
           )}
         </div>
 
-        {/* Chat list - 3 cols */}
-        <div className="lg:col-span-3 border-r border-border overflow-y-auto">
-          <div className="sticky top-0 z-10 bg-card px-4 py-3 border-b border-border">
-            <div className="flex items-center gap-2">
-              <MessagesSquare className="h-4 w-4 text-muted-foreground" />
-              <h3 className="text-sm font-semibold">Диалоги</h3>
-            </div>
-          </div>
-
-          {chatsLoading ? (
-            <div className="p-4 space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="animate-pulse flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-full bg-muted" />
-                  <div className="flex-1 space-y-1.5">
-                    <div className="h-3 w-20 bg-muted rounded" />
-                    <div className="h-2.5 w-32 bg-muted rounded" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : chats.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-[calc(100%-49px)] text-center px-4">
-              <MessageSquare className="h-8 w-8 text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">
-                Начните диалог с коллегой
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-border">
-              {chats.map((chat) => (
-                <button
-                  key={chat.id}
-                  onClick={() => loadChat(chat.id)}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/50",
-                    activeChatId === chat.id &&
-                      "bg-muted/70 border-l-2 border-l-primary"
-                  )}
-                >
-                  <Avatar className="h-9 w-9 shrink-0">
-                    <AvatarFallback className="bg-secondary text-xs">
-                      {getInit(chat.contactName || "")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium truncate">
-                        {chat.contactName}
-                      </p>
-                      {chat.unreadCount > 0 && (
-                        <Badge className="shrink-0 text-[10px] px-1.5 py-0">
-                          {chat.unreadCount}
-                        </Badge>
-                      )}
-                    </div>
-                    {chat.lastMessage && (
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">
-                        {chat.lastMessage}
-                      </p>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Chat window - 6 cols */}
-        <div className="lg:col-span-6 flex flex-col">
+        {/* Chat window - 9 cols */}
+        <div className="lg:col-span-9 flex flex-col">
           {!activeChatId ? (
             <div className="flex flex-col items-center justify-center h-full text-center px-4">
               <MessagesSquare className="h-10 w-10 text-muted-foreground mb-3" />

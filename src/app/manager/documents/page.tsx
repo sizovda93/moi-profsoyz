@@ -35,7 +35,7 @@ export default function ManagerDocumentsPage() {
     <div>
       <PageHeader
         title="Документы"
-        description="Документы членов профсоюза"
+        description="Документы участников профсоюза"
         breadcrumbs={[
           { title: "Платформа", href: "/manager/dashboard" },
           { title: "Документы" },

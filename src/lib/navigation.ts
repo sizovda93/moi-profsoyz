@@ -4,9 +4,9 @@ export const agentNav: NavItem[] = [
   { title: "О платформе", href: "/agent/dashboard", icon: "LayoutDashboard" },
   { title: "О профсоюзе", href: "/agent/about", icon: "Users" },
   { title: "Партнёры", href: "/agent/partners", icon: "Building2" },
-  { title: "Обращение к руководителю", href: "/agent/leads", icon: "UserPlus" },
-  { title: "Чат с руководителем", href: "/agent/messages", icon: "MessageCircle" },
-  { title: "Коллеги", href: "/agent/colleagues", icon: "Users" },
+  { title: "Вопрос руководителю", href: "/agent/leads", icon: "UserPlus" },
+  { title: "Корпоративные чаты", href: "/agent/colleagues", icon: "MessageSquare" },
+  { title: "Объявления", href: "/agent/announcements", icon: "Megaphone" },
   { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot"},
   { title: "Вопрос юристу", href: "/agent/legal", icon: "Shield" },
   { title: "Опросы", href: "/agent/surveys", icon: "ClipboardList" },
@@ -19,12 +19,11 @@ export const managerNav: NavItem[] = [
   { title: "Платформа", href: "/manager/dashboard", icon: "LayoutDashboard" },
   { title: "О профсоюзе", href: "/agent/about", icon: "Users" },
   { title: "Партнёры", href: "/agent/partners", icon: "Building2" },
-  { title: "Члены профсоюза", href: "/manager/agents", icon: "Users" },
+  { title: "Участники профсоюза", href: "/manager/agents", icon: "Users" },
   { title: "Обращения", href: "/manager/leads", icon: "UserPlus" },
-  { title: "Диалоги", href: "/manager/conversations", icon: "MessageSquare", badge: 5 },
+  { title: "Диалоги", href: "/manager/conversations", icon: "MessageSquare" },
   { title: "Объявления", href: "/manager/broadcasts", icon: "Send" },
   { title: "Документы", href: "/manager/documents", icon: "FileText" },
-  { title: "Приглашения", href: "/manager/referrals", icon: "Share2" },
   { title: "Опросы", href: "/agent/surveys", icon: "ClipboardList" },
   { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot"},
   { title: "Обучение", href: "/manager/learning", icon: "GraduationCap" },
@@ -64,7 +63,7 @@ export function getNavByRole(role: UserRole): NavItem[] {
 export function getRoleLabel(role: UserRole): string {
   switch (role) {
     case "agent":
-      return "Член профсоюза";
+      return "Участник профсоюза";
     case "manager":
       return "Руководитель";
     case "admin":

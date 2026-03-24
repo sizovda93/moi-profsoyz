@@ -257,7 +257,7 @@ export default function AdminLegalPage() {
     <div>
       <PageHeader
         title="Юридические вопросы"
-        description="Вопросы членов профсоюза юристу"
+        description="Вопросы участников профсоюза юристу"
         breadcrumbs={[
           { title: "Платформа", href: "/admin/dashboard" },
           { title: "Юридические вопросы" },

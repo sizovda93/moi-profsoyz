@@ -20,7 +20,7 @@ function getContactName(conv: Conversation & { agentName?: string; managerName?:
   if (role === "manager") {
     // Leader sees agent/member name as contact
     const name = (conv as any).agentName;
-    if (name) return { name, role: "Член профсоюза" };
+    if (name) return { name, role: "Участник профсоюза" };
   }
   // Fallback to clientName
   return { name: conv.clientName || "Диалог", role: "" };

@@ -219,7 +219,7 @@ export default function AgentLegalPage() {
       <div>
         <PageHeader
           title="Вопрос юристу"
-          description="Задайте вопрос по трудовому праву"
+          description="Задайте вопрос моему руководителю — вам ответят в течение 3 часов"
           breadcrumbs={[
             { title: "Платформа", href: "/agent/dashboard" },
             { title: "Вопрос юристу" },
@@ -240,18 +240,46 @@ export default function AgentLegalPage() {
     <div>
       <PageHeader
         title="Вопрос юристу"
-        description="Задайте вопрос по трудовому праву"
+        description="Задайте вопрос моему руководителю — вам ответят в течение 3 часов"
         breadcrumbs={[
           { title: "Платформа", href: "/agent/dashboard" },
           { title: "Вопрос юристу" },
         ]}
-        actions={
-          <Button onClick={() => setDialogOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Задать вопрос
-          </Button>
-        }
       />
+
+      {/* ---------- cat helper ---------- */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6">
+        <div className="lg:col-span-3 space-y-3">
+          <Card className="overflow-hidden !bg-[#2a2a2f] !border-[#3a3a42]">
+            <CardContent className="p-0">
+              <div className="relative" style={{ height: 160 }}>
+                <video
+                  src="/ai-cat/peek.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover brightness-110"
+                />
+              </div>
+              <div className="px-3 py-2 bg-[#2a2a2f]">
+                <p className="text-xs font-semibold text-[#fafafa]">Котофей Петрович</p>
+                <p className="text-[9px] text-[#a0a0a8] leading-snug">Помощник по юридическим вопросам</p>
+              </div>
+            </CardContent>
+          </Card>
+          {/* Bubble */}
+          <div className="relative">
+            <div className="bg-primary rounded-xl px-3.5 py-2.5">
+              <p className="text-[11px] leading-relaxed text-primary-foreground">
+                Задайте вопрос моему руководителю — вам ответят в течение 3 часов
+              </p>
+            </div>
+            <div className="absolute -top-1 left-4 w-2.5 h-2.5 bg-primary rotate-45" />
+          </div>
+
+        </div>
+        <div className="lg:col-span-9">
 
       {/* ---------- empty state ---------- */}
       {requests.length === 0 && (
@@ -265,6 +293,9 @@ export default function AgentLegalPage() {
               <Plus className="h-4 w-4" />
               Задать вопрос
             </Button>
+            <p className="text-xs text-muted-foreground mt-6 max-w-sm mx-auto leading-relaxed">
+              Если вам нужен подробный ответ с изучением конкретных документов — задайте вопрос моему руководителю. А я сделаю всё возможное, чтобы он ответил вам в течение 3 часов
+            </p>
           </CardContent>
         </Card>
       )}
@@ -389,6 +420,8 @@ export default function AgentLegalPage() {
           );
         })}
       </div>
+        </div>{/* end right col */}
+      </div>{/* end grid */}
 
       {/* ---------- create dialog ---------- */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -399,6 +432,12 @@ export default function AgentLegalPage() {
               Опишите вашу ситуацию, и юрист профсоюза ответит вам в ближайшее время
             </DialogDescription>
           </DialogHeader>
+
+          <div className="rounded-lg bg-primary/5 border border-primary/10 px-4 py-3 mt-4">
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Если вам нужен подробный ответ с изучением конкретных документов — задайте вопрос моему руководителю. А я сделаю всё возможное, чтобы он ответил вам в течение 3 часов
+            </p>
+          </div>
 
           <div className="space-y-4 mt-4">
             {/* subject */}

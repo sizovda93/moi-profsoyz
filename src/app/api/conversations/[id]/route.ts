@@ -36,7 +36,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       [id]
     );
 
-    const result = { ...conversation.rows[0], messages: messages.rows };
+    // Add isOwn flag based on sender_type and current user role
+    const msgsWithOwn = messages.rows.map((m: Record<string, unknown>) => ({
+      ...m,
+      is_own: m.sender_type === user.role,
+    }));
+
+    const result = { ...conversation.rows[0], messages: msgsWithOwn };
     return Response.json(toCamelCase(result));
   } catch (err) {
     console.error('GET /api/conversations/[id] error:', err);

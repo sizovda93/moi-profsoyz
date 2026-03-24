@@ -4,7 +4,7 @@ import { jwtVerify } from "jose";
 const publicPaths = ["/", "/login", "/register", "/offer", "/privacy", "/consent"];
 
 const rolePrefixes: Record<string, string[]> = {
-  "/agent": ["agent"],
+  "/agent": ["agent", "manager"],
   "/manager": ["manager"],
   "/admin": ["admin"],
 };

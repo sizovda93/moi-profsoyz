@@ -62,15 +62,12 @@ export function AppSidebar({ items, role }: AppSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card h-screen sticky top-0" style={{ fontFamily: "var(--font-manrope), sans-serif" }}>
+    <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card h-screen sticky top-0">
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-border">
-        <Link href={`/${role}/dashboard`} className="flex items-center gap-3">
-          <img src="/logo.png" alt="Мой Профсоюз" className="h-8 w-8 rounded-lg object-contain" />
-          <div>
-            <span className="font-semibold text-sm tracking-tight">Мой Профсоюз</span>
-            <span className="text-[10px] text-muted-foreground block -mt-0.5">профсоюзная платформа</span>
-          </div>
+        <Link href={`/${role}/dashboard`}>
+          <span className="font-semibold text-sm tracking-tight block">Мой Профсоюз</span>
+          <span className="text-[10px] text-muted-foreground block">профсоюзная платформа</span>
         </Link>
       </div>
 

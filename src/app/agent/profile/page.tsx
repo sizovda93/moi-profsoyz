@@ -170,14 +170,18 @@ export default function AgentProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card>
           <CardContent className="p-6 flex flex-col items-center text-center">
-            <img src="/logo.png" alt="Мой Профсоюз" className="h-20 w-20 rounded-full object-contain mb-4" />
+            <Avatar className="h-20 w-20 mb-4">
+              <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
+                {getInitials(profile.fullName)}
+              </AvatarFallback>
+            </Avatar>
             <h2 className="text-lg font-semibold">{profile.fullName}</h2>
             {(profile as any).memberNumber && (
               <p className="text-xs font-mono text-primary mt-1">{(profile as any).memberNumber}</p>
             )}
             <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
             <div className="flex items-center gap-2 mt-3">
-              <Badge variant="info">Член профсоюза</Badge>
+              <Badge variant="info">Участник профсоюза</Badge>
               <Badge variant="success">{profile.status === "active" ? "Активен" : profile.status}</Badge>
             </div>
             {(profile.unionName || profile.divisionName) && (

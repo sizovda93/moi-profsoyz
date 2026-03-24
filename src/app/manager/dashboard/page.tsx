@@ -67,7 +67,7 @@ export default function ManagerDashboard() {
       {segments && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-base">Сегменты членов профсоюза</CardTitle>
+            <CardTitle className="text-base">Сегменты участников профсоюза</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">

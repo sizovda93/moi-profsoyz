@@ -480,7 +480,7 @@ export default function AgentAboutPage() {
                       <div className="space-y-3 pl-1">
                         <div className="flex gap-3">
                           <span className="shrink-0 h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">1</span>
-                          <p>Найти не менее трёх единомышленников и обратиться с заявлениями о вступлении в члены профсоюза ВЭП в действующую территориальную организацию.</p>
+                          <p>Найти не менее трёх единомышленников и обратиться с заявлениями о вступлении в участники профсоюза ВЭП в действующую территориальную организацию.</p>
                         </div>
                         <div className="flex gap-3">
                           <span className="shrink-0 h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">2</span>
@@ -516,7 +516,7 @@ export default function AgentAboutPage() {
                   id: "youth",
                   title: "Молодежная политика",
                   content: (
-                    <p className="text-sm text-muted-foreground">Конкурсы, положения и мероприятия для молодых членов профсоюза.</p>
+                    <p className="text-sm text-muted-foreground">Конкурсы, положения и мероприятия для молодых участников профсоюза.</p>
                   ),
                   sectionKey: "youth",
                 },

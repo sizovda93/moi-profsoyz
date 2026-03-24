@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { PageHeader } from "@/components/dashboard/page-header";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -117,93 +117,135 @@ export default function AgentManagerChatPage() {
         ]}
       />
 
-      {noManager ? (
-        <Card className="flex flex-col items-center justify-center py-20 text-center">
-          <UserRound className="h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-sm font-medium mb-1">Руководитель пока не назначен</p>
-          <p className="text-xs text-muted-foreground max-w-sm">
-            Ваш руководитель появится после того, как администратор назначит вас в подразделение. После этого здесь откроется чат.
-          </p>
-        </Card>
-      ) : (
-        <Card className="flex flex-col overflow-hidden" style={{ height: 600 }}>
-          {/* Header */}
-          <div className="px-4 py-3 border-b border-border flex items-center gap-3">
-            <Avatar className="h-9 w-9 shrink-0">
-              <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                {getInit(managerName)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-semibold">{managerName}</p>
-              <p className="text-[11px] text-muted-foreground">Руководитель</p>
-            </div>
-          </div>
-
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-            {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <MessageCircle className="h-10 w-10 text-muted-foreground mb-3" />
-                <p className="text-sm text-muted-foreground">
-                  Напишите руководителю — он получит ваше сообщение
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Cat panel */}
+        <div className="lg:col-span-3">
+          <Card className="overflow-hidden !bg-[#2a2a2f] !border-[#3a3a42]">
+            <CardContent className="p-0">
+              <div className="relative" style={{ height: 240 }}>
+                <video
+                  src="/ai-cat/peek.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover brightness-110"
+                />
+              </div>
+              <div className="px-3 py-2.5 bg-[#2a2a2f]">
+                <p className="text-sm font-semibold text-[#a0a0a8]">Котофей Петрович</p>
+                <p className="text-[10px] text-[#a0a0a8] leading-snug">
+                  Заслуженный помощник профсоюзного движения.
+                  <br />
+                  Кандидат сметанных и сгущённых наук
                 </p>
               </div>
-            ) : (
-              messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
-                      msg.isOwn
-                        ? "bg-primary text-primary-foreground rounded-br-sm"
-                        : "bg-muted rounded-bl-sm"
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-wrap break-words">{msg.text}</p>
-                    <p
-                      className={`text-[10px] mt-1 ${
-                        msg.isOwn ? "text-primary-foreground/60" : "text-muted-foreground"
-                      }`}
-                    >
-                      {msg.createdAt ? formatTime(msg.createdAt) : ""}
+            </CardContent>
+          </Card>
+
+          {/* Comic bubble */}
+          <div className="relative mt-3 mx-1">
+            <div className="bg-card border border-border rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
+              <p className="text-xs leading-relaxed">
+                Задавайте вопросы, а я передам Сергею Александровичу. У нас как раз совещание через час!
+              </p>
+            </div>
+            {/* Tail */}
+            <div className="absolute -top-1 left-4 w-3 h-3 bg-card border-l border-t border-border rotate-45" />
+          </div>
+        </div>
+
+        {/* Chat window */}
+        <div className="lg:col-span-9">
+          {noManager ? (
+            <Card className="flex flex-col items-center justify-center py-20 text-center">
+              <UserRound className="h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-sm font-medium mb-1">Руководитель пока не назначен</p>
+              <p className="text-xs text-muted-foreground max-w-sm">
+                Ваш руководитель появится после того, как администратор назначит вас в подразделение. После этого здесь откроется чат.
+              </p>
+            </Card>
+          ) : (
+            <Card className="flex flex-col overflow-hidden" style={{ height: 600 }}>
+              {/* Header */}
+              <div className="px-4 py-3 border-b border-border flex items-center gap-3">
+                <Avatar className="h-9 w-9 shrink-0">
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                    {getInit(managerName)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-semibold">{managerName}</p>
+                  <p className="text-[11px] text-muted-foreground">Руководитель</p>
+                </div>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+                {messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center">
+                    <MessageCircle className="h-10 w-10 text-muted-foreground mb-3" />
+                    <p className="text-sm text-muted-foreground">
+                      Напишите руководителю — он получит ваше сообщение
                     </p>
                   </div>
-                </div>
-              ))
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input */}
-          <div className="border-t border-border px-4 py-3">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSend();
-              }}
-              className="flex items-center gap-2"
-            >
-              <Input
-                placeholder="Написать руководителю..."
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                disabled={sending}
-                className="flex-1"
-              />
-              <Button type="submit" size="icon" disabled={sending || !messageText.trim()}>
-                {sending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Send className="h-4 w-4" />
+                  messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}
+                    >
+                      <div
+                        className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                          msg.isOwn
+                            ? "bg-primary text-primary-foreground rounded-br-sm"
+                            : "bg-muted rounded-bl-sm"
+                        }`}
+                      >
+                        <p className="text-sm whitespace-pre-wrap break-words">{msg.text}</p>
+                        <p
+                          className={`text-[10px] mt-1 ${
+                            msg.isOwn ? "text-primary-foreground/60" : "text-muted-foreground"
+                          }`}
+                        >
+                          {msg.createdAt ? formatTime(msg.createdAt) : ""}
+                        </p>
+                      </div>
+                    </div>
+                  ))
                 )}
-              </Button>
-            </form>
-          </div>
-        </Card>
-      )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input */}
+              <div className="border-t border-border px-4 py-3">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSend();
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Input
+                    placeholder="Написать руководителю..."
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    disabled={sending}
+                    className="flex-1"
+                  />
+                  <Button type="submit" size="icon" disabled={sending || !messageText.trim()}>
+                    {sending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                </form>
+              </div>
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

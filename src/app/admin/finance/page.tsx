@@ -57,7 +57,7 @@ export default function AdminFinancePage() {
   const columns = [
     {
       key: "agent",
-      title: "Член профсоюза",
+      title: "Участник профсоюза",
       render: (p: Payout) => <span className="font-medium">{p.agentName}</span>,
     },
     {

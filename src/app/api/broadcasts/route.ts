@@ -143,9 +143,9 @@ export async function POST(request: NextRequest) {
     let failedCount = 0;
     const msgText = text.trim();
     // Clarification #5: Telegram text with explicit manager attribution
-    const tgText = `📢 Сообщение от менеджера ${user.fullName}:\n\n${title ? `${title.trim()}\n\n` : ''}${msgText}`;
+    const tgText = `📢 Сообщение от руководителя ${user.fullName}:\n\n${title ? `${title.trim()}\n\n` : ''}${msgText}`;
     // Clarification #2: web notification clearly marked as broadcast
-    const webTitle = title?.trim() || 'Рассылка от менеджера';
+    const webTitle = title?.trim() || 'Объявление руководства';
 
     for (const r of recipients) {
       let webStatus: 'sent' | 'skipped' = 'skipped';

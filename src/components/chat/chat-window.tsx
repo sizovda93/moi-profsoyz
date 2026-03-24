@@ -21,7 +21,7 @@ function getContactInfo(conv: Conversation & { agentName?: string; managerName?:
   }
   if (currentUserType === "manager") {
     const name = (conv as any).agentName;
-    if (name) return { name, role: "Член профсоюза" };
+    if (name) return { name, role: "Участник профсоюза" };
   }
   return { name: conv.clientName || "Диалог", role: "" };
 }

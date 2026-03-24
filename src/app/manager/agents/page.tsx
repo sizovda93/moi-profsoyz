@@ -173,7 +173,7 @@ export default function ManagerAgentsPage() {
   const columns = [
     {
       key: "name",
-      title: "Член профсоюза",
+      title: "Участник профсоюза",
       render: (a: AgentRow) => (
         <div>
           <p className="font-medium">{a.fullName}</p>
@@ -212,11 +212,11 @@ export default function ManagerAgentsPage() {
   return (
     <div>
       <PageHeader
-        title="Члены профсоюза"
+        title="Участники профсоюза"
         description="Управление членами профсоюза"
         breadcrumbs={[
           { title: "Платформа", href: "/manager/dashboard" },
-          { title: "Члены профсоюза" },
+          { title: "Участники профсоюза" },
         ]}
         actions={
           <div className="flex gap-2">

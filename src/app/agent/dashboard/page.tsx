@@ -105,11 +105,11 @@ export default function AgentDashboard() {
                   <span>Вопрос юристу</span>
                 </Link>
                 <Link
-                  href="/agent/messages"
+                  href="/agent/colleagues"
                   className="flex items-center gap-2 px-4 py-3 rounded-lg border border-border text-sm font-medium hover:bg-muted/50 transition-colors"
                 >
                   <MessageSquare className="h-4 w-4 shrink-0" />
-                  <span>Руководителю</span>
+                  <span>Чаты</span>
                 </Link>
               </div>
 

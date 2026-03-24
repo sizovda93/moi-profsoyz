@@ -19,7 +19,7 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   title: "Мой Профсоюз — профсоюзная платформа",
-  description: "Платформа для взаимодействия членов профсоюза",
+  description: "Платформа для взаимодействия участников профсоюза",
 };
 
 export default function RootLayout({
@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="dark" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} antialiased font-extrabold`} style={{ fontFamily: "var(--font-manrope), sans-serif" }}>
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('profsoyz-theme');if(t==='light'){document.documentElement.classList.remove('dark')};}catch(e){}})();`,

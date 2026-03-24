@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     );
     const profile = profileResult.rows[0];
 
-    // Генерируем уникальный номер члена профсоюза
+    // Генерируем уникальный номер участника профсоюза
     const { rows: maxRows } = await pool.query(
       `SELECT COALESCE(MAX(CAST(SUBSTRING(member_number FROM 4) AS INTEGER)), 0) + 1 AS next_num FROM agents WHERE member_number IS NOT NULL`
     );

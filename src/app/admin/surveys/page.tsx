@@ -482,7 +482,7 @@ export default function AdminSurveysPage() {
                     }
                   >
                     <option value="all">Все</option>
-                    <option value="agent">Члены профсоюза</option>
+                    <option value="agent">Участники профсоюза</option>
                     <option value="manager">Руководители</option>
                   </select>
                 </div>

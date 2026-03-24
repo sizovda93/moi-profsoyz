@@ -97,8 +97,8 @@ export default function ManagerBroadcastsPage() {
   // Form state
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
-  const [channel, setChannel] = useState<ChannelType>("both");
-  const [audienceType, setAudienceType] = useState<AudienceType>("all");
+  const [channel] = useState<ChannelType>("web");
+  const [audienceType] = useState<AudienceType>("all");
   const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
   const [divisions, setDivisions] = useState<{ id: string; name: string }[]>([]);
   const [broadcastDivisionId, setBroadcastDivisionId] = useState("");
@@ -135,8 +135,6 @@ export default function ManagerBroadcastsPage() {
   const resetForm = () => {
     setTitle("");
     setText("");
-    setChannel("both");
-    setAudienceType("all");
     setSelectedAgents([]);
     setBroadcastDivisionId("");
     setError(null);
@@ -378,64 +376,9 @@ export default function ManagerBroadcastsPage() {
               />
             </div>
 
-            {/* Channel */}
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">Канал доставки</label>
-              <div className="flex flex-wrap gap-2">
-                {(Object.keys(channelLabels) as ChannelType[]).map((ch) => (
-                  <Button
-                    key={ch}
-                    size="sm"
-                    variant={channel === ch ? "default" : "outline"}
-                    onClick={() => setChannel(ch)}
-                  >
-                    {channelLabels[ch]}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Audience */}
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">Аудитория</label>
-              <select
-                className="h-9 w-full rounded-lg border border-border bg-muted px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                value={audienceType}
-                onChange={(e) => {
-                  setAudienceType(e.target.value as AudienceType);
-                  setSelectedAgents([]);
-                }}
-              >
-                {(Object.keys(audienceLabels) as AudienceType[]).map((at) => (
-                  <option key={at} value={at}>{audienceLabels[at]}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Division selection */}
-            {audienceType === "division" && (
+            {/* Manual agent selection — hidden, audience always "all", channel always "web" */}
+            {false && (
               <div>
-                <label className="text-sm font-medium mb-1.5 block">Подразделение</label>
-                <select
-                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                  value={broadcastDivisionId}
-                  onChange={(e) => setBroadcastDivisionId(e.target.value)}
-                  required
-                >
-                  <option value="">Выберите подразделение</option>
-                  {divisions.map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {/* Manual agent selection */}
-            {audienceType === "manual" && (
-              <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">
-                  Выберите членов ({selectedAgents.length} выбрано)
-                </label>
                 <div className="max-h-60 overflow-y-auto border border-border rounded-lg divide-y divide-border">
                   {agents.length === 0 ? (
                     <p className="text-sm text-muted-foreground p-3">Нет закреплённых членов</p>
@@ -462,12 +405,7 @@ export default function ManagerBroadcastsPage() {
 
             {/* Preview */}
             <div className="rounded-lg bg-muted/50 p-3 text-sm text-muted-foreground">
-              {audienceType === "manual"
-                ? `Будет отправлено ${selectedAgents.length} членам`
-                : `Сегмент: ${audienceLabels[audienceType]}`
-              }
-              {" через "}
-              {channelLabels[channel].toLowerCase()}
+              Будет отправлено всем участникам профсоюза
             </div>
 
             {/* Error / Success */}
@@ -498,22 +436,23 @@ export default function ManagerBroadcastsPage() {
     <div>
       <PageHeader
         title="Рассылки"
-        description="Объявления для членов профсоюза"
+        description="Объявления для участников профсоюза"
         breadcrumbs={[
           { title: "Платформа", href: "/manager/dashboard" },
           { title: "Рассылки" },
         ]}
-        actions={
-          <Button size="sm" onClick={handleCreate}>
-            <Send className="h-4 w-4 mr-1" /> Новая рассылка
-          </Button>
-        }
       />
+
+      <div className="mb-4">
+        <Button onClick={handleCreate}>
+          <Send className="h-4 w-4 mr-1" /> Создать рассылку
+        </Button>
+      </div>
 
       {broadcasts.length === 0 ? (
         <EmptyState
           title="Нет рассылок"
-          description="Создайте первое объявление для членов профсоюза"
+          description="Создайте первое объявление для участников профсоюза"
           action={
             <Button size="sm" onClick={handleCreate}>
               <Send className="h-4 w-4 mr-1" /> Создать рассылку

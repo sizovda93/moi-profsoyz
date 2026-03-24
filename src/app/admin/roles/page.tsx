@@ -9,7 +9,7 @@ import { Shield, Users, Eye, Edit, Trash2 } from "lucide-react";
 const roles = [
   {
     id: "agent",
-    name: "Член профсоюза",
+    name: "Участник профсоюза",
     description: "Подача обращений, документы, обучение",
     permissions: ["Просмотр своих обращений", "Чат с поддержкой", "Просмотр финансов", "Управление профилем", "Загрузка документов"],
     usersCount: 3,

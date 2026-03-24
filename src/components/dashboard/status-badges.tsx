@@ -95,7 +95,7 @@ export function ModeBadge({ mode }: { mode: ConversationMode }) {
 
 // ====== Role Badge ======
 const roleConfig: Record<UserRole, { label: string; variant: "info" | "warning" | "destructive" }> = {
-  agent: { label: "Член профсоюза", variant: "info" },
+  agent: { label: "Участник профсоюза", variant: "info" },
   manager: { label: "Руководитель", variant: "warning" },
   admin: { label: "Админ", variant: "destructive" },
 };

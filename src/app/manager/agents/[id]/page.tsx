@@ -101,7 +101,7 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
   if (!agent) {
     return (
       <div>
-        <PageHeader title="Член профсоюза не найден" breadcrumbs={[{ title: "Члены профсоюза", href: "/manager/agents" }, { title: "Не найден" }]} />
+        <PageHeader title="Участник профсоюза не найден" breadcrumbs={[{ title: "Участники профсоюза", href: "/manager/agents" }, { title: "Не найден" }]} />
       </div>
     );
   }
@@ -117,7 +117,7 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
         title={agent.fullName}
         breadcrumbs={[
           { title: "Платформа", href: "/manager/dashboard" },
-          { title: "Члены профсоюза", href: "/manager/agents" },
+          { title: "Участники профсоюза", href: "/manager/agents" },
           { title: agent.fullName },
         ]}
       />
@@ -278,7 +278,7 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
       {/* Leads */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Обращения члена профсоюза</CardTitle>
+          <CardTitle className="text-base">Обращения участника профсоюза</CardTitle>
         </CardHeader>
         <CardContent>
           {leads.length === 0 ? (

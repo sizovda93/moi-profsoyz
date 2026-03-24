@@ -199,7 +199,7 @@ export default function AdminUsersPage() {
   const agentColumns = [
     {
       key: "name",
-      title: "Член профсоюза",
+      title: "Участник профсоюза",
       render: (a: UserRow) => (
         <div>
           <p className="font-medium">{a.fullName}</p>
@@ -287,7 +287,7 @@ export default function AdminUsersPage() {
           variant={viewMode === "agents" ? "default" : "outline"}
           onClick={() => setViewMode("agents")}
         >
-          Члены профсоюза
+          Участники профсоюза
           <span className="ml-1.5 text-xs opacity-70">{agents.length}</span>
         </Button>
       </div>
