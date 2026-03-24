@@ -104,7 +104,7 @@ export default function AiChatPage() {
     <div>
       <PageHeader
         title="Чат с ИИ"
-        description="Справочный помощник по платформе"
+        description="Мгновенные юридические консультации и помощь по платформе"
         breadcrumbs={[
           { title: "О платформе", href: "/agent/dashboard" },
           { title: "Чат с ИИ" },
