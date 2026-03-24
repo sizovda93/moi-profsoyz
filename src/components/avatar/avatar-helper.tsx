@@ -155,9 +155,9 @@ export function AvatarHelper() {
   return (
     <div className="flex items-start gap-4">
       {/* Video card — left */}
-      <Card className="overflow-hidden rounded-2xl shrink-0 !bg-[#111113] !border-[#1e1e22]" style={{ width: 180 }}>
+      <Card className="overflow-hidden rounded-2xl shrink-0 !bg-[#2a2a2f] !border-[#3a3a42]" style={{ width: 180 }}>
         <CardContent className="p-0">
-          <div className="relative overflow-hidden bg-[#111113]" style={{ height: 170 }}>
+          <div className="relative overflow-hidden bg-[#2a2a2f]" style={{ height: 170 }}>
             <video
               ref={videoRef}
               src={IDLE_VIDEO}
@@ -165,7 +165,7 @@ export function AvatarHelper() {
               loop
               muted
               playsInline
-              className="w-full h-auto block absolute left-0"
+              className="w-full h-auto block absolute left-0 brightness-110"
               style={{ top: "-45%" }}
             />
 
@@ -183,7 +183,7 @@ export function AvatarHelper() {
             )}
           </div>
 
-          <div className="px-3 py-2 bg-[#111113]">
+          <div className="px-3 py-2 bg-[#2a2a2f]">
             <p className="text-sm font-semibold text-[#fafafa]">Сэр Бонифаций</p>
             <p className="text-[11px] text-[#71717a] leading-snug">
               Ваш помощник на платформе
