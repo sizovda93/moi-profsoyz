@@ -211,24 +211,6 @@ export default function AiChatPage() {
             </CardContent>
           </Card>
 
-          {/* Quick questions under cat */}
-          <Card className="mt-4">
-            <CardContent className="p-4">
-              <p className="text-xs font-semibold text-muted-foreground mb-3">Быстрые вопросы</p>
-              <div className="space-y-2">
-                {quickQuestions.map((q, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSend(q)}
-                    disabled={sending}
-                    className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border hover:bg-muted/50 hover:border-primary/30 transition-colors disabled:opacity-50"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Chat window */}
