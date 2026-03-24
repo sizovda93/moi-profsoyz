@@ -2,10 +2,11 @@ import { NavItem, UserRole } from "@/types";
 
 export const agentNav: NavItem[] = [
   { title: "О платформе", href: "/agent/dashboard", icon: "LayoutDashboard" },
+  { title: "О профсоюзе", href: "/agent/about", icon: "Users" },
   { title: "Обращение к руководителю", href: "/agent/leads", icon: "UserPlus" },
   { title: "Документы", href: "/agent/documents", icon: "FileText" },
   { title: "Сообщения", href: "/agent/messages", icon: "MessageSquare", badge: 3 },
-{ title: "Вопрос юристу", href: "/agent/legal", icon: "Shield" },
+  { title: "Вопрос юристу", href: "/agent/legal", icon: "Shield" },
   { title: "Обучение", href: "/agent/learning", icon: "GraduationCap" },
   { title: "Соглашения", href: "/agent/agreements", icon: "ScrollText" },
   { title: "Профиль", href: "/agent/profile", icon: "User" },
@@ -13,6 +14,7 @@ export const agentNav: NavItem[] = [
 
 export const managerNav: NavItem[] = [
   { title: "Платформа", href: "/manager/dashboard", icon: "LayoutDashboard" },
+  { title: "О профсоюзе", href: "/agent/about", icon: "Users" },
   { title: "Члены профсоюза", href: "/manager/agents", icon: "Users" },
   { title: "Обращения", href: "/manager/leads", icon: "UserPlus" },
   { title: "Диалоги", href: "/manager/conversations", icon: "MessageSquare", badge: 5 },
@@ -35,6 +37,8 @@ export const adminNav: NavItem[] = [
   { title: "Материалы", href: "/admin/marketing", icon: "Megaphone" },
   { title: "Обучение", href: "/admin/learning", icon: "GraduationCap" },
   { title: "Новости", href: "/admin/news", icon: "FileText" },
+  { title: "Мероприятия", href: "/admin/events", icon: "Target" },
+  { title: "Документы профсоюза", href: "/admin/union-docs", icon: "FileText" },
   { title: "Юридические вопросы", href: "/admin/legal", icon: "Scale" },
   { title: "Профсоюзы", href: "/admin/unions", icon: "Shield" },
 ];
