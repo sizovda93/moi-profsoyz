@@ -201,66 +201,43 @@ export default function AgentAboutPage() {
             <CardHeader>
               <CardTitle>Руководство профсоюзной организации</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <img src="/leaders/gryadkin.jpg" alt="Грядкин С.А." className="h-16 w-16 rounded-lg object-cover shrink-0" />
-                <div>
-                  <p className="text-xs text-muted-foreground">ФИО</p>
-                  <p className="text-sm font-medium">Грядкин Сергей Александрович</p>
+            <CardContent className="space-y-6">
+              {/* Грядкин С.А. */}
+              <div className="flex items-start gap-5">
+                <img src="/leaders/gryadkin.jpg" alt="Грядкин С.А." className="h-32 w-32 rounded-xl object-cover shrink-0" />
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-base font-semibold">Грядкин Сергей Александрович</p>
+                    <p className="text-sm text-muted-foreground">Председатель Правления</p>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <span>410029, г. Саратов, ул. Сакко и Ванцетти, 55</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Phone className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <a href="tel:+78452263356" className="text-primary hover:underline">
+                      8 (8452) 26-33-56
+                    </a>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <Briefcase className="h-4.5 w-4.5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Должность</p>
-                  <p className="text-sm font-medium">Председатель Правления</p>
-                </div>
-              </div>
+              <div className="border-t border-border" />
 
-              <div className="flex items-start gap-3">
-                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <MapPin className="h-4.5 w-4.5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Адрес</p>
-                  <p className="text-sm font-medium">
-                    410029, г. Саратов, ул. Сакко и Ванцетти, 55
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <Phone className="h-4.5 w-4.5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Телефон</p>
-                  <a
-                    href="tel:+78452263356"
-                    className="text-sm font-medium text-primary hover:underline"
-                  >
-                    8 (8452) 26-33-56
-                  </a>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mt-4">
-            <CardHeader>
-              <CardTitle className="text-base">Заместители председателя (на общественных началах)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <img src="/leaders/ralko.jpg" alt="Ралко Н.А." className="h-16 w-16 rounded-lg object-cover shrink-0" />
-                <div>
-                  <p className="text-sm font-medium">Ралко Наталья Александровна</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Председатель первичной профсоюзной организации «Саратовские тепловые сети»
-                  </p>
+              {/* Ралко Н.А. */}
+              <div>
+                <p className="text-xs text-muted-foreground mb-3">Заместители председателя (на общественных началах)</p>
+                <div className="flex items-start gap-5">
+                  <img src="/leaders/ralko.jpg" alt="Ралко Н.А." className="h-32 w-32 rounded-xl object-cover shrink-0" />
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-base font-semibold">Ралко Наталья Александровна</p>
+                      <p className="text-sm text-muted-foreground">
+                        Председатель первичной профсоюзной организации «Саратовские тепловые сети»
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
