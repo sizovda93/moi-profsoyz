@@ -170,9 +170,7 @@ export default function AgentProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card>
           <CardContent className="p-6 flex flex-col items-center text-center">
-            <Avatar className="h-20 w-20 mb-4">
-              <AvatarFallback className="text-xl">{getInitials(profile.fullName)}</AvatarFallback>
-            </Avatar>
+            <img src="/logo.png" alt="Мой Профсоюз" className="h-20 w-20 rounded-full object-contain mb-4" />
             <h2 className="text-lg font-semibold">{profile.fullName}</h2>
             <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
             <div className="flex items-center gap-2 mt-3">
