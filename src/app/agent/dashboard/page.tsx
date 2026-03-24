@@ -150,7 +150,7 @@ export default function AgentDashboard() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/agent/leads" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors">
-              <UserPlus className="h-3.5 w-3.5" /> Подать обращение
+              <UserPlus className="h-3.5 w-3.5" /> Обращение к руководителю
             </Link>
             <Link href="/agent/marketing" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
               <BookOpen className="h-3.5 w-3.5" /> Материалы

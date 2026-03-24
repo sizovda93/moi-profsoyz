@@ -63,7 +63,7 @@ export default function AgentLeadDetailPage({ params }: { params: Promise<{ id: 
   if (error === 'not_found' || !lead) {
     return (
       <div>
-        <PageHeader title="Обращение не найдено" breadcrumbs={[{ title: "Обращения", href: "/agent/leads" }, { title: "Не найден" }]} />
+        <PageHeader title="Обращение не найдено" breadcrumbs={[{ title: "Обращение к руководителю", href: "/agent/leads" }, { title: "Не найден" }]} />
         <p className="text-muted-foreground">Обращение не найдено.</p>
       </div>
     );
@@ -75,7 +75,7 @@ export default function AgentLeadDetailPage({ params }: { params: Promise<{ id: 
         title={lead.fullName}
         breadcrumbs={[
           { title: "Платформа", href: "/agent/dashboard" },
-          { title: "Обращения", href: "/agent/leads" },
+          { title: "Обращение к руководителю", href: "/agent/leads" },
           { title: lead.fullName },
         ]}
         actions={

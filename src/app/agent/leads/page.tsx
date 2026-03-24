@@ -19,6 +19,13 @@ import {
 import { Plus, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
+interface ProfileData {
+  fullName: string;
+  email: string;
+  phone: string;
+  city?: string;
+}
+
 export default function AgentLeadsPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -27,14 +34,10 @@ export default function AgentLeadsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [conflictAlert, setConflictAlert] = useState<string | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [form, setForm] = useState({
-    fullName: "",
-    phone: "",
-    email: "",
-    city: "",
-    source: "website",
     comment: "",
-    requestType: "consultation",
+    requestType: "complaint",
   });
 
   const loadLeads = () => {
@@ -47,24 +50,36 @@ export default function AgentLeadsPage() {
 
   useEffect(() => {
     loadLeads();
+    fetch("/api/profile")
+      .then((r) => r.json())
+      .then((data) => setProfile(data))
+      .catch(() => {});
   }, []);
 
   const handleCreate = async () => {
-    if (!form.fullName.trim() || !form.phone.trim()) return;
+    if (!profile) return;
     setSaving(true);
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          fullName: profile.fullName,
+          phone: profile.phone,
+          email: profile.email,
+          city: profile.city || "",
+          source: "website",
+          comment: form.comment,
+          requestType: form.requestType,
+        }),
       });
       if (res.ok) {
         const data = await res.json();
         setDialogOpen(false);
-        setForm({ fullName: "", phone: "", email: "", city: "", source: "website", comment: "", requestType: "consultation" });
+        setForm({ comment: "", requestType: "complaint" });
         loadLeads();
         if (data.conflict) {
-          setConflictAlert("Найден потенциальный дубль по телефону или email. Обращение создано и передано на рассмотрение руководителю.");
+          setConflictAlert("Найден похожее обращение. Новое обращение создано и передано на рассмотрение руководителю.");
           setTimeout(() => setConflictAlert(null), 6000);
         }
       }
@@ -87,11 +102,11 @@ export default function AgentLeadsPage() {
   return (
     <div>
       <PageHeader
-        title="Мои обращения"
-        description="Ваши обращения в профсоюз"
+        title="Обращение к руководителю"
+        description="Ваши обращения к руководству профсоюза"
         breadcrumbs={[
           { title: "Платформа", href: "/agent/dashboard" },
-          { title: "Обращения" },
+          { title: "Обращение к руководителю" },
         ]}
         actions={
           <Button size="sm" onClick={() => setDialogOpen(true)}>
@@ -116,42 +131,16 @@ export default function AgentLeadsPage() {
             <DialogDescription>Опишите ваше обращение</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
-            <div>
-              <label className="text-sm font-medium">ФИО *</label>
-              <input
-                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                value={form.fullName}
-                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                placeholder="Иванов Иван Иванович"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Телефон *</label>
-              <input
-                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="+7 (999) 123-45-67"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Email</label>
-              <input
-                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="email@example.com"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Город</label>
-              <input
-                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
-                placeholder="Москва"
-              />
-            </div>
+            {/* Данные из профиля — read-only */}
+            {profile && (
+              <div className="rounded-lg bg-muted/50 p-3 space-y-1 text-sm">
+                <p><span className="text-muted-foreground">Отправитель:</span> {profile.fullName}</p>
+                {profile.phone && <p><span className="text-muted-foreground">Телефон:</span> {profile.phone}</p>}
+                {profile.email && <p><span className="text-muted-foreground">Email:</span> {profile.email}</p>}
+                {profile.city && <p><span className="text-muted-foreground">Город:</span> {profile.city}</p>}
+              </div>
+            )}
+
             <div>
               <label className="text-sm font-medium">Тип обращения</label>
               <select
@@ -159,32 +148,15 @@ export default function AgentLeadsPage() {
                 value={form.requestType}
                 onChange={(e) => setForm({ ...form, requestType: e.target.value })}
               >
-                <option value="consultation">Консультация</option>
                 <option value="complaint">Жалоба</option>
-                <option value="request">Заявка</option>
                 <option value="initiative">Инициатива</option>
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium">Канал обращения</label>
-              <select
-                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                value={form.source}
-                onChange={(e) => setForm({ ...form, source: e.target.value })}
-              >
-                <option value="website">Платформа</option>
-                <option value="telegram">Telegram</option>
-                <option value="whatsapp">WhatsApp</option>
-                <option value="referral">От коллеги</option>
-                <option value="cold">Другое</option>
-                <option value="partner">Подразделение</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Комментарий</label>
+              <label className="text-sm font-medium">Описание *</label>
               <textarea
                 className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                rows={2}
+                rows={4}
                 value={form.comment}
                 onChange={(e) => setForm({ ...form, comment: e.target.value })}
                 placeholder="Опишите суть обращения..."
@@ -193,7 +165,7 @@ export default function AgentLeadsPage() {
             <Button
               className="w-full"
               onClick={handleCreate}
-              disabled={saving || !form.fullName.trim() || !form.phone.trim()}
+              disabled={saving || !form.comment.trim() || !profile}
             >
               {saving ? "Создание..." : "Создать обращение"}
             </Button>

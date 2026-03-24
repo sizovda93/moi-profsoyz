@@ -93,9 +93,7 @@ export default function ManagerLeadsPage() {
           onChange={(e) => setRequestTypeFilter(e.target.value)}
         >
           <option value="">Все типы</option>
-          <option value="consultation">Консультация</option>
           <option value="complaint">Жалоба</option>
-          <option value="request">Заявка</option>
           <option value="initiative">Инициатива</option>
         </select>
       </div>

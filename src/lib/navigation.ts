@@ -2,7 +2,7 @@ import { NavItem, UserRole } from "@/types";
 
 export const agentNav: NavItem[] = [
   { title: "Платформа", href: "/agent/dashboard", icon: "LayoutDashboard" },
-  { title: "Обращения", href: "/agent/leads", icon: "UserPlus" },
+  { title: "Обращение к руководителю", href: "/agent/leads", icon: "UserPlus" },
   { title: "Документы", href: "/agent/documents", icon: "FileText" },
   { title: "Сообщения", href: "/agent/messages", icon: "MessageSquare", badge: 3 },
   { title: "Материалы", href: "/agent/marketing", icon: "Megaphone" },
