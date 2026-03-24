@@ -3,7 +3,7 @@
 import { Message, Conversation } from "@/types";
 import { MessageBubble } from "./message-bubble";
 import { MessageInput } from "./message-input";
-import { ModeBadge, ConversationStatusBadge, ChannelBadge } from "@/components/dashboard/status-badges";
+import { ConversationStatusBadge, ChannelBadge } from "@/components/dashboard/status-badges";
 
 interface ChatWindowProps {
   conversation: Conversation;
@@ -14,15 +14,31 @@ interface ChatWindowProps {
   onInputRef?: (ref: { insert: (text: string) => void }) => void;
 }
 
+function getContactInfo(conv: Conversation & { agentName?: string; managerName?: string }, currentUserType: string): { name: string; role: string } {
+  if (currentUserType === "agent") {
+    const name = (conv as any).managerName;
+    if (name) return { name, role: "Руководитель профсоюза" };
+  }
+  if (currentUserType === "manager") {
+    const name = (conv as any).agentName;
+    if (name) return { name, role: "Член профсоюза" };
+  }
+  return { name: conv.clientName || "Диалог", role: "" };
+}
+
 export function ChatWindow({ conversation, messages, currentUserType = "agent", onSend, showClassification, onInputRef }: ChatWindowProps) {
+  const contact = getContactInfo(conversation as any, currentUserType);
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div>
-          <h3 className="font-medium">{conversation.clientName}</h3>
+          <h3 className="font-medium">{contact.name}</h3>
           <div className="flex items-center gap-2 mt-1">
-            <ModeBadge mode={conversation.mode} />
+            {contact.role && (
+              <span className="text-xs text-muted-foreground">{contact.role}</span>
+            )}
             <ConversationStatusBadge status={conversation.status} />
             {conversation.channel && conversation.channel !== "web" && (
               <ChannelBadge channel={conversation.channel} />

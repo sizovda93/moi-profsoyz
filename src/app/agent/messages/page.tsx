@@ -67,6 +67,7 @@ export default function AgentMessagesPage() {
             conversations={conversations}
             activeId={activeConv?.id}
             onSelect={setActiveConv}
+            currentRole="agent"
           />
         </div>
 
