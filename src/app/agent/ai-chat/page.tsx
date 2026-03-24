@@ -25,39 +25,10 @@ const quickQuestions = [
   "Как написать коллеге из подразделения?",
 ];
 
-// Cat video states
 const CAT_SLEEP = "/ai-cat/sleep.mp4";
 const CAT_PEEK = "/ai-cat/peek.mp4";
 const CAT_THINK = "/ai-cat/think.mp4";
-
-const ELEVENLABS_VOICE_ID = "yl2ZDV1MzN4HbQJbMihG";
-
-async function fetchTTS(text: string): Promise<Blob | null> {
-  const apiKey = process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY;
-  if (!apiKey) return null;
-  try {
-    const res = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`,
-      {
-        method: "POST",
-        headers: {
-          "xi-api-key": apiKey,
-          "Content-Type": "application/json",
-          Accept: "audio/mpeg",
-        },
-        body: JSON.stringify({
-          text,
-          model_id: "eleven_multilingual_v2",
-          voice_settings: { stability: 0.5, similarity_boost: 0.75 },
-        }),
-      }
-    );
-    if (!res.ok) return null;
-    return res.blob();
-  } catch {
-    return null;
-  }
-}
+const CAT_THINK_VOICE = "/ai-cat/think-voice.mp3";
 
 type CatState = "sleep" | "peek" | "think";
 
@@ -73,7 +44,6 @@ export default function AiChatPage() {
   const [catState, setCatState] = useState<CatState>("sleep");
   const catVideoRef = useRef<HTMLVideoElement>(null);
   const catAudioRef = useRef<HTMLAudioElement | null>(null);
-  const catAudioUrlRef = useRef<string | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -99,22 +69,14 @@ export default function AiChatPage() {
     }
   }, [catState]);
 
-  // Play think audio
-  const playCatThinkAudio = useCallback(async () => {
+  // Play think audio from static file
+  const playCatThinkAudio = useCallback(() => {
     if (muted) return;
     try {
-      const blob = await fetchTTS("Интересно, тут нужно подумать");
-      if (!blob || blob.size === 0) return;
-      // Cleanup previous
       if (catAudioRef.current) catAudioRef.current.pause();
-      if (catAudioUrlRef.current) URL.revokeObjectURL(catAudioUrlRef.current);
-
-      const url = URL.createObjectURL(blob);
-      catAudioUrlRef.current = url;
-      const audio = new Audio(url);
-      audio.muted = muted;
+      const audio = new Audio(CAT_THINK_VOICE);
       catAudioRef.current = audio;
-      await audio.play();
+      audio.play().catch(() => {});
     } catch { /* ignore */ }
   }, [muted]);
 
