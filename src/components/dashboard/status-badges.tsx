@@ -15,13 +15,13 @@ import { Send, Globe, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 // ====== Lead Status ======
 const leadStatusConfig: Record<LeadStatus, { label: string; variant: "default" | "success" | "warning" | "destructive" | "info" | "secondary" }> = {
-  new: { label: "Новый", variant: "info" },
-  contacted: { label: "Контакт", variant: "default" },
-  qualified: { label: "Квалифицирован", variant: "default" },
-  proposal: { label: "Предложение", variant: "warning" },
-  negotiation: { label: "Переговоры", variant: "warning" },
-  won: { label: "Договор заключен", variant: "success" },
-  lost: { label: "Потерян", variant: "destructive" },
+  new: { label: "Новое", variant: "info" },
+  contacted: { label: "Принято", variant: "default" },
+  qualified: { label: "Подтверждено", variant: "default" },
+  proposal: { label: "На согласовании", variant: "warning" },
+  negotiation: { label: "В работе", variant: "warning" },
+  won: { label: "Решено", variant: "success" },
+  lost: { label: "Закрыто", variant: "secondary" },
 };
 
 export function LeadStatusBadge({ status }: { status: LeadStatus }) {
@@ -95,8 +95,8 @@ export function ModeBadge({ mode }: { mode: ConversationMode }) {
 
 // ====== Role Badge ======
 const roleConfig: Record<UserRole, { label: string; variant: "info" | "warning" | "destructive" }> = {
-  agent: { label: "Партнёр", variant: "info" },
-  manager: { label: "Менеджер", variant: "warning" },
+  agent: { label: "Член профсоюза", variant: "info" },
+  manager: { label: "Руководитель", variant: "warning" },
   admin: { label: "Админ", variant: "destructive" },
 };
 
@@ -176,7 +176,7 @@ export function ConflictBadge({ status, resolution }: { status?: string | null; 
 
 // ====== AI Classification Badge ======
 const classificationConfig: Record<string, { label: string; variant: "secondary" | "info" | "warning" | "destructive" }> = {
-  lead: { label: "Лид", variant: "info" },
+  lead: { label: "Обращение", variant: "info" },
   question: { label: "Вопрос", variant: "secondary" },
   status_request: { label: "Статус", variant: "secondary" },
   document: { label: "Документ", variant: "secondary" },
@@ -193,4 +193,18 @@ export function ClassificationBadge({ classification }: { classification?: strin
 
 export function AttentionDot() {
   return <span className="h-2.5 w-2.5 rounded-full bg-red-500 shrink-0" title="Требует внимания" />;
+}
+
+// ====== Request Type Badge ======
+const requestTypeConfig: Record<string, { label: string; variant: "info" | "warning" | "secondary" | "success" }> = {
+  consultation: { label: "Консультация", variant: "info" },
+  complaint: { label: "Жалоба", variant: "warning" },
+  request: { label: "Заявка", variant: "secondary" },
+  initiative: { label: "Инициатива", variant: "success" },
+};
+
+export function RequestTypeBadge({ type }: { type?: string | null }) {
+  if (!type) return null;
+  const config = requestTypeConfig[type] ?? requestTypeConfig.consultation;
+  return <Badge variant={config.variant}>{config.label}</Badge>;
 }

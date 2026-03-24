@@ -18,7 +18,7 @@ export function PayoutTable({ payouts }: PayoutTableProps) {
     },
     {
       key: "agent",
-      title: "Партнёр",
+      title: "Член профсоюза",
       render: (p: Payout) => <span className="text-muted-foreground">{p.agentName}</span>,
     },
     {

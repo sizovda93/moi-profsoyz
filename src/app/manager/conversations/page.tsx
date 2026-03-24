@@ -47,7 +47,7 @@ export default function ManagerConversationsPage() {
     },
     {
       key: "client",
-      title: "Клиент",
+      title: "Участник",
       render: (c: any) => <span className="font-medium">{c.clientName}</span>,
     },
     {
@@ -92,7 +92,7 @@ export default function ManagerConversationsPage() {
     <div>
       <PageHeader
         title="Диалоги"
-        description="Мониторинг всех диалогов с клиентами"
+        description="Диалоги с членами профсоюза"
         breadcrumbs={[
           { title: "Дашборд", href: "/manager/dashboard" },
           { title: "Диалоги" },
@@ -100,7 +100,7 @@ export default function ManagerConversationsPage() {
       />
 
       <div className="mb-6">
-        <SearchInput value={search} onChange={setSearch} placeholder="Поиск по имени клиента..." />
+        <SearchInput value={search} onChange={setSearch} placeholder="Поиск по имени..." />
       </div>
 
       <Tabs defaultValue={defaultTab}>

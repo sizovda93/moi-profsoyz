@@ -36,14 +36,14 @@ export default function ManagerReferralsPage() {
   return (
     <>
       <PageHeader
-        title="Реферальная программа"
-        description="Статистика рефералов по партнёрам"
-        breadcrumbs={[{ title: "Дашборд", href: "/manager/dashboard" }, { title: "Рефералы" }]}
+        title="Приглашения"
+        description="Статистика приглашений по членам"
+        breadcrumbs={[{ title: "Дашборд", href: "/manager/dashboard" }, { title: "Приглашения" }]}
       />
 
       <div className="grid gap-4 md:grid-cols-3 mb-6">
         <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Партнёров с рефералами</p>
+          <p className="text-xs text-muted-foreground">Членов с приглашениями</p>
           <p className="text-2xl font-semibold mt-1">{data.filter((d) => d.uniqueClicks > 0).length}</p>
         </Card>
         <Card className="p-4">
@@ -51,7 +51,7 @@ export default function ManagerReferralsPage() {
           <p className="text-2xl font-semibold mt-1">{totalClicks}</p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs text-muted-foreground">Лидов по рефералам</p>
+          <p className="text-xs text-muted-foreground">Регистраций по приглашениям</p>
           <p className="text-2xl font-semibold mt-1">{totalLeads}</p>
         </Card>
       </div>
@@ -61,10 +61,10 @@ export default function ManagerReferralsPage() {
       ) : (
         <DataTable
           columns={[
-            { key: "fullName", title: "Партнёр", render: (row) => row.fullName },
+            { key: "fullName", title: "Член профсоюза", render: (row) => row.fullName },
             { key: "refCode", title: "Код", render: (row) => <span className="font-mono text-xs">{row.refCode}</span> },
             { key: "uniqueClicks", title: "Переходы", render: (row) => row.uniqueClicks },
-            { key: "referralLeads", title: "Лиды", render: (row) => (
+            { key: "referralLeads", title: "Регистрации", render: (row) => (
               <span className={row.referralLeads > 0 ? "text-green-500 font-medium" : "text-muted-foreground"}>{row.referralLeads}</span>
             )},
             { key: "conversion", title: "Конверсия", render: (row) => {

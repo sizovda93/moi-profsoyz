@@ -2,8 +2,8 @@
 
 import { Lead } from "@/types";
 import { DataTable } from "@/components/dashboard/data-table";
-import { LeadStatusBadge } from "@/components/dashboard/status-badges";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { LeadStatusBadge, RequestTypeBadge } from "@/components/dashboard/status-badges";
+import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 interface LeadTableProps {
@@ -12,12 +12,12 @@ interface LeadTableProps {
 }
 
 const sourceLabels: Record<string, string> = {
-  website: "Сайт",
+  website: "Платформа",
   telegram: "Telegram",
   whatsapp: "WhatsApp",
-  referral: "Реферал",
-  cold: "Холодный",
-  partner: "Партнёр",
+  referral: "От коллеги",
+  cold: "Другое",
+  partner: "Подразделение",
 };
 
 export function LeadTable({ leads, onRowClick }: LeadTableProps) {
@@ -34,25 +34,20 @@ export function LeadTable({ leads, onRowClick }: LeadTableProps) {
     },
     {
       key: "source",
-      title: "Источник",
+      title: "Канал",
       render: (lead: Lead) => (
         <Badge variant="outline">{sourceLabels[lead.source] ?? lead.source}</Badge>
       ),
     },
     {
+      key: "requestType",
+      title: "Тип",
+      render: (lead: Lead) => <RequestTypeBadge type={(lead as any).requestType} />,
+    },
+    {
       key: "status",
       title: "Статус",
       render: (lead: Lead) => <LeadStatusBadge status={lead.status} />,
-    },
-    {
-      key: "value",
-      title: "Оценка",
-      render: (lead: Lead) => (
-        <span className="text-muted-foreground">
-          {lead.estimatedValue ? formatCurrency(lead.estimatedValue) : "—"}
-        </span>
-      ),
-      className: "text-right",
     },
     {
       key: "date",
@@ -63,5 +58,5 @@ export function LeadTable({ leads, onRowClick }: LeadTableProps) {
     },
   ];
 
-  return <DataTable columns={columns} data={leads} onRowClick={onRowClick} emptyMessage="Нет лидов" />;
+  return <DataTable columns={columns} data={leads} onRowClick={onRowClick} emptyMessage="Нет обращений" />;
 }

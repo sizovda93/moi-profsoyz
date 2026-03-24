@@ -34,6 +34,7 @@ export default function AgentLeadsPage() {
     city: "",
     source: "website",
     comment: "",
+    requestType: "consultation",
   });
 
   const loadLeads = () => {
@@ -60,10 +61,10 @@ export default function AgentLeadsPage() {
       if (res.ok) {
         const data = await res.json();
         setDialogOpen(false);
-        setForm({ fullName: "", phone: "", email: "", city: "", source: "website", comment: "" });
+        setForm({ fullName: "", phone: "", email: "", city: "", source: "website", comment: "", requestType: "consultation" });
         loadLeads();
         if (data.conflict) {
-          setConflictAlert("Найден потенциальный дубль по телефону или email. Лид создан и передан на проверку менеджеру.");
+          setConflictAlert("Найден потенциальный дубль по телефону или email. Обращение создано и передано на рассмотрение руководителю.");
           setTimeout(() => setConflictAlert(null), 6000);
         }
       }
@@ -86,15 +87,15 @@ export default function AgentLeadsPage() {
   return (
     <div>
       <PageHeader
-        title="Мои лиды"
-        description="Управление вашими лидами и заявками"
+        title="Мои обращения"
+        description="Ваши обращения в профсоюз"
         breadcrumbs={[
           { title: "Дашборд", href: "/agent/dashboard" },
-          { title: "Лиды" },
+          { title: "Обращения" },
         ]}
         actions={
           <Button size="sm" onClick={() => setDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-1" /> Новый лид
+            <Plus className="h-4 w-4 mr-1" /> Новое обращение
           </Button>
         }
       />
@@ -111,8 +112,8 @@ export default function AgentLeadsPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Новый лид</DialogTitle>
-            <DialogDescription>Заполните данные клиента</DialogDescription>
+            <DialogTitle>Новое обращение</DialogTitle>
+            <DialogDescription>Опишите ваше обращение</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div>
@@ -152,18 +153,31 @@ export default function AgentLeadsPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Источник</label>
+              <label className="text-sm font-medium">Тип обращения</label>
+              <select
+                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                value={form.requestType}
+                onChange={(e) => setForm({ ...form, requestType: e.target.value })}
+              >
+                <option value="consultation">Консультация</option>
+                <option value="complaint">Жалоба</option>
+                <option value="request">Заявка</option>
+                <option value="initiative">Инициатива</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Канал обращения</label>
               <select
                 className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                 value={form.source}
                 onChange={(e) => setForm({ ...form, source: e.target.value })}
               >
-                <option value="website">Сайт</option>
+                <option value="website">Платформа</option>
                 <option value="telegram">Telegram</option>
                 <option value="whatsapp">WhatsApp</option>
-                <option value="referral">Реферал</option>
-                <option value="cold">Холодный</option>
-                <option value="partner">Партнёр</option>
+                <option value="referral">От коллеги</option>
+                <option value="cold">Другое</option>
+                <option value="partner">Подразделение</option>
               </select>
             </div>
             <div>
@@ -173,7 +187,7 @@ export default function AgentLeadsPage() {
                 rows={2}
                 value={form.comment}
                 onChange={(e) => setForm({ ...form, comment: e.target.value })}
-                placeholder="Описание ситуации клиента..."
+                placeholder="Опишите суть обращения..."
               />
             </div>
             <Button
@@ -181,7 +195,7 @@ export default function AgentLeadsPage() {
               onClick={handleCreate}
               disabled={saving || !form.fullName.trim() || !form.phone.trim()}
             >
-              {saving ? "Создание..." : "Создать лид"}
+              {saving ? "Создание..." : "Создать обращение"}
             </Button>
           </div>
         </DialogContent>

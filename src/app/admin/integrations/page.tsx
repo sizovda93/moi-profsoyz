@@ -19,7 +19,7 @@ const otherIntegrations = [
   { name: "WhatsApp Business", description: "Коммуникации через WhatsApp API", icon: MessageSquare, status: "planned" as const, category: "Мессенджеры" },
   { name: "AI Engine (OpenAI)", description: "AI-ассистент для обработки обращений", icon: Bot, status: "planned" as const, category: "AI" },
   { name: "n8n Workflows", description: "Автоматизация бизнес-процессов", icon: Workflow, status: "planned" as const, category: "Автоматизация" },
-  { name: "Платёжная система", description: "Обработка платежей и выплат партнёрам", icon: CreditCard, status: "planned" as const, category: "Финансы" },
+  { name: "Платёжная система", description: "Обработка платежей", icon: CreditCard, status: "planned" as const, category: "Финансы" },
 ];
 
 const statusConfig = {
@@ -111,7 +111,7 @@ export default function AdminIntegrationsPage() {
                     <span className="font-medium">{webhookActive ? "Зарегистрирован" : "Не установлен"}</span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground block">Подключённых партнёров</span>
+                    <span className="text-muted-foreground block">Подключённых членов</span>
                     <span className="font-medium">{tgData.connectedUsers}</span>
                   </div>
                   <div>

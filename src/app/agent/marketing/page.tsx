@@ -102,7 +102,7 @@ export default function AgentMarketingPage() {
     <div>
       <PageHeader
         title="Материалы"
-        description="Готовые тексты и инструкции для привлечения клиентов"
+        description="Полезные материалы и инструкции профсоюза"
         breadcrumbs={[
           { title: "Дашборд", href: "/agent/dashboard" },
           { title: "Материалы" },

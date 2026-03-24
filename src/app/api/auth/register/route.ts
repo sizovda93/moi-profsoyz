@@ -6,7 +6,7 @@ import { setAuthCookie } from "@/lib/auth-server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { fullName, email, phone, password, consents } = body;
+    const { fullName, email, phone, password, consents, unionId, divisionId } = body;
 
     // Валидация
     if (!fullName || !email || !password) {
@@ -23,6 +23,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!unionId || !divisionId) {
+      return Response.json(
+        { error: "Выберите профсоюз и подразделение" },
+        { status: 400 }
+      );
+    }
+
     if (
       !consents ||
       !Array.isArray(consents) ||
@@ -31,6 +38,18 @@ export async function POST(request: NextRequest) {
     ) {
       return Response.json(
         { error: "Необходимо принять оферту и согласие на обработку ПД" },
+        { status: 400 }
+      );
+    }
+
+    // Validate division belongs to union
+    const divCheck = await pool.query(
+      `SELECT id FROM union_divisions WHERE id = $1 AND union_id = $2 AND is_active = true`,
+      [divisionId, unionId]
+    );
+    if (divCheck.rows.length === 0) {
+      return Response.json(
+        { error: "Выбранное подразделение не найдено" },
         { status: 400 }
       );
     }
@@ -64,10 +83,10 @@ export async function POST(request: NextRequest) {
     );
     const profile = profileResult.rows[0];
 
-    // Создаём запись агента
+    // Создаём запись агента с привязкой к профсоюзу и подразделению
     await pool.query(
-      `INSERT INTO agents (user_id) VALUES ($1)`,
-      [profile.id]
+      `INSERT INTO agents (user_id, union_id, division_id) VALUES ($1, $2, $3)`,
+      [profile.id, unionId, divisionId]
     );
 
     // Записываем consents

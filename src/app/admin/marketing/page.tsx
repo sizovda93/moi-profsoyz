@@ -140,7 +140,7 @@ export default function AdminMarketingPage() {
     <div>
       <PageHeader
         title="Маркетинговые материалы"
-        description="Управление библиотекой контента для партнёров"
+        description="Управление библиотекой материалов"
         breadcrumbs={[
           { title: "Дашборд", href: "/admin/dashboard" },
           { title: "Материалы" },
@@ -189,7 +189,7 @@ export default function AdminMarketingPage() {
             </div>
             <div>
               <label className="text-sm font-medium">Текст материала *</label>
-              <p className="text-xs text-muted-foreground mb-1">Используйте {"{REF_LINK}"} для реферальной ссылки партнёра</p>
+              <p className="text-xs text-muted-foreground mb-1">Используйте {"{REF_LINK}"} для ссылки для приглашения</p>
               <textarea
                 className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[200px]"
                 value={form.body}

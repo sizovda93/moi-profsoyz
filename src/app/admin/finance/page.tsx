@@ -57,7 +57,7 @@ export default function AdminFinancePage() {
   const columns = [
     {
       key: "agent",
-      title: "Партнёр",
+      title: "Член профсоюза",
       render: (p: Payout) => <span className="font-medium">{p.agentName}</span>,
     },
     {
@@ -157,7 +157,7 @@ export default function AdminFinancePage() {
     <div>
       <PageHeader
         title="Финансы"
-        description="Управление выплатами партнёров"
+        description="Управление выплатами"
         breadcrumbs={[
           { title: "Дашборд", href: "/admin/dashboard" },
           { title: "Финансы" },

@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Scale, ArrowRight } from "lucide-react";
+import { Shield, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+interface UnionData {
+  id: string;
+  name: string;
+  shortName: string;
+  divisions: { id: string; name: string }[];
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -14,9 +21,34 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [unions, setUnions] = useState<UnionData[]>([]);
+  const [selectedUnionId, setSelectedUnionId] = useState("");
+  const [selectedDivisionId, setSelectedDivisionId] = useState("");
+
+  useEffect(() => {
+    fetch("/api/unions")
+      .then((r) => r.json())
+      .then((data: UnionData[]) => {
+        setUnions(data);
+        // Auto-select if only one union
+        if (data.length === 1) {
+          setSelectedUnionId(data[0].id);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const selectedUnion = unions.find((u) => u.id === selectedUnionId);
+  const divisions = selectedUnion?.divisions || [];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!selectedUnionId || !selectedDivisionId) {
+      setError("Выберите подразделение профсоюза");
+      return;
+    }
 
     if (!consents.offer || !consents.personal_data) {
       setError("Необходимо принять оферту и согласие на обработку ПД");
@@ -33,7 +65,12 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, consents: consentList }),
+        body: JSON.stringify({
+          ...form,
+          unionId: selectedUnionId,
+          divisionId: selectedDivisionId,
+          consents: consentList,
+        }),
       });
       const data = await res.json();
 
@@ -55,11 +92,11 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
           <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center mb-4">
-            <Scale className="h-6 w-6 text-primary-foreground" />
+            <Shield className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="text-xl font-semibold tracking-tight">Регистрация</h1>
-          <p className="text-sm text-muted-foreground mt-1">Станьте партнёром Агентум Про</p>
-          <p className="text-xs text-muted-foreground">система управления партнёрской сетью</p>
+          <p className="text-sm text-muted-foreground mt-1">Профсоюзная платформа</p>
+          <p className="text-xs text-muted-foreground">Мой Профсоюз</p>
         </div>
 
         {error && (
@@ -108,6 +145,36 @@ export default function RegisterPage() {
               minLength={8}
             />
           </div>
+
+          {/* Профсоюз — предвыбран, если один */}
+          {selectedUnion && (
+            <div>
+              <label className="text-sm text-muted-foreground mb-1.5 block">Профсоюз</label>
+              <div className="rounded-md border border-border bg-muted/30 px-3 py-2 text-sm text-foreground">
+                {selectedUnion.shortName || selectedUnion.name}
+              </div>
+            </div>
+          )}
+
+          {/* Подразделение */}
+          {selectedUnionId && (
+            <div>
+              <label className="text-sm text-muted-foreground mb-1.5 block">Подразделение</label>
+              <select
+                value={selectedDivisionId}
+                onChange={(e) => setSelectedDivisionId(e.target.value)}
+                required
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="">Выберите подразделение</option>
+                {divisions.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Consent checkboxes */}
           <div className="space-y-2">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Scale, ArrowRight } from "lucide-react";
+import { Shield, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -51,11 +51,11 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center mb-4">
-            <Scale className="h-6 w-6 text-primary-foreground" />
+            <Shield className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="text-xl font-semibold tracking-tight">Вход в систему</h1>
-          <p className="text-sm text-muted-foreground mt-1">Агентум Про</p>
-          <p className="text-xs text-muted-foreground">система управления партнёрской сетью</p>
+          <p className="text-sm text-muted-foreground mt-1">Мой Профсоюз</p>
+          <p className="text-xs text-muted-foreground">профсоюзная платформа</p>
         </div>
 
         {/* Error */}

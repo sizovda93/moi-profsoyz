@@ -16,21 +16,38 @@ export default function ManagerLeadsPage() {
   const [search, setSearch] = useState("");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [requestTypeFilter, setRequestTypeFilter] = useState("");
+  const [divisions, setDivisions] = useState<{ id: string; name: string }[]>([]);
+  const [divisionFilter, setDivisionFilter] = useState("");
 
   useEffect(() => {
-    fetch("/api/leads")
+    fetch("/api/unions")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setDivisions(data[0].divisions || []);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    const url = divisionFilter ? `/api/leads?divisionId=${divisionFilter}` : "/api/leads";
+    fetch(url)
       .then((r) => r.json())
       .then((data) => setLeads(Array.isArray(data) ? data : []))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [divisionFilter]);
 
   if (loading) return <CardSkeleton />;
 
   const filtered = leads.filter(
     (l) =>
-      l.fullName.toLowerCase().includes(search.toLowerCase()) ||
-      l.city.toLowerCase().includes(search.toLowerCase())
+      (l.fullName.toLowerCase().includes(search.toLowerCase()) ||
+        l.city.toLowerCase().includes(search.toLowerCase())) &&
+      (!requestTypeFilter || (l as any).requestType === requestTypeFilter)
   );
 
   const newLeads = filtered.filter((l) => l.status === "new");
@@ -42,21 +59,45 @@ export default function ManagerLeadsPage() {
   return (
     <div>
       <PageHeader
-        title="Лиды"
-        description="Все лиды системы — распределение и контроль"
+        title="Обращения"
+        description="Все обращения — рассмотрение и контроль"
         breadcrumbs={[
           { title: "Дашборд", href: "/manager/dashboard" },
-          { title: "Лиды" },
+          { title: "Обращения" },
         ]}
         actions={
           <Button size="sm">
-            <Plus className="h-4 w-4 mr-1" /> Добавить лид
+            <Plus className="h-4 w-4 mr-1" /> Новое обращение
           </Button>
         }
       />
 
       <div className="mb-6">
         <SearchInput value={search} onChange={setSearch} placeholder="Поиск по имени или городу..." />
+      </div>
+
+      <div className="flex gap-4 mb-4">
+        <select
+          className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+          value={divisionFilter}
+          onChange={(e) => setDivisionFilter(e.target.value)}
+        >
+          <option value="">Все подразделения</option>
+          {divisions.map((d) => (
+            <option key={d.id} value={d.id}>{d.name}</option>
+          ))}
+        </select>
+        <select
+          className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+          value={requestTypeFilter}
+          onChange={(e) => setRequestTypeFilter(e.target.value)}
+        >
+          <option value="">Все типы</option>
+          <option value="consultation">Консультация</option>
+          <option value="complaint">Жалоба</option>
+          <option value="request">Заявка</option>
+          <option value="initiative">Инициатива</option>
+        </select>
       </div>
 
       <Tabs defaultValue={conflictLeads.length > 0 ? "conflicts" : "new"}>

@@ -13,13 +13,13 @@ import { CardSkeleton } from "@/components/dashboard/loading-skeleton";
 import { formatDate } from "@/lib/utils";
 
 const statusOptions: { value: LeadStatus; label: string }[] = [
-  { value: "new", label: "Новый" },
-  { value: "contacted", label: "Контакт" },
-  { value: "qualified", label: "Квалифицирован" },
-  { value: "proposal", label: "Предложение" },
-  { value: "negotiation", label: "Переговоры" },
-  { value: "won", label: "Договор заключен" },
-  { value: "lost", label: "Потерян" },
+  { value: "new", label: "Новое" },
+  { value: "contacted", label: "Принято" },
+  { value: "qualified", label: "Подтверждено" },
+  { value: "proposal", label: "На согласовании" },
+  { value: "negotiation", label: "В работе" },
+  { value: "won", label: "Решено" },
+  { value: "lost", label: "Закрыто" },
 ];
 
 interface ConflictLead {
@@ -92,7 +92,7 @@ export default function ManagerLeadDetailPage({ params }: { params: Promise<{ id
       if (res.ok) {
         const updated = await res.json();
         setLead(updated);
-        setStatusMsg(newStatus === "won" ? "Статус обновлён. Выплата партнёру создана автоматически." : "Статус обновлён");
+        setStatusMsg("Статус обновлён");
         loadEvents();
       } else {
         const err = await res.json();
@@ -138,7 +138,7 @@ export default function ManagerLeadDetailPage({ params }: { params: Promise<{ id
   if (!lead) {
     return (
       <div>
-        <PageHeader title="Лид не найден" breadcrumbs={[{ title: "Лиды", href: "/manager/leads" }, { title: "Не найден" }]} />
+        <PageHeader title="Обращение не найдено" breadcrumbs={[{ title: "Обращения", href: "/manager/leads" }, { title: "Не найден" }]} />
       </div>
     );
   }
@@ -149,14 +149,14 @@ export default function ManagerLeadDetailPage({ params }: { params: Promise<{ id
         title={lead.fullName}
         breadcrumbs={[
           { title: "Дашборд", href: "/manager/dashboard" },
-          { title: "Лиды", href: "/manager/leads" },
+          { title: "Обращения", href: "/manager/leads" },
           { title: lead.fullName },
         ]}
         actions={
           <div className="flex gap-2">
             <ConflictBadge status={lead.conflictStatus} resolution={lead.conflictResolution} />
             <Button variant="outline" size="sm">
-              <UserPlus className="h-4 w-4 mr-1" /> Назначить партнёра
+              <UserPlus className="h-4 w-4 mr-1" /> Назначить ответственного
             </Button>
             <Button size="sm">
               <MessageSquare className="h-4 w-4 mr-1" /> Открыть диалог
@@ -176,19 +176,19 @@ export default function ManagerLeadDetailPage({ params }: { params: Promise<{ id
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="text-sm space-y-1">
-                <p className="font-medium">Существующий лид:</p>
+                <p className="font-medium">Существующее обращение:</p>
                 <p>{conflictLead.fullName}</p>
                 <p className="text-muted-foreground">{conflictLead.phone}</p>
                 {conflictLead.email && <p className="text-muted-foreground">{conflictLead.email}</p>}
-                <p className="text-muted-foreground">Партнёр: {conflictLead.agentName || "—"}</p>
+                <p className="text-muted-foreground">Ответственный: {conflictLead.agentName || "—"}</p>
                 <p className="text-muted-foreground">Создан: {formatDate(conflictLead.createdAt)}</p>
               </div>
               <div className="text-sm space-y-1">
-                <p className="font-medium">Текущий лид:</p>
+                <p className="font-medium">Текущее обращение:</p>
                 <p>{lead.fullName}</p>
                 <p className="text-muted-foreground">{lead.phone}</p>
                 {lead.email && <p className="text-muted-foreground">{lead.email}</p>}
-                <p className="text-muted-foreground">Партнёр: {lead.agentName || "—"}</p>
+                <p className="text-muted-foreground">Ответственный: {lead.agentName || "—"}</p>
                 <p className="text-muted-foreground">Создан: {formatDate(lead.createdAt)}</p>
               </div>
             </div>
@@ -215,7 +215,7 @@ export default function ManagerLeadDetailPage({ params }: { params: Promise<{ id
                 onClick={() => handleResolve("kept_separate")}
                 disabled={resolving}
               >
-                <SplitSquareHorizontal className="h-3.5 w-3.5 mr-1" /> Разные клиенты
+                <SplitSquareHorizontal className="h-3.5 w-3.5 mr-1" /> Разные обращения
               </Button>
             </div>
           </CardContent>
@@ -251,7 +251,7 @@ export default function ManagerLeadDetailPage({ params }: { params: Promise<{ id
           </CardHeader>
           <CardContent>
             <LeadTimeline events={events.length > 0 ? events : [
-              { id: "t1", title: "Лид создан", date: lead.createdAt, type: "status_change" },
+              { id: "t1", title: "Обращение создано", date: lead.createdAt, type: "status_change" },
             ]} />
           </CardContent>
         </Card>

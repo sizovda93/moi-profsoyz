@@ -34,7 +34,7 @@ export default function AgentDocumentsPage() {
     <div>
       <PageHeader
         title="Документы"
-        description="Ваши договоры, акты и другие документы"
+        description="Ваши заявления, справки и документы"
         breadcrumbs={[
           { title: "Дашборд", href: "/agent/dashboard" },
           { title: "Документы" },

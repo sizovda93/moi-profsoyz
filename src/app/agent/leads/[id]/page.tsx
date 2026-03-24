@@ -36,10 +36,10 @@ export default function AgentLeadDetailPage({ params }: { params: Promise<{ id: 
           setEvents(eventsData.map((e: { id: string; eventType: string; details?: string; createdAt: string }) => ({
             id: e.id,
             title: e.eventType === 'status_changed' ? 'Смена статуса'
-              : e.eventType === 'created' ? 'Лид создан'
-              : e.eventType === 'agent_assigned' ? 'Назначен партнёр'
-              : e.eventType === 'agent_reassigned' ? 'Переназначен партнёр'
-              : e.eventType === 'payout_created' ? 'Создана выплата'
+              : e.eventType === 'created' ? 'Обращение создано'
+              : e.eventType === 'agent_assigned' ? 'Назначен ответственный'
+              : e.eventType === 'agent_reassigned' ? 'Переназначен ответственный'
+              : e.eventType === 'payout_created' ? 'Решение принято'
               : e.eventType,
             description: e.details || undefined,
             date: e.createdAt,
@@ -63,8 +63,8 @@ export default function AgentLeadDetailPage({ params }: { params: Promise<{ id: 
   if (error === 'not_found' || !lead) {
     return (
       <div>
-        <PageHeader title="Лид не найден" breadcrumbs={[{ title: "Лиды", href: "/agent/leads" }, { title: "Не найден" }]} />
-        <p className="text-muted-foreground">Лид с ID {id} не найден.</p>
+        <PageHeader title="Обращение не найдено" breadcrumbs={[{ title: "Обращения", href: "/agent/leads" }, { title: "Не найден" }]} />
+        <p className="text-muted-foreground">Обращение не найдено.</p>
       </div>
     );
   }
@@ -75,7 +75,7 @@ export default function AgentLeadDetailPage({ params }: { params: Promise<{ id: 
         title={lead.fullName}
         breadcrumbs={[
           { title: "Дашборд", href: "/agent/dashboard" },
-          { title: "Лиды", href: "/agent/leads" },
+          { title: "Обращения", href: "/agent/leads" },
           { title: lead.fullName },
         ]}
         actions={

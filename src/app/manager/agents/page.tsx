@@ -10,7 +10,6 @@ import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
 import { UserPlus, Filter, X } from "lucide-react";
 import type { AgentLifecycle } from "@/types";
 
@@ -35,7 +34,7 @@ interface AgentRow {
 }
 
 type TabFilter = "all" | "learning" | "ready" | "active" | "problem";
-type SortKey = "newest" | "oldest" | "age_asc" | "age_desc" | "name_asc" | "name_desc" | "leads_desc" | "revenue_desc";
+type SortKey = "newest" | "oldest" | "age_asc" | "age_desc" | "name_asc" | "name_desc" | "leads_desc";
 
 const sortLabels: Record<SortKey, string> = {
   newest: "Новые",
@@ -44,8 +43,7 @@ const sortLabels: Record<SortKey, string> = {
   name_desc: "Имя Я→А",
   age_asc: "Возраст ↑",
   age_desc: "Возраст ↓",
-  leads_desc: "Лиды ↓",
-  revenue_desc: "Доход ↓",
+  leads_desc: "Обращения ↓",
 };
 
 export default function ManagerAgentsPage() {
@@ -56,6 +54,8 @@ export default function ManagerAgentsPage() {
   const [tab, setTab] = useState<TabFilter>("all");
   const [claiming, setClaiming] = useState<string | null>(null);
   const [showUnassigned, setShowUnassigned] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkAssigning, setBulkAssigning] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
   // Filter state
@@ -66,6 +66,19 @@ export default function ManagerAgentsPage() {
   const [minAge, setMinAge] = useState("");
   const [maxAge, setMaxAge] = useState("");
   const [sort, setSort] = useState<SortKey>("newest");
+  const [divisions, setDivisions] = useState<{ id: string; name: string }[]>([]);
+  const [divisionId, setDivisionId] = useState("");
+
+  useEffect(() => {
+    fetch("/api/unions")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setDivisions(data[0].divisions || []);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const buildQuery = useCallback(() => {
     const p = new URLSearchParams();
@@ -76,8 +89,9 @@ export default function ManagerAgentsPage() {
     if (minAge) p.set("minAge", minAge);
     if (maxAge) p.set("maxAge", maxAge);
     if (sort !== "newest") p.set("sort", sort);
+    if (divisionId) p.set("divisionId", divisionId);
     return p.toString() ? `?${p.toString()}` : "";
-  }, [search, gender, city, profession, minAge, maxAge, sort]);
+  }, [search, gender, city, profession, minAge, maxAge, sort, divisionId]);
 
   const loadData = useCallback(() =>
     Promise.all([
@@ -98,7 +112,7 @@ export default function ManagerAgentsPage() {
     if (loading) return;
     const timer = setTimeout(() => { loadData(); }, 300);
     return () => clearTimeout(timer);
-  }, [search, gender, city, profession, minAge, maxAge, sort]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [search, gender, city, profession, minAge, maxAge, sort, divisionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClaim = async (agentId: string) => {
     setClaiming(agentId);
@@ -124,9 +138,10 @@ export default function ManagerAgentsPage() {
     setMinAge("");
     setMaxAge("");
     setSort("newest");
+    setDivisionId("");
   };
 
-  const hasActiveFilters = gender || city || profession || minAge || maxAge || sort !== "newest";
+  const hasActiveFilters = gender || city || profession || minAge || maxAge || sort !== "newest" || divisionId;
 
   if (loading) return <LoadingSkeleton />;
 
@@ -150,7 +165,7 @@ export default function ManagerAgentsPage() {
   const tabs: { key: TabFilter; label: string; count: number }[] = [
     { key: "all", label: "Все", count: agents.length },
     { key: "learning", label: "Обучаются", count: learning.length },
-    { key: "ready", label: "Готовы к работе", count: activated.length },
+    { key: "ready", label: "Готовы", count: activated.length },
     { key: "active", label: "Активные", count: active.length },
     { key: "problem", label: "Проблемные", count: problem.length },
   ];
@@ -158,7 +173,7 @@ export default function ManagerAgentsPage() {
   const columns = [
     {
       key: "name",
-      title: "Партнёр",
+      title: "Член профсоюза",
       render: (a: AgentRow) => (
         <div>
           <p className="font-medium">{a.fullName}</p>
@@ -184,7 +199,7 @@ export default function ManagerAgentsPage() {
     },
     {
       key: "leads",
-      title: "Лиды",
+      title: "Обращения",
       render: (a: AgentRow) => (
         <span>
           <span className="font-medium">{a.activeLeads}</span>
@@ -192,29 +207,16 @@ export default function ManagerAgentsPage() {
         </span>
       ),
     },
-    {
-      key: "revenue",
-      title: "Доход",
-      render: (a: AgentRow) => (
-        <span className="font-medium">{formatCurrency(Number(a.totalRevenue))}</span>
-      ),
-      className: "text-right",
-    },
-    {
-      key: "rating",
-      title: "Рейтинг",
-      render: (a: AgentRow) => <span>⭐ {a.rating}</span>,
-    },
   ];
 
   return (
     <div>
       <PageHeader
-        title="Партнёры"
-        description="Управление партнёрской сетью"
+        title="Члены профсоюза"
+        description="Управление членами профсоюза"
         breadcrumbs={[
           { title: "Дашборд", href: "/manager/dashboard" },
-          { title: "Партнёры" },
+          { title: "Члены профсоюза" },
         ]}
         actions={
           <div className="flex gap-2">
@@ -241,9 +243,38 @@ export default function ManagerAgentsPage() {
       {showUnassigned && unassigned.length > 0 && (
         <Card className="mb-6 border-blue-500/20 bg-blue-500/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Партнёры без менеджера</CardTitle>
+            <CardTitle className="text-base">Члены без руководителя</CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="mb-3">
+              <Button
+                size="sm"
+                onClick={async () => {
+                  setBulkAssigning(true);
+                  try {
+                    const ids = unassigned.map((a) => a.id);
+                    const res = await fetch("/api/agents/bulk-assign", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ agentIds: ids }),
+                    });
+                    if (res.ok) {
+                      const data = await res.json();
+                      alert(`Закреплено: ${data.assigned}`);
+                      await loadData();
+                      setShowUnassigned(false);
+                    } else {
+                      const err = await res.json();
+                      alert(err.error || "Ошибка");
+                    }
+                  } catch { /* ignore */ }
+                  finally { setBulkAssigning(false); }
+                }}
+                disabled={bulkAssigning || unassigned.length === 0}
+              >
+                {bulkAssigning ? "Закрепление..." : `Закрепить всех (${unassigned.length})`}
+              </Button>
+            </div>
             <div className="space-y-2">
               {unassigned.map((a) => (
                 <div key={a.id} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-background/60">
@@ -269,7 +300,20 @@ export default function ManagerAgentsPage() {
       {showFilters && (
         <Card className="mb-6">
           <CardContent className="pt-4 pb-3">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Подразделение</label>
+                <select
+                  className="w-full h-8 rounded-md border border-border bg-background px-2 text-sm"
+                  value={divisionId}
+                  onChange={(e) => setDivisionId(e.target.value)}
+                >
+                  <option value="">Все</option>
+                  {divisions.map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Пол</label>
                 <select

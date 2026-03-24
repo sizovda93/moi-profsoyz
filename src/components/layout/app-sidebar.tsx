@@ -19,7 +19,6 @@ import {
   Plug,
   ScrollText,
   Target,
-  Scale,
   GraduationCap,
   Share2,
   Megaphone,
@@ -60,11 +59,11 @@ export function AppSidebar({ items, role }: AppSidebarProps) {
       <div className="h-16 flex items-center px-6 border-b border-border">
         <Link href={`/${role}/dashboard`} className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <Scale className="h-4.5 w-4.5 text-primary-foreground" />
+            <Shield className="h-4.5 w-4.5 text-primary-foreground" />
           </div>
           <div>
-            <span className="font-semibold text-sm tracking-tight">Агентум Про</span>
-            <span className="text-[10px] text-muted-foreground block -mt-0.5">система управления партнёрской сетью</span>
+            <span className="font-semibold text-sm tracking-tight">Мой Профсоюз</span>
+            <span className="text-[10px] text-muted-foreground block -mt-0.5">профсоюзная платформа</span>
           </div>
         </Link>
       </div>
@@ -103,7 +102,7 @@ export function AppSidebar({ items, role }: AppSidebarProps) {
       {/* Footer */}
       <div className="border-t border-border p-4">
         <div className="text-xs text-muted-foreground text-center">
-          © 2026 Агентум Про
+          © 2026 Мой Профсоюз
         </div>
       </div>
     </aside>

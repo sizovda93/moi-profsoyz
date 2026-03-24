@@ -5,13 +5,13 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { LeadStatusBadge } from "@/components/dashboard/status-badges";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { CardSkeleton } from "@/components/dashboard/loading-skeleton";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Circle, Rocket, Lightbulb, UserPlus, BookOpen, Share2, GraduationCap, MessageSquare, DollarSign } from "lucide-react";
-import { Lead, Conversation, AgentTier } from "@/types";
-import { TierBadge } from "@/components/dashboard/status-badges";
+import { ArrowRight, CheckCircle2, Circle, Rocket, Lightbulb, UserPlus, BookOpen, Share2, GraduationCap, MessageSquare } from "lucide-react";
+import { Lead, Conversation } from "@/types";
 import { AvatarHelper } from "@/components/avatar/avatar-helper";
+import { NewsBlock } from "@/components/dashboard/news-block";
 
 interface ChecklistState {
   profileFilled: boolean;
@@ -23,30 +23,23 @@ interface ChecklistState {
 export default function AgentDashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [stats, setStats] = useState<{ totalRevenue?: number }>({});
   const [loading, setLoading] = useState(true);
   const [checklist, setChecklist] = useState<ChecklistState | null>(null);
   const [showChecklist, setShowChecklist] = useState(false);
-  const [agentRank, setAgentRank] = useState<{ rank: number | null; totalAgents: number } | null>(null);
-  const [agentTier, setAgentTier] = useState<AgentTier>("base");
 
   useEffect(() => {
     Promise.all([
       fetch("/api/leads").then((r) => r.json()),
       fetch("/api/conversations").then((r) => r.json()),
-      fetch("/api/stats").then((r) => r.json()),
       fetch("/api/profile").then((r) => r.json()),
       fetch("/api/learning/progress").then((r) => r.json()).catch(() => null),
       fetch("/api/telegram/status").then((r) => r.json()).catch(() => ({ connected: false })),
-      fetch("/api/analytics").then((r) => r.ok ? r.json() : null).catch(() => null),
     ])
-      .then(([ld, cv, st, profile, progress, tgStatus, analyticsData]) => {
+      .then(([ld, cv, profile, progress, tgStatus]) => {
         const leadsArr = Array.isArray(ld) ? ld : [];
         setLeads(leadsArr);
         setConversations(Array.isArray(cv) ? cv : []);
-        setStats(st || {});
 
-        // Build checklist from existing data
         const cl: ChecklistState = {
           profileFilled: !!(profile?.city && profile?.phone),
           learningDone: progress?.allRequiredDone === true,
@@ -55,16 +48,8 @@ export default function AgentDashboard() {
         };
         setChecklist(cl);
 
-        // Show checklist if not all done
         const allDone = cl.profileFilled && cl.learningDone && cl.telegramConnected && cl.firstLead;
         setShowChecklist(!allDone);
-
-        if (analyticsData?.agentRank) {
-          setAgentRank(analyticsData.agentRank);
-        }
-        if (profile?.tier) {
-          setAgentTier(profile.tier as AgentTier);
-        }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -74,26 +59,24 @@ export default function AgentDashboard() {
 
   const activeLeads = leads.filter((l) => !["won", "lost"].includes(l.status));
   const unreadCount = conversations.reduce((acc, c) => acc + c.unreadCount, 0);
-  const wonLeads = leads.filter((l) => l.status === "won").length;
-  const conversionRate = leads.length > 0 ? Math.round((wonLeads / leads.length) * 100) : 0;
+  const resolvedCount = leads.filter((l) => l.status === "won").length;
 
   const checklistItems = checklist ? [
-    { done: checklist.profileFilled, label: "Заполнить профиль (город и телефон)", href: "/agent/profile" },
-    { done: checklist.learningDone, label: "Пройти обязательное обучение", href: "/agent/learning" },
+    { done: checklist.profileFilled, label: "Заполнить профиль (контакты)", href: "/agent/profile" },
+    { done: checklist.learningDone, label: "Пройти вводное обучение", href: "/agent/learning" },
     { done: checklist.telegramConnected, label: "Подключить Telegram", href: "/agent/profile" },
-    { done: checklist.firstLead, label: "Создать первый лид", href: "/agent/leads" },
+    { done: checklist.firstLead, label: "Подать первое обращение", href: "/agent/leads" },
   ] : [];
 
   const completedSteps = checklistItems.filter((i) => i.done).length;
 
-  // Retention reminders (for agents who finished checklist but need nudges)
   const retentionReminders: { label: string; href: string }[] = [];
   if (!showChecklist && checklist) {
     if (leads.length === 0) {
-      retentionReminders.push({ label: "Создайте первый лид — это просто!", href: "/agent/leads" });
+      retentionReminders.push({ label: "Подайте первое обращение — это просто!", href: "/agent/leads" });
     }
     if (leads.length > 0 && leads.length < 3) {
-      retentionReminders.push({ label: "Попробуйте маркетинговые материалы для привлечения клиентов", href: "/agent/marketing" });
+      retentionReminders.push({ label: "Ознакомьтесь с полезными материалами профсоюза", href: "/agent/marketing" });
     }
   }
 
@@ -101,7 +84,7 @@ export default function AgentDashboard() {
     <div>
       <PageHeader
         title="Дашборд"
-        description="Обзор вашей активности и ключевые показатели"
+        description="Обзор вашей активности в профсоюзе"
       />
 
       {/* Onboarding Checklist */}
@@ -113,7 +96,7 @@ export default function AgentDashboard() {
                 <Rocket className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold">Начало работы</h3>
+                <h3 className="text-sm font-semibold">Первые шаги</h3>
                 <p className="text-xs text-muted-foreground">{completedSteps} из {checklistItems.length} шагов выполнено</p>
               </div>
             </div>
@@ -159,73 +142,34 @@ export default function AgentDashboard() {
         </Card>
       )}
 
-      {/* Rank + Tier */}
-      {agentRank?.rank && (
-        <Card className="mb-6 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">Ваш рейтинг:</span>
-              <span className="text-lg font-bold">#{agentRank.rank}</span>
-              <span className="text-sm text-muted-foreground">из {agentRank.totalAgents}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Уровень:</span>
-              <TierBadge tier={agentTier} />
-            </div>
-          </div>
-        </Card>
-      )}
-
-      {/* How to earn block */}
-      <Card className="mb-6 border-green-500/20 bg-green-500/5">
+      {/* Quick actions */}
+      <Card className="mb-6 border-primary/20 bg-primary/5">
         <CardContent className="p-5">
           <div className="flex items-center gap-3 mb-4">
-            <div className="h-9 w-9 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <DollarSign className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold">Как зарабатывать с платформой</h3>
-              <p className="text-xs text-muted-foreground">5 простых шагов к первому вознаграждению</p>
-            </div>
+            <h3 className="text-sm font-semibold">Быстрые действия</h3>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-5">
-            {[
-              { step: "1", text: "Найдите человека с проблемой долгов — среди знакомых, клиентов или через рекламу" },
-              { step: "2", text: "Передайте контакт в платформу — создайте лида с именем и телефоном" },
-              { step: "3", text: "Менеджер берёт клиента в работу — вы отслеживаете статус в кабинете" },
-              { step: "4", text: "Клиент заключает договор на банкротство — сделка переходит в статус «Won»" },
-              { step: "5", text: "Вы получаете вознаграждение — выплата фиксируется в разделе «Финансы»" },
-            ].map((item) => (
-              <div key={item.step} className="flex gap-2.5 items-start">
-                <div className="h-6 w-6 rounded-full bg-green-500/15 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-green-600">{item.step}</span>
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">{item.text}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Quick actions */}
           <div className="flex flex-wrap gap-2">
             <Link href="/agent/leads" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors">
-              <UserPlus className="h-3.5 w-3.5" /> Создать лида
+              <UserPlus className="h-3.5 w-3.5" /> Подать обращение
             </Link>
             <Link href="/agent/marketing" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
               <BookOpen className="h-3.5 w-3.5" /> Материалы
             </Link>
             <Link href="/agent/referral" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
-              <Share2 className="h-3.5 w-3.5" /> Реферальная ссылка
+              <Share2 className="h-3.5 w-3.5" /> Пригласить коллегу
             </Link>
             <Link href="/agent/learning" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
               <GraduationCap className="h-3.5 w-3.5" /> Обучение
             </Link>
             <Link href="/agent/messages" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
-              <MessageSquare className="h-3.5 w-3.5" /> Написать менеджеру
+              <MessageSquare className="h-3.5 w-3.5" /> Написать руководителю
             </Link>
           </div>
         </CardContent>
       </Card>
+
+      {/* News Block */}
+      <NewsBlock />
 
       {/* Avatar Helper */}
       <div className="mb-6 max-w-md">
@@ -233,11 +177,11 @@ export default function AgentDashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <StatCard
-          title="Активные лиды"
+          title="Активные обращения"
           value={activeLeads.length}
-          icon="Users"
+          icon="UserPlus"
         />
         <StatCard
           title="Непрочитанные"
@@ -245,13 +189,8 @@ export default function AgentDashboard() {
           icon="MessageSquare"
         />
         <StatCard
-          title="Заработано"
-          value={formatCurrency(Number(stats.totalRevenue || 0))}
-          icon="Wallet"
-        />
-        <StatCard
-          title="Конверсия"
-          value={`${conversionRate}%`}
+          title="Решено"
+          value={resolvedCount}
           icon="Target"
         />
       </div>
@@ -260,12 +199,12 @@ export default function AgentDashboard() {
         {/* Recent Leads */}
         <Card>
           <CardHeader className="flex-row items-center justify-between">
-            <CardTitle className="text-base">Последние лиды</CardTitle>
+            <CardTitle className="text-base">Последние обращения</CardTitle>
             <Link
               href="/agent/leads"
               className="text-sm text-primary hover:underline flex items-center gap-1"
             >
-              Все лиды <ArrowRight className="h-3.5 w-3.5" />
+              Все обращения <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </CardHeader>
           <CardContent>

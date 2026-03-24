@@ -6,11 +6,11 @@ import { notifyAgent, getProfileIdByAgentId } from '@/lib/telegram';
 import { computeLifecycle } from '@/lib/lifecycle';
 import type { UserStatus, OnboardingStatus } from '@/types';
 
-type AudienceType = 'all' | 'active' | 'activated' | 'learning' | 'sleeping' | 'no_telegram' | 'manual';
+type AudienceType = 'all' | 'active' | 'activated' | 'learning' | 'sleeping' | 'no_telegram' | 'manual' | 'division';
 type Channel = 'web' | 'telegram' | 'both';
 
 /** Build audience query — always scoped to sender's agents */
-function buildAudienceQuery(audienceType: AudienceType, senderId: string, manualIds?: string[]) {
+function buildAudienceQuery(audienceType: AudienceType, senderId: string, manualIds?: string[], divisionId?: string) {
   // Base: always only sender's agents
   let query = `
     SELECT a.id as agent_id, a.user_id as profile_id, p.full_name as agent_name,
@@ -27,6 +27,12 @@ function buildAudienceQuery(audienceType: AudienceType, senderId: string, manual
       if (manualIds && manualIds.length > 0) {
         params.push(manualIds);
         query += ` AND a.id = ANY($${params.length})`;
+      }
+      break;
+    case 'division':
+      if (divisionId) {
+        params.push(divisionId);
+        query += ` AND a.division_id = $${params.length}`;
       }
       break;
     case 'no_telegram':
@@ -53,12 +59,13 @@ export async function POST(request: NextRequest) {
     const { user } = auth;
 
     const body = await request.json();
-    const { title, text, channel, audienceType, agentIds } = body as {
+    const { title, text, channel, audienceType, agentIds, divisionId } = body as {
       title?: string;
       text?: string;
       channel?: Channel;
       audienceType?: AudienceType;
       agentIds?: string[];
+      divisionId?: string;
     };
 
     // Validate required fields
@@ -68,15 +75,19 @@ export async function POST(request: NextRequest) {
 
     const finalChannel: Channel = ['web', 'telegram', 'both'].includes(channel || '') ? channel! : 'both';
     const finalAudience: AudienceType = [
-      'all', 'active', 'activated', 'learning', 'sleeping', 'no_telegram', 'manual'
+      'all', 'active', 'activated', 'learning', 'sleeping', 'no_telegram', 'manual', 'division'
     ].includes(audienceType || '') ? audienceType! : 'all';
 
     if (finalAudience === 'manual' && (!agentIds || agentIds.length === 0)) {
       return Response.json({ error: 'Выберите хотя бы одного агента' }, { status: 400 });
     }
 
+    if (finalAudience === 'division' && !divisionId) {
+      return Response.json({ error: 'Выберите подразделение' }, { status: 400 });
+    }
+
     // Fetch audience (always scoped to sender's agents)
-    const { query, params } = buildAudienceQuery(finalAudience, user.id, agentIds);
+    const { query, params } = buildAudienceQuery(finalAudience, user.id, agentIds, divisionId);
     const { rows: audienceRows } = await pool.query(query, params);
 
     // Post-filter by lifecycle for active/activated/learning

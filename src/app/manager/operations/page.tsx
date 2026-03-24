@@ -26,7 +26,7 @@ const queueConfig: { key: string; title: string; icon: string; variant: "destruc
   { key: "conflicts", title: "Открытые конфликты", icon: "AlertTriangle", variant: "destructive" },
   { key: "newInactive", title: "Пропавшие новички (3+ дней)", icon: "UserX", variant: "warning" },
   { key: "stuckLearning", title: "Застряли на обучении (7+ дней)", icon: "BookOpen", variant: "warning" },
-  { key: "noFirstLead", title: "Без первого лида (7+ дней)", icon: "Target", variant: "info" },
+  { key: "noFirstLead", title: "Без обращений (7+ дней)", icon: "Target", variant: "info" },
   { key: "sleeping", title: "Спящие (30+ дней)", icon: "Moon", variant: "secondary" },
   { key: "noTelegram", title: "Без Telegram", icon: "Send", variant: "secondary" },
 ];
@@ -78,7 +78,7 @@ export default function ManagerOperationsPage() {
     <div>
       <PageHeader
         title="Операции"
-        description="Рабочие очереди и контроль партнёрской сети"
+        description="Рабочие очереди и контроль"
         breadcrumbs={[
           { title: "Дашборд", href: "/manager/dashboard" },
           { title: "Операции" },
@@ -101,7 +101,7 @@ export default function ManagerOperationsPage() {
         <Card className="p-8 text-center">
           <CheckCircle2 className="h-8 w-8 text-green-500 mx-auto mb-3" />
           <p className="text-sm font-medium">Все очереди пусты</p>
-          <p className="text-xs text-muted-foreground mt-1">Нет партнёров, требующих внимания</p>
+          <p className="text-xs text-muted-foreground mt-1">Нет членов, требующих внимания</p>
         </Card>
       )}
 
@@ -136,7 +136,7 @@ export default function ManagerOperationsPage() {
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {isConflict
-                              ? `Партнёр: ${item.agentName || "—"} · ${formatDate(item.createdAt)}`
+                              ? `Ответственный: ${item.agentName || "—"} · ${formatDate(item.createdAt)}`
                               : item.reason}
                           </p>
                         </div>
@@ -171,7 +171,7 @@ export default function ManagerOperationsPage() {
       {data.recentFeedback?.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Обратная связь от партнёров</CardTitle>
+            <CardTitle className="text-base">Обратная связь от членов</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">

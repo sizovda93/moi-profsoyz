@@ -45,17 +45,18 @@ interface BroadcastDetail extends BroadcastRow {
   recipients: RecipientRow[];
 }
 
-type AudienceType = "all" | "active" | "activated" | "learning" | "sleeping" | "no_telegram" | "manual";
+type AudienceType = "all" | "active" | "activated" | "learning" | "sleeping" | "no_telegram" | "manual" | "division";
 type ChannelType = "web" | "telegram" | "both";
 type View = "list" | "create" | "detail";
 
 const audienceLabels: Record<AudienceType, string> = {
-  all: "Все мои партнёры",
-  active: "Активные (есть лиды)",
-  activated: "Готовы, без первого лида",
+  all: "Все мои члены",
+  active: "Активные (есть обращения)",
+  activated: "Готовы, без обращений",
   learning: "На обучении",
   sleeping: "Спящие (30+ дней)",
   no_telegram: "Без Telegram",
+  division: "По подразделению",
   manual: "Выбрать вручную",
 };
 
@@ -99,6 +100,8 @@ export default function ManagerBroadcastsPage() {
   const [channel, setChannel] = useState<ChannelType>("both");
   const [audienceType, setAudienceType] = useState<AudienceType>("all");
   const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
+  const [divisions, setDivisions] = useState<{ id: string; name: string }[]>([]);
+  const [broadcastDivisionId, setBroadcastDivisionId] = useState("");
 
   // Detail state
   const [detail, setDetail] = useState<BroadcastDetail | null>(null);
@@ -118,12 +121,24 @@ export default function ManagerBroadcastsPage() {
     Promise.all([loadBroadcasts(), loadAgents()]).finally(() => setLoading(false));
   }, [loadBroadcasts, loadAgents]);
 
+  useEffect(() => {
+    fetch("/api/unions")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setDivisions(data[0].divisions || []);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const resetForm = () => {
     setTitle("");
     setText("");
     setChannel("both");
     setAudienceType("all");
     setSelectedAgents([]);
+    setBroadcastDivisionId("");
     setError(null);
     setSuccess(null);
   };
@@ -158,7 +173,11 @@ export default function ManagerBroadcastsPage() {
       return;
     }
     if (audienceType === "manual" && selectedAgents.length === 0) {
-      setError("Выберите хотя бы одного партнёра");
+      setError("Выберите хотя бы одного члена");
+      return;
+    }
+    if (audienceType === "division" && !broadcastDivisionId) {
+      setError("Выберите подразделение");
       return;
     }
 
@@ -176,6 +195,7 @@ export default function ManagerBroadcastsPage() {
           channel,
           audienceType,
           agentIds: audienceType === "manual" ? selectedAgents : undefined,
+          divisionId: audienceType === "division" ? broadcastDivisionId : undefined,
         }),
       });
 
@@ -277,7 +297,7 @@ export default function ManagerBroadcastsPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b text-left text-xs text-muted-foreground uppercase">
-                        <th className="px-3 py-2">Партнёр</th>
+                        <th className="px-3 py-2">Член</th>
                         <th className="px-3 py-2">Web</th>
                         <th className="px-3 py-2">Telegram</th>
                         <th className="px-3 py-2">Ошибка</th>
@@ -392,15 +412,33 @@ export default function ManagerBroadcastsPage() {
               </select>
             </div>
 
+            {/* Division selection */}
+            {audienceType === "division" && (
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">Подразделение</label>
+                <select
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                  value={broadcastDivisionId}
+                  onChange={(e) => setBroadcastDivisionId(e.target.value)}
+                  required
+                >
+                  <option value="">Выберите подразделение</option>
+                  {divisions.map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* Manual agent selection */}
             {audienceType === "manual" && (
               <div>
                 <label className="text-sm text-muted-foreground mb-1.5 block">
-                  Выберите партнёров ({selectedAgents.length} выбрано)
+                  Выберите членов ({selectedAgents.length} выбрано)
                 </label>
                 <div className="max-h-60 overflow-y-auto border border-border rounded-lg divide-y divide-border">
                   {agents.length === 0 ? (
-                    <p className="text-sm text-muted-foreground p-3">Нет закреплённых партнёров</p>
+                    <p className="text-sm text-muted-foreground p-3">Нет закреплённых членов</p>
                   ) : (
                     agents.map((a) => (
                       <label
@@ -425,7 +463,7 @@ export default function ManagerBroadcastsPage() {
             {/* Preview */}
             <div className="rounded-lg bg-muted/50 p-3 text-sm text-muted-foreground">
               {audienceType === "manual"
-                ? `Будет отправлено ${selectedAgents.length} партнёрам`
+                ? `Будет отправлено ${selectedAgents.length} членам`
                 : `Сегмент: ${audienceLabels[audienceType]}`
               }
               {" через "}
@@ -460,7 +498,7 @@ export default function ManagerBroadcastsPage() {
     <div>
       <PageHeader
         title="Рассылки"
-        description="Массовые сообщения для ваших партнёров"
+        description="Объявления для членов профсоюза"
         breadcrumbs={[
           { title: "Дашборд", href: "/manager/dashboard" },
           { title: "Рассылки" },
@@ -475,7 +513,7 @@ export default function ManagerBroadcastsPage() {
       {broadcasts.length === 0 ? (
         <EmptyState
           title="Нет рассылок"
-          description="Создайте первую рассылку для ваших партнёров"
+          description="Создайте первое объявление для членов профсоюза"
           action={
             <Button size="sm" onClick={handleCreate}>
               <Send className="h-4 w-4 mr-1" /> Создать рассылку

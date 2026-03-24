@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Scale } from "lucide-react";
+import { Shield } from "lucide-react";
 
 export default function PrivacyPage() {
   return (
@@ -8,10 +8,10 @@ export default function PrivacyPage() {
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center">
           <Link href="/" className="flex items-center gap-3">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <Scale className="h-4 w-4 text-primary-foreground" />
+              <Shield className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold tracking-tight">Агентум Про</span>
-            <span className="text-xs text-muted-foreground ml-2">система управления партнёрской сетью</span>
+            <span className="font-semibold tracking-tight">Мой Профсоюз</span>
+            <span className="text-xs text-muted-foreground ml-2">профсоюзная платформа</span>
           </Link>
         </div>
       </header>

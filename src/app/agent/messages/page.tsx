@@ -54,7 +54,7 @@ export default function AgentMessagesPage() {
     <div>
       <PageHeader
         title="Сообщения"
-        description="Диалоги с клиентами"
+        description="Переписка с руководством профсоюза"
         breadcrumbs={[
           { title: "Дашборд", href: "/agent/dashboard" },
           { title: "Сообщения" },

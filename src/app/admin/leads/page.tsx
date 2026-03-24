@@ -17,14 +17,29 @@ export default function AdminLeadsPage() {
   const [search, setSearch] = useState("");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [divisions, setDivisions] = useState<{ id: string; name: string }[]>([]);
+  const [divisionFilter, setDivisionFilter] = useState("");
 
   useEffect(() => {
-    fetch("/api/leads")
+    fetch("/api/unions")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setDivisions(data[0].divisions || []);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    const url = divisionFilter ? `/api/leads?divisionId=${divisionFilter}` : "/api/leads";
+    fetch(url)
       .then((r) => r.json())
       .then((data) => setLeads(Array.isArray(data) ? data : []))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [divisionFilter]);
 
   if (loading) return <CardSkeleton />;
 
@@ -47,11 +62,11 @@ export default function AdminLeadsPage() {
   return (
     <div>
       <PageHeader
-        title="Лиды"
-        description="Все лиды системы, включая заявки с лендинга"
+        title="Обращения"
+        description="Все обращения системы, включая заявки с лендинга"
         breadcrumbs={[
           { title: "Дашборд", href: "/admin/dashboard" },
-          { title: "Лиды" },
+          { title: "Обращения" },
         ]}
       />
 
@@ -64,6 +79,19 @@ export default function AdminLeadsPage() {
 
       <div className="mb-6">
         <SearchInput value={search} onChange={setSearch} placeholder="Поиск по имени, городу или телефону..." />
+      </div>
+
+      <div className="flex gap-4 mb-4">
+        <select
+          className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+          value={divisionFilter}
+          onChange={(e) => setDivisionFilter(e.target.value)}
+        >
+          <option value="">Все подразделения</option>
+          {divisions.map((d) => (
+            <option key={d.id} value={d.id}>{d.name}</option>
+          ))}
+        </select>
       </div>
 
       <Tabs defaultValue={websiteLeads.length > 0 ? "website" : "all"}>

@@ -1,17 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LeadStatusBadge } from "@/components/dashboard/status-badges";
+import { LeadStatusBadge, RequestTypeBadge } from "@/components/dashboard/status-badges";
 import { Lead } from "@/types";
-import { formatDate, formatCurrency } from "@/lib/utils";
-import { MapPin, Phone, Mail, Calendar, MessageSquare, DollarSign } from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import { MapPin, Phone, Mail, Calendar, MessageSquare, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const sourceLabels: Record<string, string> = {
-  website: "Сайт",
+  website: "Платформа",
   telegram: "Telegram",
   whatsapp: "WhatsApp",
-  referral: "Реферал",
-  cold: "Холодный",
-  partner: "Партнёр",
+  referral: "От коллеги",
+  cold: "Другое",
+  partner: "Подразделение",
 };
 
 interface LeadDetailsPanelProps {
@@ -52,10 +52,10 @@ export function LeadDetailsPanel({ lead }: LeadDetailsPanelProps) {
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
               <Badge variant="outline">{sourceLabels[lead.source] ?? lead.source}</Badge>
             </div>
-            {lead.estimatedValue && (
+            {(lead as any).requestType && (
               <div className="flex items-center gap-3 text-sm">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span>{formatCurrency(lead.estimatedValue)}</span>
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <RequestTypeBadge type={(lead as any).requestType} />
               </div>
             )}
           </div>

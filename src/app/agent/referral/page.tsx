@@ -44,24 +44,24 @@ export default function AgentReferralPage() {
     {
       title: "Для соцсетей",
       text: (link: string) =>
-        `Я работаю с платформой Агентум Про — современная система для юридических партнёров. Присоединяйтесь: ${link}`,
+        `Наш профсоюз запустил удобную платформу «Мой Профсоюз». Присоединяйтесь: ${link}`,
     },
     {
       title: "Для мессенджеров",
       text: (link: string) =>
-        `Привет! Рекомендую платформу для юридических партнёров — удобная система управления лидами и выплатами. Регистрация: ${link}`,
+        `Привет! Рекомендую платформу профсоюза — обращения, документы, обучение, всё в одном месте. Регистрация: ${link}`,
     },
     {
       title: "Краткий",
       text: (link: string) =>
-        `Агентум Про — платформа для юридических партнёров. Регистрация: ${link}`,
+        `Мой Профсоюз — платформа для членов профсоюза. Регистрация: ${link}`,
     },
   ];
 
   if (loading) {
     return (
       <>
-        <PageHeader title="Реферальная программа" breadcrumbs={[{ title: "Дашборд", href: "/agent/dashboard" }, { title: "Рефералы" }]} />
+        <PageHeader title="Приглашения" breadcrumbs={[{ title: "Дашборд", href: "/agent/dashboard" }, { title: "Приглашения" }]} />
         <div className="grid gap-4 md:grid-cols-3 mb-6">
           {[1, 2, 3].map((i) => <Card key={i} className="h-24 animate-pulse bg-muted" />)}
         </div>
@@ -72,7 +72,7 @@ export default function AgentReferralPage() {
   if (!data) {
     return (
       <>
-        <PageHeader title="Реферальная программа" breadcrumbs={[{ title: "Дашборд", href: "/agent/dashboard" }, { title: "Рефералы" }]} />
+        <PageHeader title="Приглашения" breadcrumbs={[{ title: "Дашборд", href: "/agent/dashboard" }, { title: "Приглашения" }]} />
         <Card className="p-6 text-center text-muted-foreground">Не удалось загрузить данные</Card>
       </>
     );
@@ -81,9 +81,9 @@ export default function AgentReferralPage() {
   return (
     <>
       <PageHeader
-        title="Реферальная программа"
-        description="Приглашайте коллег и отслеживайте результат"
-        breadcrumbs={[{ title: "Дашборд", href: "/agent/dashboard" }, { title: "Рефералы" }]}
+        title="Приглашения"
+        description="Пригласите коллег в профсоюз"
+        breadcrumbs={[{ title: "Дашборд", href: "/agent/dashboard" }, { title: "Приглашения" }]}
       />
 
       {/* Stats */}
@@ -96,7 +96,7 @@ export default function AgentReferralPage() {
           changeType="neutral"
         />
         <StatCard
-          title="Лиды по реферралу"
+          title="Регистрации по приглашению"
           value={data.stats.totalLeads}
           icon="Users"
           changeType="neutral"
@@ -105,7 +105,7 @@ export default function AgentReferralPage() {
           title="Конверсия"
           value={`${data.stats.conversion}%`}
           icon="TrendingUp"
-          change="клик → лид"
+          change="переход → регистрация"
           changeType="neutral"
         />
       </div>
@@ -114,7 +114,7 @@ export default function AgentReferralPage() {
       <Card className="p-5 mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Link2 className="h-4.5 w-4.5 text-primary" />
-          <h3 className="font-medium text-sm">Ваша реферальная ссылка</h3>
+          <h3 className="font-medium text-sm">Ваша ссылка для приглашения</h3>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex-1 rounded-lg bg-muted px-4 py-2.5 text-sm font-mono truncate">
@@ -130,7 +130,7 @@ export default function AgentReferralPage() {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          Код: <span className="font-mono font-medium">{data.refCode}</span> — при переходе по ссылке и регистрации лид привязывается к вам
+          Код: <span className="font-mono font-medium">{data.refCode}</span> — при переходе по ссылке коллега сможет зарегистрироваться в профсоюзе
         </p>
       </Card>
 
@@ -138,7 +138,7 @@ export default function AgentReferralPage() {
       <Card className="p-5 mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Share2 className="h-4.5 w-4.5 text-primary" />
-          <h3 className="font-medium text-sm">Готовые тексты для размещения</h3>
+          <h3 className="font-medium text-sm">Готовые тексты для приглашения</h3>
         </div>
         <div className="space-y-3">
           {shareTemplates.map((tpl, i) => {
@@ -168,32 +168,32 @@ export default function AgentReferralPage() {
       <Card className="p-5">
         <div className="flex items-center gap-2 mb-3">
           <MessageCircle className="h-4.5 w-4.5 text-primary" />
-          <h3 className="font-medium text-sm">Где размещать ссылку</h3>
+          <h3 className="font-medium text-sm">Где делиться ссылкой</h3>
         </div>
         <div className="grid gap-2 md:grid-cols-2 text-sm text-muted-foreground">
           <div className="flex items-start gap-2 p-2">
             <span className="text-primary mt-0.5">1.</span>
-            <span>Telegram-каналы и чаты по юридической тематике</span>
+            <span>Рабочие чаты и Telegram-группы подразделений</span>
           </div>
           <div className="flex items-start gap-2 p-2">
             <span className="text-primary mt-0.5">2.</span>
-            <span>Профили в соцсетях (VK, Instagram, Facebook)</span>
+            <span>Профили в соцсетях (VK, Одноклассники)</span>
           </div>
           <div className="flex items-start gap-2 p-2">
             <span className="text-primary mt-0.5">3.</span>
-            <span>Форумы и профессиональные сообщества</span>
+            <span>Профессиональные форумы и сообщества</span>
           </div>
           <div className="flex items-start gap-2 p-2">
             <span className="text-primary mt-0.5">4.</span>
-            <span>Личные сообщения коллегам-юристам</span>
+            <span>Личные сообщения коллегам по работе</span>
           </div>
           <div className="flex items-start gap-2 p-2">
             <span className="text-primary mt-0.5">5.</span>
-            <span>Email-рассылки и визитки</span>
+            <span>Email коллегам и информационные доски</span>
           </div>
           <div className="flex items-start gap-2 p-2">
             <span className="text-primary mt-0.5">6.</span>
-            <span>WhatsApp-группы и бизнес-чаты</span>
+            <span>WhatsApp-группы и рабочие чаты</span>
           </div>
         </div>
       </Card>

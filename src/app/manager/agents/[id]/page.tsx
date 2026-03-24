@@ -7,12 +7,12 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { LifecycleBadge, LeadStatusBadge, TierBadge } from "@/components/dashboard/status-badges";
+import { LifecycleBadge, LeadStatusBadge } from "@/components/dashboard/status-badges";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton";
-import { getInitials, formatCurrency, formatDate } from "@/lib/utils";
-import { Lead, AgentLifecycle, AgentTier } from "@/types";
-import { CheckCircle2, Circle, ShieldCheck, UserX, UserCheck, ArrowUpCircle } from "lucide-react";
+import { getInitials, formatDate } from "@/lib/utils";
+import { Lead, AgentLifecycle } from "@/types";
+import { CheckCircle2, Circle, ShieldCheck, UserX, UserCheck } from "lucide-react";
 
 interface AgentData {
   id: string;
@@ -29,7 +29,7 @@ interface AgentData {
   rating: number;
   userStatus: string;
   lifecycle: AgentLifecycle;
-  tier: AgentTier;
+  tier: string;
   gender?: string;
   birthYear?: number | null;
   profession?: string | null;
@@ -101,7 +101,7 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
   if (!agent) {
     return (
       <div>
-        <PageHeader title="Партнёр не найден" breadcrumbs={[{ title: "Партнёры", href: "/manager/agents" }, { title: "Не найден" }]} />
+        <PageHeader title="Член профсоюза не найден" breadcrumbs={[{ title: "Члены профсоюза", href: "/manager/agents" }, { title: "Не найден" }]} />
       </div>
     );
   }
@@ -117,7 +117,7 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
         title={agent.fullName}
         breadcrumbs={[
           { title: "Дашборд", href: "/manager/dashboard" },
-          { title: "Партнёры", href: "/manager/agents" },
+          { title: "Члены профсоюза", href: "/manager/agents" },
           { title: agent.fullName },
         ]}
       />
@@ -133,7 +133,6 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
             <p className="text-sm text-muted-foreground mt-1">{agent.email}</p>
             <div className="flex gap-2 mt-3">
               <LifecycleBadge lifecycle={agent.lifecycle} />
-              <TierBadge tier={agent.tier || "base"} />
             </div>
 
             {/* Status & tier controls */}
@@ -159,28 +158,6 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
                   Активировать
                 </Button>
               ) : null}
-              {agent.tier === "base" && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={async () => {
-                    setStatusSaving(true);
-                    try {
-                      const res = await fetch(`/api/agents/${id}`, {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ tier: "silver" }),
-                      });
-                      if (res.ok) setAgent(await res.json());
-                    } catch { /* ignore */ }
-                    finally { setStatusSaving(false); }
-                  }}
-                  disabled={statusSaving}
-                >
-                  <ArrowUpCircle className="h-3.5 w-3.5 mr-1" />
-                  Повысить до Silver
-                </Button>
-              )}
             </div>
 
             <div className="w-full mt-6 pt-6 border-t border-border space-y-2 text-sm">
@@ -233,10 +210,8 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
         <div className="lg:col-span-2 space-y-6">
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4">
-            <StatCard title="Активные лиды" value={agent.activeLeads} icon="Users" />
-            <StatCard title="Всего лидов" value={agent.totalLeads} icon="UserPlus" />
-            <StatCard title="Общий доход" value={formatCurrency(Number(agent.totalRevenue))} icon="Wallet" />
-            <StatCard title="Рейтинг" value={`⭐ ${agent.rating}`} icon="Target" />
+            <StatCard title="Активные обращения" value={agent.activeLeads} icon="Users" />
+            <StatCard title="Всего обращений" value={agent.totalLeads} icon="UserPlus" />
           </div>
 
           {/* Learning progress */}
@@ -300,11 +275,11 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
       {/* Leads */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Лиды партнёра</CardTitle>
+          <CardTitle className="text-base">Обращения члена профсоюза</CardTitle>
         </CardHeader>
         <CardContent>
           {leads.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4">Нет лидов</p>
+            <p className="text-sm text-muted-foreground py-4">Нет обращений</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -314,7 +289,6 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
                     <th className="text-left py-3 px-3 font-medium">Город</th>
                     <th className="text-left py-3 px-3 font-medium">Источник</th>
                     <th className="text-left py-3 px-3 font-medium">Статус</th>
-                    <th className="text-right py-3 px-3 font-medium">Оценка</th>
                     <th className="text-left py-3 px-3 font-medium">Дата</th>
                   </tr>
                 </thead>
@@ -332,9 +306,6 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
                       </td>
                       <td className="py-3 px-3">
                         <LeadStatusBadge status={l.status} />
-                      </td>
-                      <td className="py-3 px-3 text-right">
-                        {l.estimatedValue ? formatCurrency(Number(l.estimatedValue)) : "—"}
                       </td>
                       <td className="py-3 px-3 text-muted-foreground">{formatDate(l.createdAt)}</td>
                     </tr>

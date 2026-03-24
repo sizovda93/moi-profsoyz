@@ -47,7 +47,7 @@ const sortLabels: Record<SortKey, string> = {
   name_desc: "Имя Я→А",
   age_asc: "Возраст ↑",
   age_desc: "Возраст ↓",
-  leads_desc: "Лиды ↓",
+  leads_desc: "Обращения ↓",
   revenue_desc: "Доход ↓",
 };
 
@@ -166,7 +166,7 @@ export default function AdminUsersPage() {
     },
     {
       key: "manager",
-      title: "Менеджер",
+      title: "Руководитель",
       render: (u: UserRow) => {
         if (u.role !== "agent" || !u.agentId) return <span className="text-muted-foreground">—</span>;
         return (
@@ -199,7 +199,7 @@ export default function AdminUsersPage() {
   const agentColumns = [
     {
       key: "name",
-      title: "Партнёр",
+      title: "Член профсоюза",
       render: (a: UserRow) => (
         <div>
           <p className="font-medium">{a.fullName}</p>
@@ -234,7 +234,7 @@ export default function AdminUsersPage() {
     },
     {
       key: "manager",
-      title: "Менеджер",
+      title: "Руководитель",
       render: (a: UserRow) => (
         <span className="text-muted-foreground">{a.managerName || "—"}</span>
       ),
@@ -250,7 +250,7 @@ export default function AdminUsersPage() {
     <div>
       <PageHeader
         title="Пользователи"
-        description="Управление пользователями и партнёрами"
+        description="Управление пользователями и членами профсоюза"
         breadcrumbs={[
           { title: "Дашборд", href: "/admin/dashboard" },
           { title: "Пользователи" },
@@ -287,7 +287,7 @@ export default function AdminUsersPage() {
           variant={viewMode === "agents" ? "default" : "outline"}
           onClick={() => setViewMode("agents")}
         >
-          Партнёры
+          Члены профсоюза
           <span className="ml-1.5 text-xs opacity-70">{agents.length}</span>
         </Button>
       </div>

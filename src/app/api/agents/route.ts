@@ -16,11 +16,29 @@ export async function GET(request: NextRequest) {
     // ?unassigned=true — show agents without manager (for "claim" UI)
     const showUnassigned = sp.get('unassigned') === 'true';
 
-    let query = `SELECT a.*, p.full_name, p.email, p.phone, p.avatar_url, p.status as user_status,
-                        pm.full_name as manager_name
-                 FROM agents a
-                 JOIN profiles p ON p.id = a.user_id
-                 LEFT JOIN profiles pm ON pm.id = a.manager_id`;
+    // Check if union tables exist (migration may not be applied yet)
+    let hasUnionTables = true;
+    try {
+      await pool.query(`SELECT 1 FROM unions LIMIT 0`);
+    } catch {
+      hasUnionTables = false;
+    }
+
+    let query = hasUnionTables
+      ? `SELECT a.*, p.full_name, p.email, p.phone, p.avatar_url, p.status as user_status,
+                pm.full_name as manager_name,
+                ud.name as division_name,
+                u.name as union_name, u.short_name as union_short_name
+         FROM agents a
+         JOIN profiles p ON p.id = a.user_id
+         LEFT JOIN profiles pm ON pm.id = a.manager_id
+         LEFT JOIN union_divisions ud ON ud.id = a.division_id
+         LEFT JOIN unions u ON u.id = a.union_id`
+      : `SELECT a.*, p.full_name, p.email, p.phone, p.avatar_url, p.status as user_status,
+                pm.full_name as manager_name
+         FROM agents a
+         JOIN profiles p ON p.id = a.user_id
+         LEFT JOIN profiles pm ON pm.id = a.manager_id`;
 
     const conditions: string[] = [];
     const params: unknown[] = [];
@@ -81,6 +99,14 @@ export async function GET(request: NextRequest) {
     if (search && search.trim()) {
       conditions.push(`(p.full_name ILIKE $${idx} OR p.email ILIKE $${idx})`);
       params.push(`%${search.trim()}%`);
+      idx++;
+    }
+
+    // Filter: divisionId
+    const divisionId = sp.get('divisionId');
+    if (divisionId && divisionId.trim()) {
+      conditions.push(`a.division_id = $${idx}`);
+      params.push(divisionId.trim());
       idx++;
     }
 

@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Агентум Про — система управления партнёрской сетью",
-  description: "Платформа для управления партнёрской сетью, лидами и выплатами",
+  title: "Мой Профсоюз — профсоюзная платформа",
+  description: "Платформа для взаимодействия членов профсоюза",
 };
 
 export default function RootLayout({

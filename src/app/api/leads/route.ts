@@ -5,7 +5,7 @@ import { toCamelCase } from '@/lib/api-utils';
 import { normalizePhone } from '@/lib/phone';
 import { touchAgentActivity } from '@/lib/activity';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const auth = await requireAuth();
     if (auth.error) return auth.error;
@@ -14,16 +14,32 @@ export async function GET() {
     let query = `SELECT l.*,
        ag.id as agent_uuid,
        pa.full_name as agent_name,
-       pm.full_name as manager_name
+       pm.full_name as manager_name,
+       ag.division_id as agent_division_id
      FROM leads l
      LEFT JOIN agents ag ON ag.id = l.assigned_agent_id
      LEFT JOIN profiles pa ON pa.id = ag.user_id
      LEFT JOIN profiles pm ON pm.id = l.assigned_manager_id`;
+    const conditions: string[] = [];
     const params: string[] = [];
+    let idx = 1;
 
     if (user.role === 'agent' && user.agentId) {
-      query += ` WHERE l.assigned_agent_id = $1`;
+      conditions.push(`l.assigned_agent_id = $${idx}`);
       params.push(user.agentId);
+      idx++;
+    }
+
+    // Division filter (manager/admin only)
+    const divisionId = request.nextUrl.searchParams.get('divisionId');
+    if (divisionId && divisionId.trim() && user.role !== 'agent') {
+      conditions.push(`ag.division_id = $${idx}`);
+      params.push(divisionId.trim());
+      idx++;
+    }
+
+    if (conditions.length > 0) {
+      query += ` WHERE ` + conditions.join(' AND ');
     }
 
     query += ` ORDER BY l.created_at DESC`;
@@ -43,7 +59,7 @@ export async function POST(request: NextRequest) {
     const { user } = auth;
 
     const body = await request.json();
-    const { fullName, phone, email, city, source, assignedAgentId, comment, estimatedValue, refCode } = body;
+    const { fullName, phone, email, city, source, assignedAgentId, comment, estimatedValue, refCode, requestType } = body;
 
     if (!fullName || !phone) {
       return Response.json({ error: 'ФИО и телефон обязательны' }, { status: 400 });
@@ -51,6 +67,9 @@ export async function POST(request: NextRequest) {
 
     const validSources = ['website', 'telegram', 'whatsapp', 'referral', 'cold', 'partner'];
     const leadSource = validSources.includes(source) ? source : 'website';
+
+    const validRequestTypes = ['complaint', 'request', 'initiative', 'consultation'];
+    const leadRequestType = validRequestTypes.includes(requestType) ? requestType : 'consultation';
 
     const effectiveAgentId = user.role === 'agent' ? user.agentId : assignedAgentId;
 
@@ -123,8 +142,8 @@ export async function POST(request: NextRequest) {
     const { rows } = await pool.query(
       `INSERT INTO leads (full_name, phone, phone_normalized, email, city, source,
                           assigned_agent_id, assigned_manager_id, comment, estimated_value,
-                          ref_code, conflict_status, conflict_with_lead_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                          ref_code, request_type, conflict_status, conflict_with_lead_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING *`,
       [
         fullName,
@@ -138,6 +157,7 @@ export async function POST(request: NextRequest) {
         comment || null,
         estimatedValue || null,
         validRefCode,
+        leadRequestType,
         hasConflict ? 'open' : null,
         conflictLeadId,
       ]

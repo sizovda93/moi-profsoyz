@@ -46,7 +46,7 @@ export default function AgentFinancePage() {
     },
     {
       key: "lead",
-      title: "Лид",
+      title: "Обращение",
       render: (p: Payout) => (
         <span className="text-muted-foreground">{p.leadName || "—"}</span>
       ),

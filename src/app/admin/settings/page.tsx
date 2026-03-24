@@ -188,7 +188,7 @@ export default function AdminSettingsPage() {
               { label: "Email уведомления", active: true },
               { label: "Telegram уведомления", active: false },
               { label: "Уведомления об эскалациях", active: true },
-              { label: "Уведомления о новых лидах", active: true },
+              { label: "Уведомления о новых обращениях", active: true },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between py-2">
                 <span className="text-sm">{item.label}</span>

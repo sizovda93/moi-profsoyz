@@ -28,6 +28,9 @@ interface ProfileData {
   birthYear?: number | null;
   profession?: string | null;
   preferredMessenger?: string;
+  divisionName?: string;
+  unionName?: string;
+  unionShortName?: string;
 }
 
 interface TelegramStatus {
@@ -173,9 +176,25 @@ export default function AgentProfilePage() {
             <h2 className="text-lg font-semibold">{profile.fullName}</h2>
             <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
             <div className="flex items-center gap-2 mt-3">
-              <Badge variant="info">Партнёр</Badge>
+              <Badge variant="info">Член профсоюза</Badge>
               <Badge variant="success">{profile.status === "active" ? "Активен" : profile.status}</Badge>
             </div>
+            {(profile.unionName || profile.divisionName) && (
+              <div className="w-full mt-4 pt-4 border-t border-border space-y-2 text-sm">
+                {profile.unionShortName && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Профсоюз</span>
+                    <span className="text-right max-w-[180px]">{profile.unionShortName}</span>
+                  </div>
+                )}
+                {profile.divisionName && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Подразделение</span>
+                    <span className="text-right max-w-[180px]">{profile.divisionName}</span>
+                  </div>
+                )}
+              </div>
+            )}
             <div className="w-full mt-6 pt-6 border-t border-border space-y-3 text-sm">
               {profile.city && (
                 <div className="flex justify-between">
@@ -185,7 +204,7 @@ export default function AgentProfilePage() {
               )}
               {profile.specialization && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Специализация</span>
+                  <span className="text-muted-foreground">Должность</span>
                   <span>{profile.specialization}</span>
                 </div>
               )}
@@ -209,7 +228,7 @@ export default function AgentProfilePage() {
               )}
               {profile.totalLeads !== undefined && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Всего лидов</span>
+                  <span className="text-muted-foreground">Обращений</span>
                   <span>{profile.totalLeads}</span>
                 </div>
               )}
@@ -241,7 +260,7 @@ export default function AgentProfilePage() {
                   <Input value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} />
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Специализация</label>
+                  <label className="text-sm text-muted-foreground mb-1.5 block">Должность</label>
                   <Input value={form.specialization} onChange={(e) => setForm((f) => ({ ...f, specialization: e.target.value }))} />
                 </div>
                 <div>
@@ -249,7 +268,7 @@ export default function AgentProfilePage() {
                   <Input
                     value={form.profession}
                     onChange={(e) => setForm((f) => ({ ...f, profession: e.target.value }))}
-                    placeholder="Например: юрист, риэлтор..."
+                    placeholder="Например: инженер, электрик..."
                   />
                 </div>
                 <div>
@@ -314,7 +333,7 @@ export default function AgentProfilePage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Вы получаете уведомления и сообщения менеджера в Telegram.
+                    Вы получаете уведомления и сообщения руководителя в Telegram.
                   </p>
                   <Button variant="outline" size="sm" onClick={handleTgDisconnect} disabled={tgLoading}>
                     <Unlink className="h-3.5 w-3.5 mr-1" />
@@ -346,7 +365,7 @@ export default function AgentProfilePage() {
               ) : (
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Подключите Telegram, чтобы получать уведомления и отвечать менеджеру прямо из мессенджера.
+                    Подключите Telegram, чтобы получать уведомления и отвечать руководителю прямо из мессенджера.
                   </p>
                   <Button onClick={handleTgConnect} disabled={tgLoading}>
                     <Send className="h-4 w-4 mr-1" />
