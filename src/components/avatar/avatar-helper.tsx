@@ -135,16 +135,21 @@ export function AvatarHelper() {
         audioUrlRef.current = url;
         const audio = new Audio(url);
         audio.muted = muted;
+        audio.preload = "auto";
         audioRef.current = audio;
 
-        // Switch to answer video — LOOP it so it plays as long as audio lasts
+        // Wait for audio to be ready, then start video + audio together
+        await new Promise<void>((resolve) => {
+          audio.addEventListener("canplaythrough", () => resolve(), { once: true });
+          audio.load();
+        });
+
+        // Start video and audio simultaneously
         if (videoRef.current) {
           videoRef.current.loop = true;
           videoRef.current.src = q.video;
           videoRef.current.play().catch(() => {});
         }
-
-        // Start audio simultaneously
         setState("answering");
         await audio.play();
 
@@ -198,9 +203,9 @@ export function AvatarHelper() {
           </div>
 
           <div className="px-3 py-2 bg-[#2a2a2f]">
-            <p className="text-sm font-semibold text-[#fafafa]">Сэр Бонифаций</p>
-            <p className="text-[11px] text-[#71717a] leading-snug">
-              Ваш помощник на платформе
+            <p className="text-sm font-semibold text-[#fafafa]">Котофей Петрович</p>
+            <p className="text-[11px] text-[#fafafa] leading-snug">
+              Ваш лучший советник
             </p>
           </div>
         </CardContent>

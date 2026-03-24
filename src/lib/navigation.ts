@@ -5,9 +5,9 @@ export const agentNav: NavItem[] = [
   { title: "О профсоюзе", href: "/agent/about", icon: "Users" },
   { title: "Партнёры", href: "/agent/partners", icon: "Building2" },
   { title: "Обращение к руководителю", href: "/agent/leads", icon: "UserPlus" },
-  { title: "Сообщения", href: "/agent/messages", icon: "MessageSquare", badge: 3 },
+  { title: "Чат с руководителем", href: "/agent/messages", icon: "MessageCircle" },
   { title: "Коллеги", href: "/agent/colleagues", icon: "Users" },
-  { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot", highlight: true },
+  { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot"},
   { title: "Вопрос юристу", href: "/agent/legal", icon: "Shield" },
   { title: "Опросы", href: "/agent/surveys", icon: "ClipboardList" },
   { title: "Обучение", href: "/agent/learning", icon: "GraduationCap" },
@@ -26,7 +26,7 @@ export const managerNav: NavItem[] = [
   { title: "Документы", href: "/manager/documents", icon: "FileText" },
   { title: "Приглашения", href: "/manager/referrals", icon: "Share2" },
   { title: "Опросы", href: "/agent/surveys", icon: "ClipboardList" },
-  { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot", highlight: true },
+  { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot"},
   { title: "Обучение", href: "/manager/learning", icon: "GraduationCap" },
 ];
 

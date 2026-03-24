@@ -131,7 +131,7 @@ export default function AgentColleaguesPage() {
     <div>
       <PageHeader
         title="Коллеги"
-        description="Общение с коллегами из вашего подразделения"
+        description="Общение с коллегами из вашего профсоюза"
         breadcrumbs={[
           { title: "О платформе", href: "/agent/dashboard" },
           { title: "Коллеги" },
@@ -172,7 +172,7 @@ export default function AgentColleaguesPage() {
             <div className="flex flex-col items-center justify-center h-[calc(100%-49px)] text-center px-4">
               <UserRound className="h-8 w-8 text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">
-                Нет коллег в подразделении
+                Нет коллег в профсоюзе
               </p>
             </div>
           ) : (
@@ -184,12 +184,12 @@ export default function AgentColleaguesPage() {
                 >
                   <Avatar className="h-9 w-9 shrink-0">
                     <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                      {getInit(colleague.full_name || "")}
+                      {getInit(colleague.fullName || "")}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
-                      {colleague.full_name}
+                      {colleague.fullName}
                     </p>
                     {colleague.profession && (
                       <p className="text-xs text-muted-foreground truncate">

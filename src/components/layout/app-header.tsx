@@ -168,7 +168,7 @@ export function AppHeader({ user, onMenuToggle }: AppHeaderProps) {
               className="flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-muted/50 transition-colors cursor-pointer"
             >
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="text-xs">{getInitials(user.fullName)}</AvatarFallback>
+                <AvatarFallback className="text-xs bg-primary text-primary-foreground">{getInitials(user.fullName)}</AvatarFallback>
               </Avatar>
               <div className="hidden md:block text-left">
                 <p className="text-sm font-medium leading-tight">{user.fullName}</p>

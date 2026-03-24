@@ -26,6 +26,7 @@ import {
   Scale,
   Building2,
   Bot,
+  MessageCircle,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -49,6 +50,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Scale,
   Building2,
   Bot,
+  MessageCircle,
 };
 
 interface AppSidebarProps {
@@ -60,7 +62,7 @@ export function AppSidebar({ items, role }: AppSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card h-screen sticky top-0">
+    <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card h-screen sticky top-0" style={{ fontFamily: "var(--font-manrope), sans-serif" }}>
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-border">
         <Link href={`/${role}/dashboard`} className="flex items-center gap-3">
@@ -84,18 +86,15 @@ export function AppSidebar({ items, role }: AppSidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                  item.highlight && !isActive
-                    ? "bg-gradient-to-r from-violet-500/10 to-blue-500/10 text-violet-400 hover:from-violet-500/20 hover:to-blue-500/20 border border-violet-500/20"
-                    : isActive
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
-                  item.highlight && isActive && "bg-gradient-to-r from-violet-500/20 to-blue-500/20 text-violet-400 font-medium border border-violet-500/30"
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-extrabold transition-colors",
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 )}
               >
-                <Icon className={cn("h-4.5 w-4.5 shrink-0", item.highlight && "text-violet-400")} />
+                <Icon className="h-4.5 w-4.5 shrink-0" />
                 <span className="flex-1">{item.title}</span>
-                {item.highlight && (
+                {(item.highlight || item.pulse) && (
                   <span className="relative flex h-2.5 w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-violet-500" />

@@ -71,17 +71,16 @@ export default function AgentDashboard() {
 
   return (
     <div>
-      {/* ============ HERO: Помощник + Действия ============ */}
       <Card className="mb-6 overflow-hidden">
         <CardContent className="p-0">
           <div className="grid grid-cols-1 lg:grid-cols-2">
             {/* Left: Avatar helper */}
-            <div className="p-6 flex items-center justify-center bg-muted/30">
+            <div className="p-6 flex items-center bg-muted/30">
               <AvatarHelper />
             </div>
 
             {/* Right: Welcome + CTA */}
-            <div className="p-6 flex flex-col justify-center">
+            <div className="p-6 pt-4 flex flex-col justify-start">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="h-5 w-5 text-primary" />
                 <h1 className="text-lg font-semibold">Мой Профсоюз</h1>
@@ -117,7 +116,7 @@ export default function AgentDashboard() {
               <div className="mt-4">
                 <Link
                   href="/agent/ai-chat"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-violet-500/10 to-blue-500/10 border border-violet-500/20 text-sm font-medium text-violet-400 hover:from-violet-500/20 hover:to-blue-500/20 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted/50 transition-colors"
                 >
                   <Sparkles className="h-4 w-4" />
                   Чат с ИИ — мгновенная консультация
@@ -135,14 +134,21 @@ export default function AgentDashboard() {
         <StatCard title="Решено" value={resolvedCount} icon="Target" />
       </div>
 
-      {/* ============ ПЕРВЫЕ ШАГИ (компактный) ============ */}
+      {/* ============ ПЕРВЫЕ ШАГИ ============ */}
       {showChecklist && checklist && (
+        <>
+        <div className="flex items-center gap-2 mb-4">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
+            <GraduationCap className="h-4 w-4" />
+            Первые шаги
+          </span>
+        </div>
         <Card className="mb-6">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <GraduationCap className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">Первые шаги</span>
+                <span className="text-sm font-medium">Чек-лист</span>
               </div>
               <span className="text-xs text-muted-foreground">{completedSteps}/{checklistItems.length}</span>
             </div>
@@ -171,6 +177,7 @@ export default function AgentDashboard() {
             </div>
           </CardContent>
         </Card>
+        </>
       )}
 
       {/* ============ НОВОСТИ ============ */}

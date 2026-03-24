@@ -173,6 +173,7 @@ export interface NavItem {
   icon: string;
   badge?: number;
   highlight?: boolean;
+  pulse?: boolean;
 }
 
 export interface BreadcrumbItem {

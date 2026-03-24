@@ -29,10 +29,12 @@ const CAT_SLEEP = "/ai-cat/sleep.mp4";
 const CAT_PEEK = "/ai-cat/peek.mp4";
 const CAT_TALK = "/ai-cat/talk.mp4";
 const CAT_THINK = "/ai-cat/think.mp4";
+const CAT_ANSWER = "/ai-cat/answer.mp4";
 const CAT_THINK_VOICE = "/ai-cat/think-voice.mp3";
+const CAT_ANSWER_VOICE = "/ai-cat/answer-voice.mp3";
 const CAT_PURR = "/ai-cat/purr.mp3";
 
-type CatState = "sleep" | "peek" | "talk" | "think";
+type CatState = "sleep" | "peek" | "talk" | "think" | "answer";
 
 export default function AiChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -61,16 +63,50 @@ export default function AiChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Switch cat video + purr sound when state changes
+  // Switch cat video + audio when state changes
   useEffect(() => {
     if (!catVideoRef.current) return;
-    const srcMap: Record<CatState, string> = { sleep: CAT_SLEEP, peek: CAT_PEEK, talk: CAT_TALK, think: CAT_THINK };
-    const src = srcMap[catState];
-    const shouldLoop = catState !== "talk"; // talk plays once
+    const srcMap: Record<CatState, string> = {
+      sleep: CAT_SLEEP, peek: CAT_PEEK, talk: CAT_TALK, think: CAT_THINK, answer: CAT_ANSWER,
+    };
 
-    catVideoRef.current.src = src;
-    catVideoRef.current.loop = shouldLoop;
+    catVideoRef.current.src = srcMap[catState];
+    catVideoRef.current.loop = catState !== "talk"; // talk plays once, rest loop
     catVideoRef.current.play().catch(() => {});
+
+    // Voice: play when entering "talk" or "answer" state
+    let voiceAudio: HTMLAudioElement | null = null;
+    let mutedTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    if (catState === "talk") {
+      if (!muted) {
+        voiceAudio = new Audio(CAT_THINK_VOICE);
+        catAudioRef.current = voiceAudio;
+        voiceAudio.addEventListener("ended", () => {
+          setCatState("think");
+        }, { once: true });
+        voiceAudio.play().catch(() => {
+          setCatState("think");
+        });
+      } else {
+        mutedTimeout = setTimeout(() => setCatState("think"), 3000);
+      }
+    }
+
+    if (catState === "answer") {
+      if (!muted) {
+        voiceAudio = new Audio(CAT_ANSWER_VOICE);
+        catAudioRef.current = voiceAudio;
+        voiceAudio.addEventListener("ended", () => {
+          setCatState("sleep");
+        }, { once: true });
+        voiceAudio.play().catch(() => {
+          setCatState("sleep");
+        });
+      } else {
+        mutedTimeout = setTimeout(() => setCatState("sleep"), 5000);
+      }
+    }
 
     // Purr: play when sleeping, stop otherwise
     if (catState === "sleep" && !muted) {
@@ -81,63 +117,64 @@ export default function AiChatPage() {
         purrAudioRef.current = purr;
       }
       purrAudioRef.current.play().catch(() => {});
-    } else {
-      if (purrAudioRef.current) {
-        purrAudioRef.current.pause();
-      }
+    } else if (purrAudioRef.current) {
+      purrAudioRef.current.pause();
     }
 
-    // Cleanup on unmount — stop all audio
+    // Cleanup: stop audio created in THIS effect run
     return () => {
+      if (voiceAudio) { voiceAudio.pause(); voiceAudio = null; }
+      if (mutedTimeout) clearTimeout(mutedTimeout);
       if (purrAudioRef.current) { purrAudioRef.current.pause(); purrAudioRef.current = null; }
+    };
+  }, [catState, muted]);
+
+  // Cleanup catAudioRef on unmount only
+  useEffect(() => {
+    return () => {
       if (catAudioRef.current) { catAudioRef.current.pause(); catAudioRef.current = null; }
     };
-  }, [catState, muted]);
+  }, []);
 
-  // Stop purr when browser tab is hidden
+  // Stop audio when user leaves the page (tab switch, window switch, alt-tab)
   useEffect(() => {
-    const handleVisibility = () => {
-      if (document.hidden) {
-        if (purrAudioRef.current) purrAudioRef.current.pause();
-        if (catAudioRef.current) catAudioRef.current.pause();
-      } else {
-        if (catState === "sleep" && !muted && purrAudioRef.current) {
-          purrAudioRef.current.play().catch(() => {});
-        }
+    const pauseAll = () => {
+      if (purrAudioRef.current) purrAudioRef.current.pause();
+      if (catAudioRef.current) catAudioRef.current.pause();
+    };
+    const resumeIfNeeded = () => {
+      if (catState === "sleep" && !muted && purrAudioRef.current) {
+        purrAudioRef.current.play().catch(() => {});
       }
     };
+    const handleVisibility = () => {
+      if (document.hidden) pauseAll(); else resumeIfNeeded();
+    };
+
     document.addEventListener("visibilitychange", handleVisibility);
-    return () => document.removeEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("blur", pauseAll);
+    window.addEventListener("focus", resumeIfNeeded);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("blur", pauseAll);
+      window.removeEventListener("focus", resumeIfNeeded);
+    };
   }, [catState, muted]);
 
-  // Sequence: talk video + voice → then think video silently
+  // Trigger talk → voice → think sequence (audio handled in useEffect)
   const playCatThinkSequence = useCallback(() => {
+    // Clear any pending typing timeout so it doesn't override cat state
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
     // Stop purr
     if (purrAudioRef.current) purrAudioRef.current.pause();
-
-    // Switch to talk video (plays once)
+    // Stop any previous voice
+    if (catAudioRef.current) { catAudioRef.current.pause(); catAudioRef.current = null; }
+    // Switch to talk — useEffect will play the voice audio
     setCatState("talk");
-
-    if (!muted) {
-      try {
-        if (catAudioRef.current) catAudioRef.current.pause();
-        const audio = new Audio(CAT_THINK_VOICE);
-        catAudioRef.current = audio;
-        audio.addEventListener("ended", () => {
-          // Voice done → switch to think video (silent loop)
-          setCatState("think");
-        }, { once: true });
-        audio.play().catch(() => {
-          setCatState("think");
-        });
-      } catch {
-        setCatState("think");
-      }
-    } else {
-      // Muted → show talk video briefly, then think
-      setTimeout(() => setCatState("think"), 3000);
-    }
-  }, [muted]);
+  }, []);
 
   // Handle input typing → cat peeks
   const handleInputChange = (value: string) => {
@@ -203,10 +240,9 @@ export default function AiChatPage() {
       }]);
     } finally {
       setSending(false);
-      // Stop voice audio, but keep think video running
-      if (catAudioRef.current) catAudioRef.current.pause();
-      // Cat stays in think — will switch to peek when user types, or sleep after timeout
-      setCatState("think");
+      // Stop think voice, switch to answer video + voice
+      if (catAudioRef.current) { catAudioRef.current.pause(); catAudioRef.current = null; }
+      setCatState("answer");
     }
   };
 
@@ -266,10 +302,11 @@ export default function AiChatPage() {
                   {catState === "peek" && "👀 Подсматривает..."}
                   {catState === "talk" && "💬 Говорит..."}
                   {catState === "think" && "🤔 Думает..."}
+                  {catState === "answer" && "✅ Ответ готов!"}
                 </div>
               </div>
               <div className="px-3 py-2 bg-[#2a2a2f]">
-                <p className="text-sm font-semibold text-[#fafafa]">Сэр Бонифаций</p>
+                <p className="text-sm font-semibold text-[#fafafa]">Котофей Петрович</p>
                 <p className="text-[11px] text-[#71717a] leading-snug">ИИ-помощник профсоюза</p>
               </div>
             </CardContent>
