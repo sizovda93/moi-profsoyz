@@ -7,7 +7,7 @@ export const agentNav: NavItem[] = [
   { title: "Обращение к руководителю", href: "/agent/leads", icon: "UserPlus" },
   { title: "Сообщения", href: "/agent/messages", icon: "MessageSquare", badge: 3 },
   { title: "Коллеги", href: "/agent/colleagues", icon: "Users" },
-  { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot" },
+  { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot", highlight: true },
   { title: "Вопрос юристу", href: "/agent/legal", icon: "Shield" },
   { title: "Опросы", href: "/agent/surveys", icon: "ClipboardList" },
   { title: "Обучение", href: "/agent/learning", icon: "GraduationCap" },
@@ -26,7 +26,7 @@ export const managerNav: NavItem[] = [
   { title: "Документы", href: "/manager/documents", icon: "FileText" },
   { title: "Приглашения", href: "/manager/referrals", icon: "Share2" },
   { title: "Опросы", href: "/agent/surveys", icon: "ClipboardList" },
-  { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot" },
+  { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot", highlight: true },
   { title: "Обучение", href: "/manager/learning", icon: "GraduationCap" },
 ];
 

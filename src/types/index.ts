@@ -172,6 +172,7 @@ export interface NavItem {
   href: string;
   icon: string;
   badge?: number;
+  highlight?: boolean;
 }
 
 export interface BreadcrumbItem {

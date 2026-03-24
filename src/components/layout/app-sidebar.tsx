@@ -85,13 +85,22 @@ export function AppSidebar({ items, role }: AppSidebarProps) {
                 href={item.href}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                  isActive
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  item.highlight && !isActive
+                    ? "bg-gradient-to-r from-violet-500/10 to-blue-500/10 text-violet-400 hover:from-violet-500/20 hover:to-blue-500/20 border border-violet-500/20"
+                    : isActive
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                  item.highlight && isActive && "bg-gradient-to-r from-violet-500/20 to-blue-500/20 text-violet-400 font-medium border border-violet-500/30"
                 )}
               >
-                <Icon className="h-4.5 w-4.5 shrink-0" />
+                <Icon className={cn("h-4.5 w-4.5 shrink-0", item.highlight && "text-violet-400")} />
                 <span className="flex-1">{item.title}</span>
+                {item.highlight && (
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-violet-500" />
+                  </span>
+                )}
                 {item.badge && item.badge > 0 && (
                   <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground px-1.5">
                     {item.badge}
