@@ -29,6 +29,7 @@ const CAT_SLEEP = "/ai-cat/sleep.mp4";
 const CAT_PEEK = "/ai-cat/peek.mp4";
 const CAT_THINK = "/ai-cat/think.mp4";
 const CAT_THINK_VOICE = "/ai-cat/think-voice.mp3";
+const CAT_PURR = "/ai-cat/purr.mp3";
 
 type CatState = "sleep" | "peek" | "think";
 
@@ -44,6 +45,7 @@ export default function AiChatPage() {
   const [catState, setCatState] = useState<CatState>("sleep");
   const catVideoRef = useRef<HTMLVideoElement>(null);
   const catAudioRef = useRef<HTMLAudioElement | null>(null);
+  const purrAudioRef = useRef<HTMLAudioElement | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -58,7 +60,7 @@ export default function AiChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Switch cat video when state changes
+  // Switch cat video + purr sound when state changes
   useEffect(() => {
     if (!catVideoRef.current) return;
     const src = catState === "think" ? CAT_THINK : catState === "peek" ? CAT_PEEK : CAT_SLEEP;
@@ -67,7 +69,22 @@ export default function AiChatPage() {
       catVideoRef.current.loop = true;
       catVideoRef.current.play().catch(() => {});
     }
-  }, [catState]);
+
+    // Purr: play when sleeping, stop otherwise
+    if (catState === "sleep" && !muted) {
+      if (!purrAudioRef.current) {
+        const purr = new Audio(CAT_PURR);
+        purr.loop = true;
+        purr.volume = 0.3;
+        purrAudioRef.current = purr;
+      }
+      purrAudioRef.current.play().catch(() => {});
+    } else {
+      if (purrAudioRef.current) {
+        purrAudioRef.current.pause();
+      }
+    }
+  }, [catState, muted]);
 
   // Play think audio from static file
   const playCatThinkAudio = useCallback(() => {
@@ -158,6 +175,13 @@ export default function AiChatPage() {
     setMuted((prev) => {
       const next = !prev;
       if (catAudioRef.current) catAudioRef.current.muted = next;
+      if (purrAudioRef.current) {
+        if (next) {
+          purrAudioRef.current.pause();
+        } else if (catState === "sleep") {
+          purrAudioRef.current.play().catch(() => {});
+        }
+      }
       return next;
     });
   };
