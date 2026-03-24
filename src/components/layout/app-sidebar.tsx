@@ -60,9 +60,7 @@ export function AppSidebar({ items, role }: AppSidebarProps) {
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-border">
         <Link href={`/${role}/dashboard`} className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <Shield className="h-4.5 w-4.5 text-primary-foreground" />
-          </div>
+          <img src="/logo.png" alt="Мой Профсоюз" className="h-8 w-8 rounded-lg object-contain" />
           <div>
             <span className="font-semibold text-sm tracking-tight">Мой Профсоюз</span>
             <span className="text-[10px] text-muted-foreground block -mt-0.5">профсоюзная платформа</span>
