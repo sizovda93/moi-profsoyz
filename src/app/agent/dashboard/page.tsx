@@ -83,7 +83,7 @@ export default function AgentDashboard() {
   return (
     <div>
       <PageHeader
-        title="Платформа"
+        title="О платформе"
         description="Обзор вашей активности в профсоюзе"
       />
 
