@@ -86,15 +86,31 @@ export default function AiChatPage() {
     }
   }, [catState, muted]);
 
-  // Play think audio from static file
-  const playCatThinkAudio = useCallback(() => {
-    if (muted) return;
-    try {
-      if (catAudioRef.current) catAudioRef.current.pause();
-      const audio = new Audio(CAT_THINK_VOICE);
-      catAudioRef.current = audio;
-      audio.play().catch(() => {});
-    } catch { /* ignore */ }
+  // Play think audio once, then switch to silent think video
+  const playCatThinkSequence = useCallback(() => {
+    // Stop purr
+    if (purrAudioRef.current) purrAudioRef.current.pause();
+
+    // First: play voice with current video (sleep/peek → acts as "speaking" pose)
+    if (!muted) {
+      try {
+        if (catAudioRef.current) catAudioRef.current.pause();
+        const audio = new Audio(CAT_THINK_VOICE);
+        catAudioRef.current = audio;
+        audio.addEventListener("ended", () => {
+          // After voice ends → switch to think video (silent loop)
+          setCatState("think");
+        }, { once: true });
+        audio.play().catch(() => {
+          setCatState("think");
+        });
+      } catch {
+        setCatState("think");
+      }
+    } else {
+      // Muted → go straight to think
+      setCatState("think");
+    }
   }, [muted]);
 
   // Handle input typing → cat peeks
@@ -128,9 +144,8 @@ export default function AiChatPage() {
     setInput("");
     setSending(true);
 
-    // Cat thinks
-    setCatState("think");
-    playCatThinkAudio();
+    // Cat: voice first, then think video
+    playCatThinkSequence();
 
     try {
       const res = await fetch("/api/ai-chat", {
