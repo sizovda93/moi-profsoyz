@@ -203,9 +203,7 @@ export default function AgentAboutPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <User className="h-4.5 w-4.5 text-primary" />
-                </div>
+                <img src="/leaders/gryadkin.jpg" alt="Грядкин С.А." className="h-16 w-16 rounded-lg object-cover shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground">ФИО</p>
                   <p className="text-sm font-medium">Грядкин Сергей Александрович</p>
@@ -257,9 +255,7 @@ export default function AgentAboutPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <User className="h-4.5 w-4.5 text-primary" />
-                </div>
+                <img src="/leaders/ralko.jpg" alt="Ралко Н.А." className="h-16 w-16 rounded-lg object-cover shrink-0" />
                 <div>
                   <p className="text-sm font-medium">Ралко Наталья Александровна</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
