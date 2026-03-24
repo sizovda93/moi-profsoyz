@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bot, Send, Loader2, User, AlertCircle, Sparkles } from "lucide-react";
+import { Bot, Send, Loader2, User, AlertCircle, Sparkles, Volume2, VolumeX } from "lucide-react";
 
 interface ChatMessage {
   id: string;
@@ -25,12 +25,56 @@ const quickQuestions = [
   "Как написать коллеге из подразделения?",
 ];
 
+// Cat video states
+const CAT_SLEEP = "/ai-cat/sleep.mp4";
+const CAT_PEEK = "/ai-cat/peek.mp4";
+const CAT_THINK = "/ai-cat/think.mp4";
+
+const ELEVENLABS_VOICE_ID = "yl2ZDV1MzN4HbQJbMihG";
+
+async function fetchTTS(text: string): Promise<Blob | null> {
+  const apiKey = process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY;
+  if (!apiKey) return null;
+  try {
+    const res = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`,
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json",
+          Accept: "audio/mpeg",
+        },
+        body: JSON.stringify({
+          text,
+          model_id: "eleven_multilingual_v2",
+          voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+        }),
+      }
+    );
+    if (!res.ok) return null;
+    return res.blob();
+  } catch {
+    return null;
+  }
+}
+
+type CatState = "sleep" | "peek" | "think";
+
 export default function AiChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [muted, setMuted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Cat state
+  const [catState, setCatState] = useState<CatState>("sleep");
+  const catVideoRef = useRef<HTMLVideoElement>(null);
+  const catAudioRef = useRef<HTMLAudioElement | null>(null);
+  const catAudioUrlRef = useRef<string | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     fetch("/api/ai-chat")
@@ -44,11 +88,57 @@ export default function AiChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Switch cat video when state changes
+  useEffect(() => {
+    if (!catVideoRef.current) return;
+    const src = catState === "think" ? CAT_THINK : catState === "peek" ? CAT_PEEK : CAT_SLEEP;
+    if (catVideoRef.current.src !== window.location.origin + src) {
+      catVideoRef.current.src = src;
+      catVideoRef.current.loop = true;
+      catVideoRef.current.play().catch(() => {});
+    }
+  }, [catState]);
+
+  // Play think audio
+  const playCatThinkAudio = useCallback(async () => {
+    if (muted) return;
+    try {
+      const blob = await fetchTTS("Интересно, тут нужно подумать");
+      if (!blob || blob.size === 0) return;
+      // Cleanup previous
+      if (catAudioRef.current) catAudioRef.current.pause();
+      if (catAudioUrlRef.current) URL.revokeObjectURL(catAudioUrlRef.current);
+
+      const url = URL.createObjectURL(blob);
+      catAudioUrlRef.current = url;
+      const audio = new Audio(url);
+      audio.muted = muted;
+      catAudioRef.current = audio;
+      await audio.play();
+    } catch { /* ignore */ }
+  }, [muted]);
+
+  // Handle input typing → cat peeks
+  const handleInputChange = (value: string) => {
+    setInput(value);
+    if (!sending) {
+      if (value.trim()) {
+        setCatState("peek");
+        // Reset timeout
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(() => {
+          if (!sending) setCatState("sleep");
+        }, 3000);
+      } else {
+        setCatState("sleep");
+      }
+    }
+  };
+
   const handleSend = async (text?: string) => {
     const msg = (text || input).trim();
     if (!msg || sending) return;
 
-    // Optimistic add user message
     const tempUserMsg: ChatMessage = {
       id: `temp-${Date.now()}`,
       role: "user",
@@ -59,6 +149,10 @@ export default function AiChatPage() {
     setInput("");
     setSending(true);
 
+    // Cat thinks
+    setCatState("think");
+    playCatThinkAudio();
+
     try {
       const res = await fetch("/api/ai-chat", {
         method: "POST",
@@ -68,33 +162,42 @@ export default function AiChatPage() {
 
       if (res.ok) {
         const data = await res.json();
-        const assistantMsg: ChatMessage = {
+        setMessages((prev) => [...prev, {
           id: data.message?.id || `ai-${Date.now()}`,
           role: "assistant",
           content: data.reply,
           createdAt: data.message?.createdAt || new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, assistantMsg]);
+        }]);
       } else {
-        const errorMsg: ChatMessage = {
+        setMessages((prev) => [...prev, {
           id: `err-${Date.now()}`,
           role: "assistant",
           content: "Не удалось получить ответ. Попробуйте позже.",
           createdAt: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, errorMsg]);
+        }]);
       }
     } catch {
-      const errorMsg: ChatMessage = {
+      setMessages((prev) => [...prev, {
         id: `err-${Date.now()}`,
         role: "assistant",
         content: "Ошибка соединения. Попробуйте позже.",
         createdAt: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, errorMsg]);
+      }]);
     } finally {
       setSending(false);
+      // Cat goes back to sleep after answer
+      setCatState("sleep");
+      // Stop audio
+      if (catAudioRef.current) catAudioRef.current.pause();
     }
+  };
+
+  const toggleMute = () => {
+    setMuted((prev) => {
+      const next = !prev;
+      if (catAudioRef.current) catAudioRef.current.muted = next;
+      return next;
+    });
   };
 
   const formatTime = (dateStr: string) =>
@@ -111,18 +214,72 @@ export default function AiChatPage() {
         ]}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        {/* Chat window */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Cat panel */}
         <div className="lg:col-span-3">
+          <Card className="overflow-hidden !bg-[#2a2a2f] !border-[#3a3a42]">
+            <CardContent className="p-0">
+              <div className="relative" style={{ height: 280 }}>
+                <video
+                  ref={catVideoRef}
+                  src={CAT_SLEEP}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover brightness-110"
+                />
+                <button
+                  onClick={toggleMute}
+                  className="absolute top-2 right-2 h-6 w-6 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors z-10"
+                >
+                  {muted ? <VolumeX className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
+                </button>
+                {/* State indicator */}
+                <div className="absolute bottom-2 left-2 px-2 py-1 rounded-full bg-black/50 text-[10px] text-white">
+                  {catState === "sleep" && "💤 Дремлет..."}
+                  {catState === "peek" && "👀 Подсматривает..."}
+                  {catState === "think" && "🤔 Думает..."}
+                </div>
+              </div>
+              <div className="px-3 py-2 bg-[#2a2a2f]">
+                <p className="text-sm font-semibold text-[#fafafa]">Сэр Бонифаций</p>
+                <p className="text-[11px] text-[#71717a] leading-snug">ИИ-помощник профсоюза</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick questions under cat */}
+          <Card className="mt-4">
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold text-muted-foreground mb-3">Быстрые вопросы</p>
+              <div className="space-y-2">
+                {quickQuestions.map((q, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleSend(q)}
+                    disabled={sending}
+                    className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border hover:bg-muted/50 hover:border-primary/30 transition-colors disabled:opacity-50"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Chat window */}
+        <div className="lg:col-span-9">
           <Card className="flex flex-col" style={{ height: 600 }}>
             {/* Header */}
             <div className="p-4 border-b border-border flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Bot className="h-4.5 w-4.5 text-primary" />
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-blue-500/20 flex items-center justify-center">
+                <Sparkles className="h-4.5 w-4.5 text-violet-400" />
               </div>
               <div>
                 <p className="text-sm font-medium">Помощник «Мой Профсоюз»</p>
-                <p className="text-[10px] text-muted-foreground">Справочная информация по платформе</p>
+                <p className="text-[10px] text-muted-foreground">Юридические консультации и навигация по платформе</p>
               </div>
             </div>
 
@@ -134,12 +291,12 @@ export default function AiChatPage() {
                 </div>
               ) : messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
-                  <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-                    <Sparkles className="h-8 w-8 text-primary" />
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-violet-500/10 to-blue-500/10 flex items-center justify-center mb-4">
+                    <Sparkles className="h-8 w-8 text-violet-400" />
                   </div>
                   <p className="text-sm font-medium mb-1">Добро пожаловать!</p>
                   <p className="text-xs text-muted-foreground max-w-sm">
-                    Задайте вопрос о платформе, профсоюзе или выберите один из быстрых вопросов справа.
+                    Задайте вопрос о трудовых правах, платформе или профсоюзе. Выберите быстрый вопрос слева или напишите свой.
                   </p>
                 </div>
               ) : (
@@ -149,8 +306,8 @@ export default function AiChatPage() {
                     className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     {msg.role === "assistant" && (
-                      <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <Bot className="h-3.5 w-3.5 text-primary" />
+                      <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-violet-500/20 to-blue-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                        <Bot className="h-3.5 w-3.5 text-violet-400" />
                       </div>
                     )}
                     <div
@@ -175,8 +332,8 @@ export default function AiChatPage() {
               )}
               {sending && (
                 <div className="flex gap-3">
-                  <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <Bot className="h-3.5 w-3.5 text-primary" />
+                  <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-violet-500/20 to-blue-500/20 flex items-center justify-center shrink-0">
+                    <Bot className="h-3.5 w-3.5 text-violet-400" />
                   </div>
                   <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3">
                     <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -194,7 +351,7 @@ export default function AiChatPage() {
               >
                 <Input
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={(e) => handleInputChange(e.target.value)}
                   placeholder="Задайте вопрос..."
                   disabled={sending}
                   className="flex-1"
@@ -213,27 +370,6 @@ export default function AiChatPage() {
               ИИ-помощник консультирует по трудовому праву и профсоюзной деятельности. Для персонального сопровождения с документами используйте раздел «Вопрос юристу».
             </p>
           </div>
-        </div>
-
-        {/* Quick questions sidebar */}
-        <div className="lg:col-span-1">
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs font-semibold text-muted-foreground mb-3">Быстрые вопросы</p>
-              <div className="space-y-2">
-                {quickQuestions.map((q, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSend(q)}
-                    disabled={sending}
-                    className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border hover:bg-muted/50 hover:border-primary/30 transition-colors disabled:opacity-50"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>
