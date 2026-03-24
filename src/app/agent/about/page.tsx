@@ -162,6 +162,15 @@ export default function AgentAboutPage() {
         ]}
       />
 
+      {/* Баннер */}
+      <div className="mb-6 rounded-xl overflow-hidden border border-border">
+        <img
+          src="/about-union.png"
+          alt="Саратовская областная организация Всероссийского Электропрофсоюза"
+          className="w-full h-auto object-cover"
+        />
+      </div>
+
       <Tabs defaultValue="management" className="w-full">
         <TabsList className="flex flex-wrap h-auto gap-1">
           <TabsTrigger value="management" className="gap-1.5">
