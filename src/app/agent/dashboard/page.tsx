@@ -76,7 +76,7 @@ export default function AgentDashboard() {
       retentionReminders.push({ label: "Подайте первое обращение — это просто!", href: "/agent/leads" });
     }
     if (leads.length > 0 && leads.length < 3) {
-      retentionReminders.push({ label: "Ознакомьтесь с полезными материалами профсоюза", href: "/agent/marketing" });
+      retentionReminders.push({ label: "Пройдите обучение по трудовым правам", href: "/agent/learning" });
     }
   }
 
@@ -151,9 +151,6 @@ export default function AgentDashboard() {
           <div className="flex flex-wrap gap-2">
             <Link href="/agent/leads" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors">
               <UserPlus className="h-3.5 w-3.5" /> Обращение к руководителю
-            </Link>
-            <Link href="/agent/marketing" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
-              <BookOpen className="h-3.5 w-3.5" /> Материалы
             </Link>
 <Link href="/agent/learning" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground text-xs font-medium hover:bg-muted/70 transition-colors">
               <GraduationCap className="h-3.5 w-3.5" /> Обучение
