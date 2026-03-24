@@ -178,7 +178,7 @@ export default function ManagerAgentsPage() {
         <div>
           <p className="font-medium">{a.fullName}</p>
           <p className="text-xs text-muted-foreground">
-            {[a.city, a.profession].filter(Boolean).join(" · ") || "—"}
+            {[(a as any).memberNumber, a.city, a.profession].filter(Boolean).join(" · ") || "—"}
           </p>
         </div>
       ),

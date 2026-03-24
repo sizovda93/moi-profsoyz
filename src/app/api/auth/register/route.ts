@@ -83,10 +83,16 @@ export async function POST(request: NextRequest) {
     );
     const profile = profileResult.rows[0];
 
+    // Генерируем уникальный номер члена профсоюза
+    const { rows: maxRows } = await pool.query(
+      `SELECT COALESCE(MAX(CAST(SUBSTRING(member_number FROM 4) AS INTEGER)), 0) + 1 AS next_num FROM agents WHERE member_number IS NOT NULL`
+    );
+    const memberNumber = 'MP-' + String(maxRows[0].next_num).padStart(6, '0');
+
     // Создаём запись агента с привязкой к профсоюзу и подразделению
     await pool.query(
-      `INSERT INTO agents (user_id, union_id, division_id) VALUES ($1, $2, $3)`,
-      [profile.id, unionId, divisionId]
+      `INSERT INTO agents (user_id, union_id, division_id, member_number) VALUES ($1, $2, $3, $4)`,
+      [profile.id, unionId, divisionId, memberNumber]
     );
 
     // Записываем consents

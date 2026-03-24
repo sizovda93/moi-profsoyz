@@ -130,6 +130,9 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
               <AvatarFallback className="text-lg">{getInitials(agent.fullName)}</AvatarFallback>
             </Avatar>
             <h2 className="font-semibold">{agent.fullName}</h2>
+            {(agent as any).memberNumber && (
+              <p className="text-xs font-mono text-primary mt-1">{(agent as any).memberNumber}</p>
+            )}
             <p className="text-sm text-muted-foreground mt-1">{agent.email}</p>
             <div className="flex gap-2 mt-3">
               <LifecycleBadge lifecycle={agent.lifecycle} />
