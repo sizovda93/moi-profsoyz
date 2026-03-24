@@ -142,7 +142,7 @@ export default function AdminMarketingPage() {
         title="Маркетинговые материалы"
         description="Управление библиотекой материалов"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Материалы" },
         ]}
         actions={

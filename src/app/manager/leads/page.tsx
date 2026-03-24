@@ -62,7 +62,7 @@ export default function ManagerLeadsPage() {
         title="Обращения"
         description="Все обращения — рассмотрение и контроль"
         breadcrumbs={[
-          { title: "Дашборд", href: "/manager/dashboard" },
+          { title: "Платформа", href: "/manager/dashboard" },
           { title: "Обращения" },
         ]}
         actions={

@@ -80,7 +80,7 @@ export default function AdminSettingsPage() {
         title="Настройки"
         description="Конфигурация платформы"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Настройки" },
         ]}
       />

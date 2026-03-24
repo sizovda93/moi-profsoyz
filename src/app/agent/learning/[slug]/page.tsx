@@ -115,7 +115,7 @@ export default function AgentLessonPage({ params }: { params: Promise<{ slug: st
       <PageHeader
         title={lesson.title}
         breadcrumbs={[
-          { title: "Дашборд", href: `/${ROLE}/dashboard` },
+          { title: "Платформа", href: `/${ROLE}/dashboard` },
           { title: "Обучение", href: `/${ROLE}/learning` },
           { title: mod.title },
         ]}

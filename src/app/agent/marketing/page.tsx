@@ -104,7 +104,7 @@ export default function AgentMarketingPage() {
         title="Материалы"
         description="Полезные материалы и инструкции профсоюза"
         breadcrumbs={[
-          { title: "Дашборд", href: "/agent/dashboard" },
+          { title: "Платформа", href: "/agent/dashboard" },
           { title: "Материалы" },
         ]}
       />

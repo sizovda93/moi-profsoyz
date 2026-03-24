@@ -80,7 +80,7 @@ export default function ManagerOperationsPage() {
         title="Операции"
         description="Рабочие очереди и контроль"
         breadcrumbs={[
-          { title: "Дашборд", href: "/manager/dashboard" },
+          { title: "Платформа", href: "/manager/dashboard" },
           { title: "Операции" },
         ]}
       />

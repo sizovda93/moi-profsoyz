@@ -109,7 +109,7 @@ export default function ManagerConversationDetailPage({ params }: { params: Prom
       <PageHeader
         title={`Диалог: ${conversation.clientName}`}
         breadcrumbs={[
-          { title: "Дашборд", href: "/manager/dashboard" },
+          { title: "Платформа", href: "/manager/dashboard" },
           { title: "Диалоги", href: "/manager/conversations" },
           { title: conversation.clientName },
         ]}

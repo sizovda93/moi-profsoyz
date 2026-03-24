@@ -116,7 +116,7 @@ export default function ManagerAgentDetailPage({ params }: { params: Promise<{ i
       <PageHeader
         title={agent.fullName}
         breadcrumbs={[
-          { title: "Дашборд", href: "/manager/dashboard" },
+          { title: "Платформа", href: "/manager/dashboard" },
           { title: "Члены профсоюза", href: "/manager/agents" },
           { title: agent.fullName },
         ]}

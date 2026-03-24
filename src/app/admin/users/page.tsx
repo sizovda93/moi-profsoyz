@@ -252,7 +252,7 @@ export default function AdminUsersPage() {
         title="Пользователи"
         description="Управление пользователями и членами профсоюза"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Пользователи" },
         ]}
         actions={

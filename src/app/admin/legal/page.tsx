@@ -259,7 +259,7 @@ export default function AdminLegalPage() {
         title="Юридические вопросы"
         description="Вопросы членов профсоюза юристу"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Юридические вопросы" },
         ]}
       />

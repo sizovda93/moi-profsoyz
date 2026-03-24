@@ -34,7 +34,7 @@ export default function ManagerFinancePage() {
         title="Финансы"
         description="Выплаты и взносы членов профсоюза"
         breadcrumbs={[
-          { title: "Дашборд", href: "/manager/dashboard" },
+          { title: "Платформа", href: "/manager/dashboard" },
           { title: "Финансы" },
         ]}
       />

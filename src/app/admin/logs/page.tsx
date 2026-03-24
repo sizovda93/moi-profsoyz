@@ -51,7 +51,7 @@ export default function AdminLogsPage() {
         title="Логи"
         description="Журнал действий системы"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Логи" },
         ]}
       />

@@ -38,7 +38,7 @@ export default function ManagerReferralsPage() {
       <PageHeader
         title="Приглашения"
         description="Статистика приглашений по членам"
-        breadcrumbs={[{ title: "Дашборд", href: "/manager/dashboard" }, { title: "Приглашения" }]}
+        breadcrumbs={[{ title: "Платформа", href: "/manager/dashboard" }, { title: "Приглашения" }]}
       />
 
       <div className="grid gap-4 md:grid-cols-3 mb-6">

@@ -141,7 +141,7 @@ export default function AdminUnionsPage() {
         title="Профсоюзы и подразделения"
         description="Управление справочником профсоюзов"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Профсоюзы" },
         ]}
         actions={

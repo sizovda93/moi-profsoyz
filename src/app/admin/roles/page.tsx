@@ -40,7 +40,7 @@ export default function AdminRolesPage() {
         title="Роли"
         description="Управление ролями и правами доступа"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Роли" },
         ]}
       />

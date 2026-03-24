@@ -21,14 +21,14 @@ const questions: AvatarQuestion[] = [
     label: "Что это за платформа?",
     video: "/avatar/answer-q1.webm",
     answerText:
-      "Это профсоюзная платформа, где вы можете подавать обращения, получать документы, проходить обучение и общаться с руководством профсоюза",
+      "Это партнёрская платформа, где вы можете передавать клиентов, следить за их статусами и зарабатывать через партнёрскую программу",
   },
   {
     id: "q2",
-    label: "Как подать обращение?",
+    label: "Как здесь зарабатывать?",
     video: "/avatar/answer-q2.webm",
     answerText:
-      "Перейдите в раздел Обращения, нажмите Новое обращение, выберите тип, заполните данные и опишите ситуацию. Руководитель профсоюза рассмотрит его в ближайшее время",
+      "Вы передаёте клиентов в платформу, команда берёт их в работу, а вы получаете вознаграждение по результату",
   },
 ];
 
@@ -150,7 +150,7 @@ export function AvatarHelper() {
       {/* Video card — left */}
       <Card className="overflow-hidden rounded-2xl shrink-0" style={{ width: 180 }}>
         <CardContent className="p-0">
-          <div className="relative overflow-hidden bg-[#111113]" style={{ height: 170 }}>
+          <div className="relative overflow-hidden" style={{ height: 170 }}>
             <video
               ref={videoRef}
               src={IDLE_VIDEO}
@@ -177,7 +177,7 @@ export function AvatarHelper() {
           </div>
 
           <div className="px-3 py-2">
-            <p className="text-sm font-semibold">Барсик</p>
+            <p className="text-sm font-semibold">Сэр Бонифаций</p>
             <p className="text-[11px] text-muted-foreground leading-snug">
               Ваш помощник на платформе
             </p>

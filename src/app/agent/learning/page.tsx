@@ -79,7 +79,7 @@ export default function AgentLearningPage() {
     return (
       <>
         <PageHeader title="Обучение" description="Руководства и инструкции по работе с платформой"
-          breadcrumbs={[{ title: "Дашборд", href: `/${ROLE}/dashboard` }, { title: "Обучение" }]} />
+          breadcrumbs={[{ title: "Платформа", href: `/${ROLE}/dashboard` }, { title: "Обучение" }]} />
         <div className="flex items-center justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
@@ -93,7 +93,7 @@ export default function AgentLearningPage() {
         title="Обучение"
         description="Руководства и инструкции по работе с платформой"
         breadcrumbs={[
-          { title: "Дашборд", href: `/${ROLE}/dashboard` },
+          { title: "Платформа", href: `/${ROLE}/dashboard` },
           { title: "Обучение" },
         ]}
       />

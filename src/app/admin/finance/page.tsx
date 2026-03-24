@@ -159,7 +159,7 @@ export default function AdminFinancePage() {
         title="Финансы"
         description="Управление выплатами"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Финансы" },
         ]}
       />

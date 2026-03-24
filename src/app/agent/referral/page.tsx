@@ -61,7 +61,7 @@ export default function AgentReferralPage() {
   if (loading) {
     return (
       <>
-        <PageHeader title="Приглашения" breadcrumbs={[{ title: "Дашборд", href: "/agent/dashboard" }, { title: "Приглашения" }]} />
+        <PageHeader title="Приглашения" breadcrumbs={[{ title: "Платформа", href: "/agent/dashboard" }, { title: "Приглашения" }]} />
         <div className="grid gap-4 md:grid-cols-3 mb-6">
           {[1, 2, 3].map((i) => <Card key={i} className="h-24 animate-pulse bg-muted" />)}
         </div>
@@ -72,7 +72,7 @@ export default function AgentReferralPage() {
   if (!data) {
     return (
       <>
-        <PageHeader title="Приглашения" breadcrumbs={[{ title: "Дашборд", href: "/agent/dashboard" }, { title: "Приглашения" }]} />
+        <PageHeader title="Приглашения" breadcrumbs={[{ title: "Платформа", href: "/agent/dashboard" }, { title: "Приглашения" }]} />
         <Card className="p-6 text-center text-muted-foreground">Не удалось загрузить данные</Card>
       </>
     );
@@ -83,7 +83,7 @@ export default function AgentReferralPage() {
       <PageHeader
         title="Приглашения"
         description="Пригласите коллег в профсоюз"
-        breadcrumbs={[{ title: "Дашборд", href: "/agent/dashboard" }, { title: "Приглашения" }]}
+        breadcrumbs={[{ title: "Платформа", href: "/agent/dashboard" }, { title: "Приглашения" }]}
       />
 
       {/* Stats */}

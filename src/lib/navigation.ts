@@ -1,7 +1,7 @@
 import { NavItem, UserRole } from "@/types";
 
 export const agentNav: NavItem[] = [
-  { title: "Дашборд", href: "/agent/dashboard", icon: "LayoutDashboard" },
+  { title: "Платформа", href: "/agent/dashboard", icon: "LayoutDashboard" },
   { title: "Обращения", href: "/agent/leads", icon: "UserPlus" },
   { title: "Документы", href: "/agent/documents", icon: "FileText" },
   { title: "Сообщения", href: "/agent/messages", icon: "MessageSquare", badge: 3 },
@@ -13,7 +13,7 @@ export const agentNav: NavItem[] = [
 ];
 
 export const managerNav: NavItem[] = [
-  { title: "Дашборд", href: "/manager/dashboard", icon: "LayoutDashboard" },
+  { title: "Платформа", href: "/manager/dashboard", icon: "LayoutDashboard" },
   { title: "Члены профсоюза", href: "/manager/agents", icon: "Users" },
   { title: "Обращения", href: "/manager/leads", icon: "UserPlus" },
   { title: "Диалоги", href: "/manager/conversations", icon: "MessageSquare", badge: 5 },
@@ -24,7 +24,7 @@ export const managerNav: NavItem[] = [
 ];
 
 export const adminNav: NavItem[] = [
-  { title: "Дашборд", href: "/admin/dashboard", icon: "LayoutDashboard" },
+  { title: "Платформа", href: "/admin/dashboard", icon: "LayoutDashboard" },
   { title: "Пользователи", href: "/admin/users", icon: "Users" },
   { title: "Обращения", href: "/admin/leads", icon: "UserPlus" },
   { title: "Финансы", href: "/admin/finance", icon: "Wallet" },

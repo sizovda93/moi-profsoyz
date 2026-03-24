@@ -215,7 +215,7 @@ export default function ManagerAgentsPage() {
         title="Члены профсоюза"
         description="Управление членами профсоюза"
         breadcrumbs={[
-          { title: "Дашборд", href: "/manager/dashboard" },
+          { title: "Платформа", href: "/manager/dashboard" },
           { title: "Члены профсоюза" },
         ]}
         actions={

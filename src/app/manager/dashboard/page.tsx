@@ -51,7 +51,7 @@ export default function ManagerDashboard() {
   return (
     <div>
       <PageHeader
-        title="Дашборд руководителя"
+        title="Платформа руководителя"
         description="Обзор профсоюзной организации и показателей"
       />
 

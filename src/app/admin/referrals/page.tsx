@@ -38,7 +38,7 @@ export default function AdminReferralsPage() {
       <PageHeader
         title="Реферальная программа"
         description="Статистика приглашений по членам"
-        breadcrumbs={[{ title: "Дашборд", href: "/admin/dashboard" }, { title: "Рефералы" }]}
+        breadcrumbs={[{ title: "Платформа", href: "/admin/dashboard" }, { title: "Рефералы" }]}
       />
 
       <div className="grid gap-4 md:grid-cols-3 mb-6">

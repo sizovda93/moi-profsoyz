@@ -270,7 +270,7 @@ export default function AdminNewsPage() {
         title="Новости"
         description="Управление новостями профсоюза"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Новости" },
         ]}
         actions={

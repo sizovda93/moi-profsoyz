@@ -162,7 +162,7 @@ export default function AgentProfilePage() {
         title="Профиль"
         description="Ваши данные и настройки"
         breadcrumbs={[
-          { title: "Дашборд", href: "/agent/dashboard" },
+          { title: "Платформа", href: "/agent/dashboard" },
           { title: "Профиль" },
         ]}
       />

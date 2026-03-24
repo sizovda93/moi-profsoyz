@@ -65,7 +65,7 @@ export default function AdminLeadsPage() {
         title="Обращения"
         description="Все обращения системы, включая заявки с лендинга"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Обращения" },
         ]}
       />

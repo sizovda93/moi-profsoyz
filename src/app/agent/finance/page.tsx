@@ -98,7 +98,7 @@ export default function AgentFinancePage() {
         title="Финансы"
         description="Баланс, выплаты и комиссии"
         breadcrumbs={[
-          { title: "Дашборд", href: "/agent/dashboard" },
+          { title: "Платформа", href: "/agent/dashboard" },
           { title: "Финансы" },
         ]}
       />

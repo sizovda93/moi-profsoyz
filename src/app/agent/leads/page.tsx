@@ -90,7 +90,7 @@ export default function AgentLeadsPage() {
         title="Мои обращения"
         description="Ваши обращения в профсоюз"
         breadcrumbs={[
-          { title: "Дашборд", href: "/agent/dashboard" },
+          { title: "Платформа", href: "/agent/dashboard" },
           { title: "Обращения" },
         ]}
         actions={

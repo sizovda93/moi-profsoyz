@@ -56,7 +56,7 @@ export default function AgentMessagesPage() {
         title="Сообщения"
         description="Переписка с руководством профсоюза"
         breadcrumbs={[
-          { title: "Дашборд", href: "/agent/dashboard" },
+          { title: "Платформа", href: "/agent/dashboard" },
           { title: "Сообщения" },
         ]}
       />

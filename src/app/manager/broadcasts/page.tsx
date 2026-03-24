@@ -238,7 +238,7 @@ export default function ManagerBroadcastsPage() {
         <PageHeader
           title="Детали рассылки"
           breadcrumbs={[
-            { title: "Дашборд", href: "/manager/dashboard" },
+            { title: "Платформа", href: "/manager/dashboard" },
             { title: "Рассылки" },
             { title: "Детали" },
           ]}
@@ -342,7 +342,7 @@ export default function ManagerBroadcastsPage() {
         <PageHeader
           title="Новая рассылка"
           breadcrumbs={[
-            { title: "Дашборд", href: "/manager/dashboard" },
+            { title: "Платформа", href: "/manager/dashboard" },
             { title: "Рассылки" },
             { title: "Новая" },
           ]}
@@ -500,7 +500,7 @@ export default function ManagerBroadcastsPage() {
         title="Рассылки"
         description="Объявления для членов профсоюза"
         breadcrumbs={[
-          { title: "Дашборд", href: "/manager/dashboard" },
+          { title: "Платформа", href: "/manager/dashboard" },
           { title: "Рассылки" },
         ]}
         actions={

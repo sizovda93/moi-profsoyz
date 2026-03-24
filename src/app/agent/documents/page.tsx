@@ -36,7 +36,7 @@ export default function AgentDocumentsPage() {
         title="Документы"
         description="Ваши заявления, справки и документы"
         breadcrumbs={[
-          { title: "Дашборд", href: "/agent/dashboard" },
+          { title: "Платформа", href: "/agent/dashboard" },
           { title: "Документы" },
         ]}
       />

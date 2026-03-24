@@ -37,7 +37,7 @@ export default function ManagerDocumentsPage() {
         title="Документы"
         description="Документы членов профсоюза"
         breadcrumbs={[
-          { title: "Дашборд", href: "/manager/dashboard" },
+          { title: "Платформа", href: "/manager/dashboard" },
           { title: "Документы" },
         ]}
       />

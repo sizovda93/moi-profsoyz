@@ -221,7 +221,7 @@ export default function AgentLegalPage() {
           title="Вопрос юристу"
           description="Задайте вопрос по трудовому праву"
           breadcrumbs={[
-            { title: "Дашборд", href: "/agent/dashboard" },
+            { title: "Платформа", href: "/agent/dashboard" },
             { title: "Вопрос юристу" },
           ]}
         />
@@ -242,7 +242,7 @@ export default function AgentLegalPage() {
         title="Вопрос юристу"
         description="Задайте вопрос по трудовому праву"
         breadcrumbs={[
-          { title: "Дашборд", href: "/agent/dashboard" },
+          { title: "Платформа", href: "/agent/dashboard" },
           { title: "Вопрос юристу" },
         ]}
         actions={

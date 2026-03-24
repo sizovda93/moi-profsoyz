@@ -70,7 +70,7 @@ export default function AdminIntegrationsPage() {
         title="Интеграции"
         description="Подключённые сервисы и API"
         breadcrumbs={[
-          { title: "Дашборд", href: "/admin/dashboard" },
+          { title: "Платформа", href: "/admin/dashboard" },
           { title: "Интеграции" },
         ]}
       />

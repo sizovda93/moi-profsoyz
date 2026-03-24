@@ -148,7 +148,7 @@ export default function ManagerLeadDetailPage({ params }: { params: Promise<{ id
       <PageHeader
         title={lead.fullName}
         breadcrumbs={[
-          { title: "Дашборд", href: "/manager/dashboard" },
+          { title: "Платформа", href: "/manager/dashboard" },
           { title: "Обращения", href: "/manager/leads" },
           { title: lead.fullName },
         ]}

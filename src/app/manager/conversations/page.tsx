@@ -94,7 +94,7 @@ export default function ManagerConversationsPage() {
         title="Диалоги"
         description="Диалоги с членами профсоюза"
         breadcrumbs={[
-          { title: "Дашборд", href: "/manager/dashboard" },
+          { title: "Платформа", href: "/manager/dashboard" },
           { title: "Диалоги" },
         ]}
       />

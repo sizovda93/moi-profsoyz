@@ -74,7 +74,7 @@ export default function AgentLeadDetailPage({ params }: { params: Promise<{ id: 
       <PageHeader
         title={lead.fullName}
         breadcrumbs={[
-          { title: "Дашборд", href: "/agent/dashboard" },
+          { title: "Платформа", href: "/agent/dashboard" },
           { title: "Обращения", href: "/agent/leads" },
           { title: lead.fullName },
         ]}
