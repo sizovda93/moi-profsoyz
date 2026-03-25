@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useCallback } from "react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { ChatWindow } from "@/components/chat/chat-window";
 import { LoadingSkeleton } from "@/components/dashboard/loading-skeleton";
@@ -22,7 +22,7 @@ export default function ManagerConversationDetailPage({ params }: { params: Prom
   const [draftError, setDraftError] = useState<string | null>(null);
   const [inputRef, setInputRef] = useState<{ insert: (text: string) => void } | null>(null);
 
-  useEffect(() => {
+  const loadConversation = useCallback(() => {
     fetch(`/api/conversations/${id}`)
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
@@ -34,6 +34,16 @@ export default function ManagerConversationDetailPage({ params }: { params: Prom
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    loadConversation();
+  }, [loadConversation]);
+
+  // Auto-refresh every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(loadConversation, 5000);
+    return () => clearInterval(interval);
+  }, [loadConversation]);
 
   const handleSend = async (text: string) => {
     const res = await fetch(`/api/conversations/${id}`, {

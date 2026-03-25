@@ -88,6 +88,21 @@ export default function AgentColleaguesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Auto-refresh active chat every 5 seconds
+  useEffect(() => {
+    if (!activeChatId) return;
+    const interval = setInterval(() => {
+      const endpoint = activeChatType === "conversation" ? `/api/conversations/${activeChatId}` : `/api/direct-chats/${activeChatId}`;
+      fetch(endpoint)
+        .then((r) => r.ok ? r.json() : null)
+        .then((data) => {
+          if (data?.messages) setMessages(data.messages);
+        })
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [activeChatId, activeChatType]);
+
   const loadChat = async (chatId: string, type: "direct" | "conversation" = "direct") => {
     setActiveChatId(chatId);
     setActiveChatType(type);
