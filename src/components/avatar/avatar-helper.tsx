@@ -138,16 +138,28 @@ export function AvatarHelper() {
         audio.preload = "auto";
         audioRef.current = audio;
 
-        // Wait for audio to be ready, then start video + audio together
-        await new Promise<void>((resolve) => {
+        // Preload both video and audio, then start simultaneously
+        const audioReady = new Promise<void>((resolve) => {
           audio.addEventListener("canplaythrough", () => resolve(), { once: true });
           audio.load();
         });
 
-        // Start video and audio simultaneously
+        let videoReady = Promise.resolve();
         if (videoRef.current) {
           videoRef.current.loop = true;
           videoRef.current.src = q.video;
+          videoRef.current.preload = "auto";
+          videoReady = new Promise<void>((resolve) => {
+            videoRef.current!.addEventListener("canplaythrough", () => resolve(), { once: true });
+            videoRef.current!.load();
+          });
+        }
+
+        // Wait for BOTH to be ready
+        await Promise.all([audioReady, videoReady]);
+
+        // Start both at the same time
+        if (videoRef.current) {
           videoRef.current.play().catch(() => {});
         }
         setState("answering");
@@ -172,11 +184,11 @@ export function AvatarHelper() {
   }, []);
 
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex items-start gap-6">
       {/* Video card — left */}
-      <Card className="overflow-hidden rounded-2xl shrink-0 !bg-[#2a2a2f] !border-[#3a3a42]" style={{ width: 220 }}>
+      <Card className="overflow-hidden rounded-2xl shrink-0 !bg-[#2a2a2f] !border-[#3a3a42]" style={{ width: 300 }}>
         <CardContent className="p-0">
-          <div className="relative overflow-hidden bg-[#2a2a2f]" style={{ height: 210 }}>
+          <div className="relative overflow-hidden bg-[#2a2a2f]" style={{ height: 290 }}>
             <video
               ref={videoRef}
               src={IDLE_VIDEO}
@@ -202,9 +214,9 @@ export function AvatarHelper() {
             )}
           </div>
 
-          <div className="px-3 py-2 bg-[#2a2a2f]">
-            <p className="text-sm font-semibold text-[#fafafa]">Котофей Петрович</p>
-            <p className="text-[11px] text-[#fafafa] leading-snug">
+          <div className="px-4 py-3 bg-[#2a2a2f]">
+            <p className="text-base font-semibold text-[#fafafa]">Котофей Петрович</p>
+            <p className="text-sm text-[#fafafa] leading-snug">
               Ваш лучший советник
             </p>
           </div>
@@ -213,16 +225,15 @@ export function AvatarHelper() {
 
       {/* Questions — right */}
       <div className="pt-2 space-y-3">
-        <p className="text-xs text-muted-foreground">Подскажу, как всё устроено и с чего начать:</p>
-        <div className="flex flex-col gap-2">
+        <p className="text-sm text-muted-foreground">Подскажу, как всё устроено и с чего начать:</p>
+        <div className="flex flex-col gap-2.5">
           {questions.map((q) => (
             <Button
               key={q.id}
-              size="sm"
               variant="outline"
               onClick={() => handleQuestion(q)}
               disabled={state === "loading"}
-              className={`text-xs h-8 px-3 justify-start ${
+              className={`text-sm h-10 px-4 justify-start ${
                 activeQuestion?.id === q.id
                   ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600"
                   : "border-blue-500/50 text-blue-400 hover:bg-blue-500/10"

@@ -51,7 +51,7 @@ export default function ManagerDashboard() {
   return (
     <div>
       <PageHeader
-        title="Платформа руководителя"
+        title="Кабинет руководителя"
         description="Обзор профсоюзной организации и показателей"
       />
 
@@ -126,95 +126,6 @@ export default function ManagerDashboard() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Funnel */}
-        {funnel && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Воронка обращений</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FunnelBar stages={funnel.stages} conversionRate={funnel.conversionRate} />
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Top members */}
-        {topAgents && topAgents.length > 0 && (
-          <Card>
-            <CardHeader className="flex-row items-center justify-between">
-              <CardTitle className="text-base">Активные члены</CardTitle>
-              <Link href="/manager/agents" className="text-sm text-primary hover:underline flex items-center gap-1">
-                Все <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {topAgents.slice(0, 5).map((a: any) => (
-                  <Link
-                    key={a.id}
-                    href={`/manager/agents/${a.id}`}
-                    className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-muted-foreground w-5">#{a.rank}</span>
-                      <div>
-                        <p className="text-sm font-medium">{a.fullName}</p>
-                        <p className="text-xs text-muted-foreground">{a.wonLeads} решено</p>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      {/* Referral + Conflicts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {referral && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Приглашения</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Переходы</p>
-                  <p className="text-lg font-semibold">{referral.uniqueClicks}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Обращения</p>
-                  <p className="text-lg font-semibold">{referral.referralLeads}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Решено</p>
-                  <p className="text-lg font-semibold">{referral.referralWon}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Конверсия</p>
-                  <p className="text-lg font-semibold">{referral.clickToLeadConversion}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {s?.openConflicts > 0 && (
-          <Card className="border-yellow-500/20">
-            <CardHeader>
-              <CardTitle className="text-base text-yellow-600">Конфликты</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-2">Нерешённых конфликтов: <span className="font-semibold text-yellow-600">{s.openConflicts}</span></p>
-              <Link href="/manager/leads?tab=conflicts" className="text-sm text-primary hover:underline">
-                Перейти к конфликтам →
-              </Link>
-            </CardContent>
-          </Card>
-        )}
-      </div>
     </div>
   );
 }

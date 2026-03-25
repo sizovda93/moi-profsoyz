@@ -271,7 +271,7 @@ export default function AgentLegalPage() {
           {/* Bubble */}
           <div className="relative">
             <div className="bg-primary rounded-xl px-3.5 py-2.5">
-              <p className="text-[11px] leading-relaxed text-primary-foreground">
+              <p className="text-[13px] leading-relaxed text-primary-foreground">
                 Задайте вопрос моему руководителю — вам ответят в течение 3 часов
               </p>
             </div>

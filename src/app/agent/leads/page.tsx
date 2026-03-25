@@ -236,7 +236,7 @@ export default function AgentLeadsPage() {
           {/* Tip bubble */}
           <div className="relative">
             <div className="bg-primary rounded-xl px-3.5 py-2.5">
-              <p className="text-[11px] leading-relaxed text-primary-foreground">
+              <p className="text-[22px] leading-relaxed text-primary-foreground">
                 Задавайте свой вопрос, я передам Сергею Александровичу. У нас как раз с ним совещание через час!
               </p>
             </div>

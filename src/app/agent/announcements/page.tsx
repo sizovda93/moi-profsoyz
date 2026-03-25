@@ -94,22 +94,22 @@ export default function AgentAnnouncementsPage() {
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${!a.read ? "bg-primary/10" : "bg-muted"}`}>
-                    <Megaphone className={`h-4 w-4 ${!a.read ? "text-primary" : "text-muted-foreground"}`} />
+                  <div className={`h-12 w-12 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${!a.read ? "bg-primary/10" : "bg-muted"}`}>
+                    <Megaphone className={`h-6 w-6 ${!a.read ? "text-primary" : "text-muted-foreground"}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className={`text-sm font-medium ${!a.read ? "" : "text-muted-foreground"}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <p className={`text-lg font-medium ${!a.read ? "text-primary" : "text-muted-foreground"}`}>
                         {a.title}
                       </p>
                       {!a.read && (
-                        <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                        <span className="h-3 w-3 rounded-full bg-primary shrink-0" />
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground whitespace-pre-line">{a.message}</p>
-                    <div className="flex items-center gap-1.5 mt-2">
-                      <Clock className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-[11px] text-muted-foreground">{formatTimeAgo(a.createdAt)}</span>
+                    <p className="text-base text-muted-foreground whitespace-pre-line">{a.message}</p>
+                    <div className="flex items-center gap-1.5 mt-3">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">{formatTimeAgo(a.createdAt)}</span>
                     </div>
                   </div>
                 </div>

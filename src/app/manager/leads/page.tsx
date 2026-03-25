@@ -65,11 +65,6 @@ export default function ManagerLeadsPage() {
           { title: "Платформа", href: "/manager/dashboard" },
           { title: "Обращения" },
         ]}
-        actions={
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-1" /> Новое обращение
-          </Button>
-        }
       />
 
       <div className="mb-6">

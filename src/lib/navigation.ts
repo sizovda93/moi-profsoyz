@@ -3,12 +3,12 @@ import { NavItem, UserRole } from "@/types";
 export const agentNav: NavItem[] = [
   { title: "О платформе", href: "/agent/dashboard", icon: "LayoutDashboard" },
   { title: "О профсоюзе", href: "/agent/about", icon: "Users" },
-  { title: "Партнёры", href: "/agent/partners", icon: "Building2" },
   { title: "Вопрос руководителю", href: "/agent/leads", icon: "UserPlus" },
+  { title: "Вопрос юристу", href: "/agent/legal", icon: "Shield" },
+  { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot" },
   { title: "Корпоративные чаты", href: "/agent/colleagues", icon: "MessageSquare" },
   { title: "Объявления", href: "/agent/announcements", icon: "Megaphone" },
-  { title: "Чат с ИИ", href: "/agent/ai-chat", icon: "Bot"},
-  { title: "Вопрос юристу", href: "/agent/legal", icon: "Shield" },
+  { title: "Партнёры", href: "/agent/partners", icon: "Building2" },
   { title: "Опросы", href: "/agent/surveys", icon: "ClipboardList" },
   { title: "Обучение", href: "/agent/learning", icon: "GraduationCap" },
   { title: "Соглашения", href: "/agent/agreements", icon: "ScrollText" },
@@ -17,8 +17,7 @@ export const agentNav: NavItem[] = [
 
 export const managerNav: NavItem[] = [
   { title: "Платформа", href: "/manager/dashboard", icon: "LayoutDashboard" },
-  { title: "О профсоюзе", href: "/agent/about", icon: "Users" },
-  { title: "Партнёры", href: "/agent/partners", icon: "Building2" },
+  { title: "О профсоюзе", href: "/manager/about", icon: "Users" },
   { title: "Участники профсоюза", href: "/manager/agents", icon: "Users" },
   { title: "Обращения", href: "/manager/leads", icon: "UserPlus" },
   { title: "Диалоги", href: "/manager/conversations", icon: "MessageSquare" },
