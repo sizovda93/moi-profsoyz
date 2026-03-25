@@ -1,9 +1,9 @@
 import pool from "@/lib/db";
 import { retrieveKnowledge } from "./retrieve-knowledge";
 
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-const API_URL = "https://api.voidai.app/v1/chat/completions";
-const MODEL = "claude-haiku-4-5-20251001";
+const ANTHROPIC_API_KEY = process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY;
+const API_URL = process.env.OPENAI_BASE_URL ? `${process.env.OPENAI_BASE_URL}/chat/completions` : "https://aspbllm.online/v1/chat/completions";
+const MODEL = "gpt-5.4";
 const TIMEOUT_MS = 10000;
 
 const SYSTEM_PROMPT = `Ты — помощник руководителя профсоюзной организации на платформе «Мой Профсоюз».

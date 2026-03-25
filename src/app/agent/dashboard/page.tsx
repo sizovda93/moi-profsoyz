@@ -73,52 +73,52 @@ export default function AgentDashboard() {
     <div>
       <Card className="mb-6 overflow-hidden">
         <CardContent className="p-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12">
             {/* Left: Avatar helper */}
-            <div className="p-6 flex items-center bg-muted/30">
+            <div className="lg:col-span-7 p-4 flex items-center bg-muted/30 overflow-hidden">
               <AvatarHelper />
             </div>
 
             {/* Right: Welcome + CTA */}
-            <div className="p-6 pt-4 flex flex-col justify-start">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <h1 className="text-lg font-semibold">Мой Профсоюз</h1>
+            <div className="lg:col-span-5 p-4 flex flex-col justify-start">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <h1 className="text-base font-semibold">Мой Профсоюз</h1>
               </div>
-              <p className="text-sm text-muted-foreground mb-5">
-                Платформа для обращений, юридической помощи и взаимодействия с профсоюзной организацией
+              <p className="text-xs text-muted-foreground mb-3">
+                Обращения, юридическая помощь и взаимодействие с профсоюзом
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5">
                 <Link
                   href="/agent/leads"
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
                 >
-                  <UserPlus className="h-4 w-4 shrink-0" />
+                  <UserPlus className="h-3.5 w-3.5 shrink-0" />
                   <span>Обращение</span>
                 </Link>
                 <Link
                   href="/agent/legal"
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg border border-border text-sm font-medium hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-xs font-medium hover:bg-muted/50 transition-colors"
                 >
-                  <Shield className="h-4 w-4 shrink-0" />
-                  <span>Вопрос юристу</span>
+                  <Shield className="h-3.5 w-3.5 shrink-0" />
+                  <span>Юристу</span>
                 </Link>
                 <Link
                   href="/agent/colleagues"
-                  className="flex items-center gap-2 px-4 py-3 rounded-lg border border-border text-sm font-medium hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-xs font-medium hover:bg-muted/50 transition-colors"
                 >
-                  <MessageSquare className="h-4 w-4 shrink-0" />
+                  <MessageSquare className="h-3.5 w-3.5 shrink-0" />
                   <span>Чаты</span>
                 </Link>
               </div>
 
-              <div className="mt-4">
+              <div className="mt-2">
                 <Link
                   href="/agent/ai-chat"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted/50 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-xs font-medium hover:bg-muted/50 transition-colors"
                 >
-                  <Sparkles className="h-4 w-4" />
+                  <Sparkles className="h-3.5 w-3.5" />
                   Чат с ИИ — мгновенная консультация
                 </Link>
               </div>

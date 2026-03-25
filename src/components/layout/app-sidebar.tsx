@@ -83,7 +83,7 @@ export function AppSidebar({ items, role }: AppSidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-extrabold transition-colors",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-extrabold uppercase transition-colors", "font-[family-name:var(--font-montserrat)]",
                   isActive
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"

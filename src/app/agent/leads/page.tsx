@@ -212,7 +212,7 @@ export default function AgentLeadsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left — mascot + how it works */}
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-4 space-y-4">
           {/* Compact mascot card */}
           <Card className="overflow-hidden !bg-[#2a2a2f] !border-[#3a3a42]">
             <CardContent className="p-0">
@@ -237,7 +237,7 @@ export default function AgentLeadsPage() {
           <div className="relative">
             <div className="bg-primary rounded-xl px-3.5 py-2.5">
               <p className="text-[22px] leading-relaxed text-primary-foreground">
-                Задавайте свой вопрос, я передам Сергею Александровичу. У нас как раз с ним совещание через час!
+                Задайте свой вопрос, я передам Сергею Александровичу. У нас как раз с ним совещание через час!
               </p>
             </div>
             <div className="absolute -top-1 left-4 w-2.5 h-2.5 bg-primary rotate-45" />
@@ -275,7 +275,7 @@ export default function AgentLeadsPage() {
         </div>
 
         {/* Right — main workspace */}
-        <div className="lg:col-span-9">
+        <div className="lg:col-span-8">
           {/* Search + Tabs control panel */}
           <Card className="mb-4">
             <CardContent className="p-3">

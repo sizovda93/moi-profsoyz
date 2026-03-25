@@ -6,17 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CardSkeleton } from "@/components/dashboard/loading-skeleton";
 import { formatDate } from "@/lib/utils";
 import {
-  Plus,
   ChevronDown,
   ChevronUp,
   Paperclip,
@@ -26,6 +19,10 @@ import {
   Loader2,
   Scale,
   MessageSquare,
+  Send,
+  Eye,
+  CheckCircle2,
+  Clock,
 } from "lucide-react";
 
 /* ---------- constants ---------- */
@@ -80,7 +77,6 @@ interface LegalRequest {
 export default function AgentLegalPage() {
   const [requests, setRequests] = useState<LegalRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   // form
   const [subject, setSubject] = useState("");
@@ -89,6 +85,7 @@ export default function AgentLegalPage() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // expand
@@ -117,10 +114,7 @@ export default function AgentLegalPage() {
       setExpandedId(null);
       return;
     }
-
     setExpandedId(id);
-
-    // Load full detail with attachments if not cached
     if (!expandedData[id]) {
       setLoadingDetail(id);
       try {
@@ -175,7 +169,6 @@ export default function AgentLegalPage() {
 
   const handleCreate = async () => {
     if (!subject.trim() || !description.trim()) return;
-
     setSaving(true);
     try {
       const res = await fetch("/api/legal-requests", {
@@ -188,10 +181,10 @@ export default function AgentLegalPage() {
           attachments,
         }),
       });
-
       if (res.ok) {
-        setDialogOpen(false);
         resetForm();
+        setSubmitSuccess(true);
+        setTimeout(() => setSubmitSuccess(false), 4000);
         setLoading(true);
         loadRequests();
       }
@@ -219,9 +212,9 @@ export default function AgentLegalPage() {
       <div>
         <PageHeader
           title="Вопрос юристу"
-          description="Задайте вопрос моему руководителю — вам ответят в течение 3 часов"
+          description="Задайте вопрос юристу профсоюза и получите ответ в течение 3 часов"
           breadcrumbs={[
-            { title: "Платформа", href: "/agent/dashboard" },
+            { title: "О платформе", href: "/agent/dashboard" },
             { title: "Вопрос юристу" },
           ]}
         />
@@ -234,22 +227,143 @@ export default function AgentLegalPage() {
     );
   }
 
+  // Filter helpers
+  const inProgressRequests = requests.filter((r) => ["new", "in_progress", "waiting"].includes(r.status));
+  const answeredRequests = requests.filter((r) => r.status === "answered");
+  const closedRequests = requests.filter((r) => r.status === "closed");
+
+  const statusIcon = (status: string) => {
+    if (status === "answered") return <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />;
+    if (status === "closed") return <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground" />;
+    return <Clock className="h-3.5 w-3.5 text-yellow-500" />;
+  };
+
+  /* ---------- request card component ---------- */
+
+  const RequestCard = ({ req }: { req: LegalRequest }) => {
+    const expanded = expandedId === req.id;
+    const detail = expandedData[req.id];
+    const st = getStatus(req.status);
+
+    return (
+      <Card className="overflow-hidden">
+        <button
+          type="button"
+          className="w-full text-left p-4 flex items-start gap-3 hover:bg-muted/30 transition-colors cursor-pointer"
+          onClick={() => toggleExpand(req.id)}
+        >
+          <div className="mt-0.5 shrink-0">{statusIcon(req.status)}</div>
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold text-sm truncate">{req.subject}</span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant={st.variant}>{st.label}</Badge>
+              <Badge variant="outline">{categoryLabels[req.category] ?? req.category}</Badge>
+              <span className="text-[11px] text-muted-foreground">{formatDate(req.createdAt)}</span>
+              {req.attachmentCount && Number(req.attachmentCount) > 0 && (
+                <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground">
+                  <Paperclip className="h-3 w-3" />
+                  {req.attachmentCount}
+                </span>
+              )}
+              {req.answerText && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-green-600">
+                  <MessageSquare className="h-3 w-3" />
+                  Есть ответ
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="shrink-0 pt-0.5 text-muted-foreground">
+            {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </div>
+        </button>
+
+        {expanded && (
+          <div className="px-4 pb-4 border-t border-border pt-4 space-y-4">
+            {loadingDetail === req.id ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Загрузка...
+              </div>
+            ) : (
+              <>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Описание</p>
+                  <p className="text-sm whitespace-pre-line">{detail?.description ?? req.description}</p>
+                </div>
+
+                {detail?.attachments && detail.attachments.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground mb-2">Прикреплённые файлы</p>
+                    <div className="flex flex-col gap-1.5">
+                      {detail.attachments.map((att, idx) => (
+                        <a
+                          key={att.id ?? idx}
+                          href={att.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                        >
+                          <FileText className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{att.fileName}</span>
+                          {att.fileSize && (
+                            <span className="text-xs text-muted-foreground">({formatFileSize(att.fileSize)})</span>
+                          )}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(detail?.answerText ?? req.answerText) && (
+                  <div className="p-4 rounded-lg border-l-4 border-green-500 bg-green-500/5">
+                    <p className="text-xs font-medium text-green-600 mb-2">
+                      Ответ юриста
+                      {(detail?.answeredByName ?? req.answeredByName) &&
+                        ` (${detail?.answeredByName ?? req.answeredByName})`}
+                    </p>
+                    <p className="text-sm whitespace-pre-line">{detail?.answerText ?? req.answerText}</p>
+                    {(detail?.answeredAt ?? req.answeredAt) && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {formatDate((detail?.answeredAt ?? req.answeredAt)!)}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {!(detail?.answerText ?? req.answerText) && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <MessageSquare className="h-4 w-4" />
+                    Ответ ещё не получен
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </Card>
+    );
+  };
+
   /* ---------- render ---------- */
 
   return (
     <div>
       <PageHeader
         title="Вопрос юристу"
-        description="Задайте вопрос моему руководителю — вам ответят в течение 3 часов"
+        description="Задайте вопрос юристу профсоюза и получите ответ в течение 3 часов"
         breadcrumbs={[
-          { title: "Платформа", href: "/agent/dashboard" },
+          { title: "О платформе", href: "/agent/dashboard" },
           { title: "Вопрос юристу" },
         ]}
       />
 
-      {/* ---------- cat helper ---------- */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6">
-        <div className="lg:col-span-3 space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* ===== LEFT SIDEBAR ===== */}
+        <div className="lg:col-span-4 space-y-4">
+          {/* Mascot */}
           <Card className="overflow-hidden !bg-[#2a2a2f] !border-[#3a3a42]">
             <CardContent className="p-0">
               <div className="relative" style={{ height: 160 }}>
@@ -268,304 +382,247 @@ export default function AgentLegalPage() {
               </div>
             </CardContent>
           </Card>
-          {/* Bubble */}
+
+          {/* Tip */}
           <div className="relative">
             <div className="bg-primary rounded-xl px-3.5 py-2.5">
               <p className="text-[13px] leading-relaxed text-primary-foreground">
-                Задайте вопрос моему руководителю — вам ответят в течение 3 часов
+                Если Ваш вопрос требует изучения документов и предварительного анализа, задайте его моему руководителю — ответ поступит в течение 3 часов.
               </p>
             </div>
             <div className="absolute -top-1 left-4 w-2.5 h-2.5 bg-primary rotate-45" />
           </div>
 
-        </div>
-        <div className="lg:col-span-9">
-
-      {/* ---------- empty state ---------- */}
-      {requests.length === 0 && (
-        <Card>
-          <CardContent className="py-16 text-center">
-            <Scale className="h-12 w-12 mx-auto text-muted-foreground/40 mb-4" />
-            <p className="text-muted-foreground text-sm">
-              У вас пока нет вопросов юристу
-            </p>
-            <Button className="mt-4" onClick={() => setDialogOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Задать вопрос
-            </Button>
-            <p className="text-xs text-muted-foreground mt-6 max-w-sm mx-auto leading-relaxed">
-              Если вам нужен подробный ответ с изучением конкретных документов — задайте вопрос моему руководителю. А я сделаю всё возможное, чтобы он ответил вам в течение 3 часов
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* ---------- requests list ---------- */}
-      <div className="space-y-3">
-        {requests.map((req) => {
-          const expanded = expandedId === req.id;
-          const detail = expandedData[req.id];
-          const st = getStatus(req.status);
-
-          return (
-            <Card key={req.id} className="overflow-hidden">
-              {/* header row */}
-              <button
-                type="button"
-                className="w-full text-left p-4 sm:p-6 flex items-start gap-4 hover:bg-muted/30 transition-colors cursor-pointer"
-                onClick={() => toggleExpand(req.id)}
-              >
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-sm truncate">{req.subject}</span>
-                    <Badge variant={st.variant}>{st.label}</Badge>
-                    <Badge variant="outline">{categoryLabels[req.category] ?? req.category}</Badge>
+          {/* How it works */}
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold mb-3">Как это работает</p>
+              <div className="space-y-3">
+                <div className="flex items-start gap-2.5">
+                  <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <Send className="h-2.5 w-2.5 text-primary" />
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {formatDate(req.createdAt)}
-                    {req.attachmentCount && Number(req.attachmentCount) > 0 && (
-                      <span className="inline-flex items-center gap-0.5 ml-3">
-                        <Paperclip className="h-3 w-3" />
-                        {req.attachmentCount}
-                      </span>
-                    )}
-                  </p>
+                  <p className="text-[11px] text-muted-foreground leading-snug">Вы задаёте вопрос юристу с описанием ситуации</p>
                 </div>
-                <div className="shrink-0 pt-0.5 text-muted-foreground">
-                  {expanded ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
+                <div className="flex items-start gap-2.5">
+                  <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <Eye className="h-2.5 w-2.5 text-primary" />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-snug">Юрист профсоюза получает и рассматривает обращение</p>
                 </div>
-              </button>
+                <div className="flex items-start gap-2.5">
+                  <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <MessageSquare className="h-2.5 w-2.5 text-primary" />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-snug">Ответ появится в этом разделе</p>
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-border">
+                <p className="text-[10px] text-muted-foreground">Среднее время ответа — до 3 часов</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-              {/* expanded content */}
-              {expanded && (
-                <div className="px-4 sm:px-6 pb-4 sm:pb-6 border-t border-border pt-4 space-y-4">
-                  {loadingDetail === req.id ? (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Загрузка...
-                    </div>
-                  ) : (
-                    <>
-                      {/* description */}
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground mb-1">Описание</p>
-                        <p className="text-sm whitespace-pre-line">
-                          {detail?.description ?? req.description}
-                        </p>
-                      </div>
+        {/* ===== RIGHT MAIN ZONE ===== */}
+        <div className="lg:col-span-8 space-y-6">
 
-                      {/* attachments */}
-                      {detail?.attachments && detail.attachments.length > 0 && (
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-2">
-                            Прикреплённые файлы
-                          </p>
-                          <div className="flex flex-col gap-1.5">
-                            {detail.attachments.map((att, idx) => (
-                              <a
-                                key={att.id ?? idx}
-                                href={att.fileUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                              >
-                                <FileText className="h-4 w-4 shrink-0" />
-                                <span className="truncate">{att.fileName}</span>
-                                {att.fileSize && (
-                                  <span className="text-xs text-muted-foreground">
-                                    ({formatFileSize(att.fileSize)})
-                                  </span>
-                                )}
-                              </a>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+          {/* --- INLINE FORM --- */}
+          <Card>
+            <CardContent className="p-5">
+              <div className="mb-4">
+                <h3 className="text-sm font-semibold">Задать вопрос юристу</h3>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Опишите ситуацию — ответ появится в истории обращений ниже</p>
+              </div>
 
-                      {/* answer */}
-                      {(detail?.answerText ?? req.answerText) && (
-                        <div className="mt-4 p-4 rounded-lg border-l-4 border-green-500 bg-green-500/5">
-                          <p className="text-xs font-medium text-green-600 mb-2">
-                            Ответ юриста
-                            {(detail?.answeredByName ?? req.answeredByName) &&
-                              ` (${detail?.answeredByName ?? req.answeredByName})`}
-                          </p>
-                          <p className="text-sm whitespace-pre-line">
-                            {detail?.answerText ?? req.answerText}
-                          </p>
-                          {(detail?.answeredAt ?? req.answeredAt) && (
-                            <p className="text-xs text-muted-foreground mt-2">
-                              {formatDate((detail?.answeredAt ?? req.answeredAt)!)}
-                            </p>
-                          )}
-                        </div>
-                      )}
-
-                      {/* no answer yet */}
-                      {!(detail?.answerText ?? req.answerText) && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <MessageSquare className="h-4 w-4" />
-                          Ответ ещё не получен
-                        </div>
-                      )}
-                    </>
-                  )}
+              {submitSuccess && (
+                <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
+                  <p className="text-sm text-green-700">Вопрос отправлен! Юрист ответит в течение 3 часов.</p>
                 </div>
               )}
-            </Card>
-          );
-        })}
-      </div>
-        </div>{/* end right col */}
-      </div>{/* end grid */}
 
-      {/* ---------- create dialog ---------- */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Задать вопрос юристу</DialogTitle>
-            <DialogDescription>
-              Опишите вашу ситуацию, и юрист профсоюза ответит вам в ближайшее время
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="rounded-lg bg-primary/5 border border-primary/10 px-4 py-3 mt-4">
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              Если вам нужен подробный ответ с изучением конкретных документов — задайте вопрос моему руководителю. А я сделаю всё возможное, чтобы он ответил вам в течение 3 часов
-            </p>
-          </div>
-
-          <div className="space-y-4 mt-4">
-            {/* subject */}
-            <div className="space-y-1.5">
-              <label htmlFor="lr-subject" className="text-sm font-medium">
-                Тема <span className="text-destructive">*</span>
-              </label>
-              <Input
-                id="lr-subject"
-                placeholder="Кратко опишите тему вопроса"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-              />
-            </div>
-
-            {/* category */}
-            <div className="space-y-1.5">
-              <label htmlFor="lr-category" className="text-sm font-medium">
-                Категория
-              </label>
-              <select
-                id="lr-category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="flex h-10 w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {Object.entries(categoryLabels).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* description */}
-            <div className="space-y-1.5">
-              <label htmlFor="lr-description" className="text-sm font-medium">
-                Описание <span className="text-destructive">*</span>
-              </label>
-              <textarea
-                id="lr-description"
-                placeholder="Подробно опишите вашу ситуацию или вопрос..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="flex w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
-                style={{ minHeight: 120 }}
-              />
-            </div>
-
-            {/* attachments */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Прикрепить файлы</label>
-
-              {attachments.length > 0 && (
-                <div className="space-y-1.5">
-                  {attachments.map((att, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-2 text-sm rounded-lg border border-border bg-muted/50 px-3 py-2"
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Тема вопроса *</label>
+                    <Input
+                      placeholder="Например: вопрос по трудовому спору"
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Категория</label>
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="flex h-10 w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
-                      <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <span className="truncate flex-1">{att.fileName}</span>
-                      {att.fileSize && (
-                        <span className="text-xs text-muted-foreground shrink-0">
-                          {formatFileSize(att.fileSize)}
-                        </span>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => removeAttachment(idx)}
-                        className="text-muted-foreground hover:text-destructive transition-colors shrink-0 cursor-pointer"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
+                      {Object.entries(categoryLabels).map(([value, label]) => (
+                        <option key={value} value={value}>{label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              )}
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
-                onChange={handleUpload}
-                className="hidden"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={uploading}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {uploading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Upload className="h-4 w-4" />
-                )}
-                {uploading ? "Загрузка..." : "Выбрать файл"}
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                PDF, JPG, PNG, WEBP, DOC, DOCX
-              </p>
-            </div>
-          </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Опишите ситуацию *</label>
+                  <textarea
+                    placeholder="Кратко опишите вашу ситуацию, чтобы юрист мог быстрее разобраться"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="flex w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
+                    style={{ minHeight: 100 }}
+                  />
+                </div>
 
-          {/* actions */}
-          <div className="flex justify-end gap-2 mt-6">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setDialogOpen(false);
-                resetForm();
-              }}
-              disabled={saving}
-            >
-              Отмена
-            </Button>
-            <Button
-              onClick={handleCreate}
-              disabled={saving || !subject.trim() || !description.trim()}
-            >
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              Отправить
-            </Button>
+                {/* Attachments */}
+                <div>
+                  {attachments.length > 0 && (
+                    <div className="space-y-1.5 mb-2">
+                      {attachments.map((att, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 text-sm rounded-lg border border-border bg-muted/50 px-3 py-2"
+                        >
+                          <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <span className="truncate flex-1">{att.fileName}</span>
+                          {att.fileSize && (
+                            <span className="text-xs text-muted-foreground shrink-0">{formatFileSize(att.fileSize)}</span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => removeAttachment(idx)}
+                            className="text-muted-foreground hover:text-destructive transition-colors shrink-0 cursor-pointer"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
+                    onChange={handleUpload}
+                    className="hidden"
+                  />
+                  <div className="flex items-center gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={uploading}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      {uploading ? "Загрузка..." : "Прикрепить файл"}
+                    </Button>
+                    <span className="text-[10px] text-muted-foreground">PDF, JPG, PNG, DOC — при необходимости</span>
+                  </div>
+                </div>
+
+                {/* Submit */}
+                <div className="flex items-center justify-between pt-2">
+                  <Button
+                    onClick={handleCreate}
+                    disabled={saving || !subject.trim() || !description.trim()}
+                  >
+                    {saving && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
+                    Отправить вопрос
+                  </Button>
+                  <span className="text-[10px] text-muted-foreground">Среднее время ответа — до 3 часов</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* --- HISTORY --- */}
+          <div>
+            <h3 className="text-sm font-semibold mb-3">Мои вопросы</h3>
+
+            {requests.length === 0 ? (
+              <Card>
+                <CardContent className="py-12">
+                  <div className="flex flex-col items-center text-center max-w-sm mx-auto">
+                    <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                      <Scale className="h-6 w-6 text-primary" />
+                    </div>
+                    <h4 className="text-sm font-semibold mb-1">У вас пока нет обращений к юристу</h4>
+                    <p className="text-xs text-muted-foreground mb-4">
+                      После отправки вопроса здесь появится история ваших обращений и ответы юриста
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-1.5">
+                      {["Трудовые вопросы", "Документы", "Права работника", "Консультация"].map((chip) => (
+                        <span key={chip} className="px-2.5 py-1 rounded-full bg-muted text-[10px] text-muted-foreground">
+                          {chip}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Tabs defaultValue="all">
+                <TabsList className="mb-3">
+                  <TabsTrigger value="all">
+                    Все
+                    {requests.length > 0 && <span className="ml-1.5 text-[10px] opacity-70">({requests.length})</span>}
+                  </TabsTrigger>
+                  <TabsTrigger value="in_progress">
+                    В работе
+                    {inProgressRequests.length > 0 && <span className="ml-1.5 text-[10px] opacity-70">({inProgressRequests.length})</span>}
+                  </TabsTrigger>
+                  <TabsTrigger value="answered">
+                    Отвечено
+                    {answeredRequests.length > 0 && <span className="ml-1.5 text-[10px] opacity-70">({answeredRequests.length})</span>}
+                  </TabsTrigger>
+                  <TabsTrigger value="closed">
+                    Закрыто
+                    {closedRequests.length > 0 && <span className="ml-1.5 text-[10px] opacity-70">({closedRequests.length})</span>}
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="all">
+                  <div className="space-y-2">
+                    {requests.map((req) => <RequestCard key={req.id} req={req} />)}
+                  </div>
+                </TabsContent>
+                <TabsContent value="in_progress">
+                  {inProgressRequests.length === 0 ? (
+                    <Card><CardContent className="py-8 text-center"><p className="text-sm text-muted-foreground">Нет вопросов в работе</p></CardContent></Card>
+                  ) : (
+                    <div className="space-y-2">
+                      {inProgressRequests.map((req) => <RequestCard key={req.id} req={req} />)}
+                    </div>
+                  )}
+                </TabsContent>
+                <TabsContent value="answered">
+                  {answeredRequests.length === 0 ? (
+                    <Card><CardContent className="py-8 text-center"><p className="text-sm text-muted-foreground">Нет отвеченных вопросов</p></CardContent></Card>
+                  ) : (
+                    <div className="space-y-2">
+                      {answeredRequests.map((req) => <RequestCard key={req.id} req={req} />)}
+                    </div>
+                  )}
+                </TabsContent>
+                <TabsContent value="closed">
+                  {closedRequests.length === 0 ? (
+                    <Card><CardContent className="py-8 text-center"><p className="text-sm text-muted-foreground">Нет закрытых вопросов</p></CardContent></Card>
+                  ) : (
+                    <div className="space-y-2">
+                      {closedRequests.map((req) => <RequestCard key={req.id} req={req} />)}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            )}
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
     </div>
   );
 }

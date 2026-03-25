@@ -164,10 +164,6 @@ export default function ManagerAgentsPage() {
 
   const tabs: { key: TabFilter; label: string; count: number }[] = [
     { key: "all", label: "Все", count: agents.length },
-    { key: "learning", label: "Обучаются", count: learning.length },
-    { key: "ready", label: "Готовы", count: activated.length },
-    { key: "active", label: "Активные", count: active.length },
-    { key: "problem", label: "Проблемные", count: problem.length },
   ];
 
   const columns = [

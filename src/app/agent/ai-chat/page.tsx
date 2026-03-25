@@ -25,7 +25,14 @@ const quickQuestions = [
   "Как написать коллеге из подразделения?",
 ];
 
-const CAT_SLEEP = "/ai-cat/sleep.mp4";
+// Idle variants — random one picked on each page load
+const IDLE_VARIANTS = [
+  { video: "/ai-cat/sleep.mp4", voice: null, hasAudioInVideo: false }, // silent sleep with purr
+  { video: "/ai-cat/idle-1.mp4", voice: "/ai-cat/idle-1-voice.mp3", hasAudioInVideo: false },
+  { video: "/ai-cat/idle-2.mp4", voice: "/ai-cat/idle-2-voice.mp3", hasAudioInVideo: false },
+  { video: "/ai-cat/idle-3.mp4", voice: null, hasAudioInVideo: true }, // sound baked into video
+];
+
 const CAT_PEEK = "/ai-cat/peek.mp4";
 const CAT_TALK = "/ai-cat/talk.mp4";
 const CAT_THINK = "/ai-cat/think.mp4";
@@ -34,7 +41,7 @@ const CAT_THINK_VOICE = "/ai-cat/think-voice.mp3";
 const CAT_ANSWER_VOICE = "/ai-cat/answer-voice.mp3";
 const CAT_PURR = "/ai-cat/purr.mp3";
 
-type CatState = "sleep" | "peek" | "talk" | "think" | "answer";
+type CatState = "idle" | "peek" | "talk" | "think" | "answer";
 
 export default function AiChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -44,12 +51,14 @@ export default function AiChatPage() {
   const [muted, setMuted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Cat state
-  const [catState, setCatState] = useState<CatState>("sleep");
+  // Cat state — pick random idle variant on mount
+  const [idleVariant] = useState(() => IDLE_VARIANTS[Math.floor(Math.random() * IDLE_VARIANTS.length)]);
+  const [catState, setCatState] = useState<CatState>("idle");
   const catVideoRef = useRef<HTMLVideoElement>(null);
   const catAudioRef = useRef<HTMLAudioElement | null>(null);
   const purrAudioRef = useRef<HTMLAudioElement | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleVoicePlayed = useRef(false);
 
   useEffect(() => {
     fetch("/api/ai-chat")
@@ -63,18 +72,51 @@ export default function AiChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Play idle voice in loop while catState is "idle" (stops when user types)
+  useEffect(() => {
+    if (catState !== "idle" || !idleVariant.voice || muted) return;
+    let stopped = false;
+    const playLoop = () => {
+      if (stopped) return;
+      const audio = new Audio(idleVariant.voice!);
+      catAudioRef.current = audio;
+      audio.addEventListener("ended", () => {
+        // Small pause between repeats
+        setTimeout(() => { if (!stopped) playLoop(); }, 500);
+      }, { once: true });
+      audio.play().catch(() => {});
+    };
+    // Start with 1s delay on first load
+    const timer = setTimeout(playLoop, 1000);
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+      if (catAudioRef.current) { catAudioRef.current.pause(); catAudioRef.current = null; }
+    };
+  }, [catState, idleVariant.voice, muted]);
+
   // Switch cat video + audio when state changes
   useEffect(() => {
     if (!catVideoRef.current) return;
-    const srcMap: Record<CatState, string> = {
-      sleep: CAT_SLEEP, peek: CAT_PEEK, talk: CAT_TALK, think: CAT_THINK, answer: CAT_ANSWER,
-    };
 
-    catVideoRef.current.src = srcMap[catState];
+    // Map state to video src
+    let videoSrc: string;
+    if (catState === "idle") {
+      videoSrc = idleVariant.video;
+    } else {
+      const srcMap: Record<string, string> = {
+        peek: CAT_PEEK, talk: CAT_TALK, think: CAT_THINK, answer: CAT_ANSWER,
+      };
+      videoSrc = srcMap[catState] || idleVariant.video;
+    }
+
+    catVideoRef.current.src = videoSrc;
     catVideoRef.current.loop = catState !== "talk"; // talk plays once, rest loop
+    // Unmute video only for idle variants with baked-in audio
+    catVideoRef.current.muted = !(catState === "idle" && idleVariant.hasAudioInVideo && !muted);
     catVideoRef.current.play().catch(() => {});
 
-    // Voice: play when entering "talk" or "answer" state
+    // Voice: play when entering different states
     let voiceAudio: HTMLAudioElement | null = null;
     let mutedTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -98,18 +140,18 @@ export default function AiChatPage() {
         voiceAudio = new Audio(CAT_ANSWER_VOICE);
         catAudioRef.current = voiceAudio;
         voiceAudio.addEventListener("ended", () => {
-          setCatState("sleep");
+          setCatState("idle");
         }, { once: true });
         voiceAudio.play().catch(() => {
-          setCatState("sleep");
+          setCatState("idle");
         });
       } else {
-        mutedTimeout = setTimeout(() => setCatState("sleep"), 5000);
+        mutedTimeout = setTimeout(() => setCatState("idle"), 5000);
       }
     }
 
-    // Purr: play when sleeping, stop otherwise
-    if (catState === "sleep" && !muted) {
+    // Purr: play only when idle with sleep variant (no voice), stop otherwise
+    if (catState === "idle" && !idleVariant.voice && !muted) {
       if (!purrAudioRef.current) {
         const purr = new Audio(CAT_PURR);
         purr.loop = true;
@@ -127,7 +169,7 @@ export default function AiChatPage() {
       if (mutedTimeout) clearTimeout(mutedTimeout);
       if (purrAudioRef.current) { purrAudioRef.current.pause(); purrAudioRef.current = null; }
     };
-  }, [catState, muted]);
+  }, [catState, muted, idleVariant]);
 
   // Cleanup catAudioRef on unmount only
   useEffect(() => {
@@ -143,7 +185,7 @@ export default function AiChatPage() {
       if (catAudioRef.current) catAudioRef.current.pause();
     };
     const resumeIfNeeded = () => {
-      if (catState === "sleep" && !muted && purrAudioRef.current) {
+      if (catState === "idle" && !idleVariant.voice && !muted && purrAudioRef.current) {
         purrAudioRef.current.play().catch(() => {});
       }
     };
@@ -184,10 +226,10 @@ export default function AiChatPage() {
       setCatState("peek");
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
-        setCatState("sleep");
+        setCatState("idle");
       }, 3000);
     } else {
-      setCatState("sleep");
+      setCatState("idle");
     }
   };
 
@@ -253,7 +295,7 @@ export default function AiChatPage() {
       if (purrAudioRef.current) {
         if (next) {
           purrAudioRef.current.pause();
-        } else if (catState === "sleep") {
+        } else if (catState === "idle" && !idleVariant.voice) {
           purrAudioRef.current.play().catch(() => {});
         }
       }
@@ -280,10 +322,10 @@ export default function AiChatPage() {
         <div className="lg:col-span-3">
           <Card className="overflow-hidden !bg-[#2a2a2f] !border-[#3a3a42]">
             <CardContent className="p-0">
-              <div className="relative" style={{ height: 280 }}>
+              <div className="relative bg-[#2a2a2f]" style={{ height: 280 }}>
                 <video
                   ref={catVideoRef}
-                  src={CAT_SLEEP}
+                  src={idleVariant.video}
                   autoPlay
                   loop
                   muted
@@ -298,7 +340,7 @@ export default function AiChatPage() {
                 </button>
                 {/* State indicator */}
                 <div className="absolute bottom-2 left-2 px-2 py-1 rounded-full bg-black/50 text-[10px] text-white">
-                  {catState === "sleep" && "💤 Дремлет..."}
+                  {catState === "idle" && "😺 На месте"}
                   {catState === "peek" && "👀 Подсматривает..."}
                   {catState === "talk" && "💬 Говорит..."}
                   {catState === "think" && "🤔 Думает..."}
