@@ -58,7 +58,6 @@ export default function AiChatPage() {
   const catAudioRef = useRef<HTMLAudioElement | null>(null);
   const purrAudioRef = useRef<HTMLAudioElement | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const idleVoicePlayed = useRef(false);
 
   useEffect(() => {
     fetch("/api/ai-chat")
@@ -72,28 +71,18 @@ export default function AiChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Play idle voice in loop while catState is "idle" (stops when user types)
+  // Play idle voice once on mount, then freeze on last frame
   useEffect(() => {
-    if (catState !== "idle" || !idleVariant.voice || muted) return;
-    let stopped = false;
-    const playLoop = () => {
-      if (stopped) return;
-      const audio = new Audio(idleVariant.voice!);
-      catAudioRef.current = audio;
-      audio.addEventListener("ended", () => {
-        // Small pause between repeats
-        setTimeout(() => { if (!stopped) playLoop(); }, 500);
-      }, { once: true });
-      audio.play().catch(() => {});
-    };
-    // Start with 1s delay on first load
-    const timer = setTimeout(playLoop, 1000);
+    if (catState !== "idle" || muted || !idleVariant.voice) return;
+    const audio = new Audio(idleVariant.voice);
+    catAudioRef.current = audio;
+    const timer = setTimeout(() => { audio.play().catch(() => {}); }, 1000);
     return () => {
-      stopped = true;
       clearTimeout(timer);
-      if (catAudioRef.current) { catAudioRef.current.pause(); catAudioRef.current = null; }
+      audio.pause();
     };
-  }, [catState, idleVariant.voice, muted]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Switch cat video + audio when state changes
   useEffect(() => {
@@ -111,7 +100,8 @@ export default function AiChatPage() {
     }
 
     catVideoRef.current.src = videoSrc;
-    catVideoRef.current.loop = catState !== "talk"; // talk plays once, rest loop
+    // idle and talk play once and freeze on last frame; rest loop
+    catVideoRef.current.loop = catState !== "talk" && catState !== "idle";
     // Unmute video only for idle variants with baked-in audio
     catVideoRef.current.muted = !(catState === "idle" && idleVariant.hasAudioInVideo && !muted);
     catVideoRef.current.play().catch(() => {});
