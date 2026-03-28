@@ -39,9 +39,14 @@ const SYSTEM_PROMPT = `Ты — профсоюзный помощник плат
 Адрес: 410029, г. Саратов, ул. Сакко и Ванцетти, 55
 Телефон: 8 (8452) 26-33-56`;
 
-const VOIDAI_API_URL = process.env.OPENAI_BASE_URL ? `${process.env.OPENAI_BASE_URL}/chat/completions` : "https://aspbllm.online/v1/chat/completions";
-const VOIDAI_API_KEY = process.env.OPENAI_API_KEY || "";
-const MODEL = "gpt-5.4";
+const API_URL = process.env.OPENAI_BASE_URL ? `${process.env.OPENAI_BASE_URL}/chat/completions` : "https://aspbllm.online/v1/chat/completions";
+const API_KEY = process.env.OPENAI_API_KEY || "";
+const MODELS = [
+  "gpt-5.4",
+  "claude-sonnet-4.6",
+  "gemini-3.1-pro-preview",
+  "claude-sonnet-4-5-20250929",
+];
 const MAX_HISTORY = 20; // last N messages to include in context
 
 export async function GET() {
@@ -120,28 +125,38 @@ export async function POST(request: NextRequest) {
       ...history.map((m) => ({ role: m.role, content: m.content })),
     ];
 
-    // Call VoidAI
-    const aiResponse = await fetch(VOIDAI_API_URL, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${VOIDAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: aiMessages,
-        max_tokens: 1024,
-        temperature: 0.7,
-      }),
-    });
-
+    // Call AI with fallback models
     let assistantContent = "Извините, не удалось получить ответ. Попробуйте позже.";
 
-    if (aiResponse.ok) {
-      const data = await aiResponse.json();
-      assistantContent = data.choices?.[0]?.message?.content || assistantContent;
-    } else {
-      console.error("VoidAI error:", aiResponse.status, await aiResponse.text().catch(() => ""));
+    for (const model of MODELS) {
+      try {
+        const aiResponse = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: aiMessages,
+            max_tokens: 1024,
+            temperature: 0.7,
+          }),
+        });
+
+        if (aiResponse.ok) {
+          const data = await aiResponse.json();
+          const content = data.choices?.[0]?.message?.content;
+          if (content) {
+            assistantContent = content;
+            break;
+          }
+        }
+
+        console.warn(`AI model ${model} failed:`, aiResponse.status);
+      } catch (err) {
+        console.warn(`AI model ${model} error:`, err);
+      }
     }
 
     // Save assistant message
