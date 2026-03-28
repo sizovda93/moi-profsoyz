@@ -45,6 +45,7 @@ export const adminNav: NavItem[] = [
   { title: "Документы профсоюза", href: "/admin/union-docs", icon: "FileText" },
   { title: "Опросы", href: "/admin/surveys", icon: "ClipboardList" },
   { title: "Юридические вопросы", href: "/admin/legal", icon: "Scale" },
+  { title: "Чаты с ИИ", href: "/admin/ai-chats", icon: "Bot" },
   { title: "Профсоюзы", href: "/admin/unions", icon: "Shield" },
 ];
 
