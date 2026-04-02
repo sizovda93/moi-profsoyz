@@ -367,7 +367,7 @@ export default function AgentProfilePage() {
                     <option value="suggestion">Предложение</option>
                     <option value="problem">Проблема</option>
                   </select>
-                  <textarea className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[80px]" placeholder="Ваш комментарий..." value={fbMessage} onChange={(e) => setFbMessage(e.target.value)} />
+                  <textarea className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[48px]" placeholder="Ваш комментарий..." value={fbMessage} onChange={(e) => setFbMessage(e.target.value)} />
                   <div className="flex justify-end">
                     <Button size="sm" disabled={fbSending || !fbMessage.trim()} onClick={async () => {
                       setFbSending(true);
