@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-const publicPaths = ["/", "/login", "/register", "/offer", "/privacy", "/consent"];
+const publicPaths = ["/", "/login", "/register", "/forgot-password", "/offer", "/privacy", "/consent"];
 
 const rolePrefixes: Record<string, string[]> = {
   "/agent": ["agent", "manager"],

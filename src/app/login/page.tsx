@@ -102,6 +102,11 @@ export default function LoginPage() {
             {loading ? "Вход..." : "Войти"}
             {!loading && <ArrowRight className="h-4 w-4" />}
           </Button>
+          <div className="text-right">
+            <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+              Забыли пароль?
+            </Link>
+          </div>
         </form>
 
         {/* Links */}
