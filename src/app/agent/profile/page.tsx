@@ -167,9 +167,9 @@ export default function AgentProfilePage() {
         ]}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <div className="space-y-6">
-        <Card className="h-fit">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+        <div className="space-y-4">
+        <Card>
           <CardContent className="p-6 flex flex-col items-center text-center">
             <Avatar className="h-20 w-20 mb-4">
               <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
@@ -306,7 +306,7 @@ export default function AgentProfilePage() {
           </Card>
         </div>
 
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Личные данные</CardTitle>
