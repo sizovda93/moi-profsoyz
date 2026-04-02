@@ -167,8 +167,8 @@ export default function AgentProfilePage() {
         ]}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-        <div className="space-y-4">
+      {/* Row 1: Profile + Personal data */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <Card>
           <CardContent className="p-6 flex flex-col items-center text-center">
             <Avatar className="h-20 w-20 mb-4">
@@ -242,71 +242,7 @@ export default function AgentProfilePage() {
           </CardContent>
         </Card>
 
-          {/* Telegram — under profile card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Send className="h-4 w-4" /> Telegram
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {tgStatus?.connected ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <Badge variant="success">Подключён</Badge>
-                    {tgStatus.telegramUsername && (
-                      <span className="text-sm text-muted-foreground">@{tgStatus.telegramUsername}</span>
-                    )}
-                    {!tgStatus.telegramUsername && tgStatus.telegramFirstName && (
-                      <span className="text-sm text-muted-foreground">{tgStatus.telegramFirstName}</span>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Вы получаете уведомления и сообщения руководителя в Telegram.
-                  </p>
-                  <Button variant="outline" size="sm" onClick={handleTgDisconnect} disabled={tgLoading}>
-                    <Unlink className="h-3.5 w-3.5 mr-1" />
-                    {tgLoading ? "Отключение..." : "Отключить"}
-                  </Button>
-                </div>
-              ) : tgDeepLink ? (
-                <div className="space-y-3">
-                  <p className="text-sm">Откройте ссылку и нажмите Start в боте:</p>
-                  <a
-                    href={tgDeepLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2AABEE] text-white text-sm font-medium hover:bg-[#229ED9] transition-colors"
-                  >
-                    <Send className="h-4 w-4" /> Открыть Telegram
-                  </a>
-                  <p className="text-xs text-muted-foreground">
-                    Ссылка действительна 15 минут. После привязки обновите страницу.
-                  </p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => { setTgDeepLink(null); loadTgStatus(); }}
-                  >
-                    Я уже привязал — обновить статус
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Подключите Telegram, чтобы получать уведомления и отвечать руководителю прямо из мессенджера.
-                  </p>
-                  <Button onClick={handleTgConnect} disabled={tgLoading}>
-                    <Send className="h-4 w-4 mr-1" />
-                    {tgLoading ? "Генерация ссылки..." : "Подключить Telegram"}
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Личные данные</CardTitle>
@@ -335,19 +271,11 @@ export default function AgentProfilePage() {
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground mb-1.5 block">Профессия</label>
-                  <Input
-                    value={form.profession}
-                    onChange={(e) => setForm((f) => ({ ...f, profession: e.target.value }))}
-                    placeholder="Например: инженер, электрик..."
-                  />
+                  <Input value={form.profession} onChange={(e) => setForm((f) => ({ ...f, profession: e.target.value }))} placeholder="Например: инженер, электрик..." />
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground mb-1.5 block">Пол</label>
-                  <select
-                    className="w-full h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground"
-                    value={form.gender}
-                    onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}
-                  >
+                  <select className="w-full h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}>
                     <option value="not_specified">Не указан</option>
                     <option value="male">Мужской</option>
                     <option value="female">Женский</option>
@@ -355,22 +283,11 @@ export default function AgentProfilePage() {
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground mb-1.5 block">Год рождения</label>
-                  <Input
-                    type="number"
-                    min={1940}
-                    max={2010}
-                    placeholder="Например: 1990"
-                    value={form.birthYear}
-                    onChange={(e) => setForm((f) => ({ ...f, birthYear: e.target.value }))}
-                  />
+                  <Input type="number" min={1940} max={2010} placeholder="Например: 1990" value={form.birthYear} onChange={(e) => setForm((f) => ({ ...f, birthYear: e.target.value }))} />
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground mb-1.5 block">Предпочтительный мессенджер</label>
-                  <select
-                    className="w-full h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground"
-                    value={form.preferredMessenger}
-                    onChange={(e) => setForm((f) => ({ ...f, preferredMessenger: e.target.value }))}
-                  >
+                  <select className="w-full h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground" value={form.preferredMessenger} onChange={(e) => setForm((f) => ({ ...f, preferredMessenger: e.target.value }))}>
                     <option value="telegram">Telegram</option>
                     <option value="max">MAX</option>
                     <option value="vk">VK</option>
@@ -383,8 +300,53 @@ export default function AgentProfilePage() {
               </div>
             </CardContent>
           </Card>
+        </div>
+      </div>
 
-          {/* Feedback */}
+      {/* Row 2: Telegram + Feedback */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start mt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Send className="h-4 w-4" /> Telegram
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {tgStatus?.connected ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Badge variant="success">Подключён</Badge>
+                  {tgStatus.telegramUsername && <span className="text-sm text-muted-foreground">@{tgStatus.telegramUsername}</span>}
+                  {!tgStatus.telegramUsername && tgStatus.telegramFirstName && <span className="text-sm text-muted-foreground">{tgStatus.telegramFirstName}</span>}
+                </div>
+                <p className="text-xs text-muted-foreground">Вы получаете уведомления и сообщения руководителя в Telegram.</p>
+                <Button variant="outline" size="sm" onClick={handleTgDisconnect} disabled={tgLoading}>
+                  <Unlink className="h-3.5 w-3.5 mr-1" />
+                  {tgLoading ? "Отключение..." : "Отключить"}
+                </Button>
+              </div>
+            ) : tgDeepLink ? (
+              <div className="space-y-3">
+                <p className="text-sm">Откройте ссылку и нажмите Start в боте:</p>
+                <a href={tgDeepLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2AABEE] text-white text-sm font-medium hover:bg-[#229ED9] transition-colors">
+                  <Send className="h-4 w-4" /> Открыть Telegram
+                </a>
+                <p className="text-xs text-muted-foreground">Ссылка действительна 15 минут. После привязки обновите страницу.</p>
+                <Button variant="ghost" size="sm" onClick={() => { setTgDeepLink(null); loadTgStatus(); }}>Я уже привязал — обновить статус</Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">Подключите Telegram, чтобы получать уведомления и отвечать руководителю прямо из мессенджера.</p>
+                <Button onClick={handleTgConnect} disabled={tgLoading}>
+                  <Send className="h-4 w-4 mr-1" />
+                  {tgLoading ? "Генерация ссылки..." : "Подключить Telegram"}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
@@ -399,42 +361,22 @@ export default function AgentProfilePage() {
               ) : (
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">Расскажите, что можно улучшить или что мешает работе</p>
-                  <select
-                    className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                    value={fbType}
-                    onChange={(e) => setFbType(e.target.value)}
-                  >
+                  <select className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" value={fbType} onChange={(e) => setFbType(e.target.value)}>
                     <option value="platform">О платформе</option>
                     <option value="onboarding">Об обучении</option>
                     <option value="suggestion">Предложение</option>
                     <option value="problem">Проблема</option>
                   </select>
-                  <textarea
-                    className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[80px]"
-                    placeholder="Ваш комментарий..."
-                    value={fbMessage}
-                    onChange={(e) => setFbMessage(e.target.value)}
-                  />
+                  <textarea className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[80px]" placeholder="Ваш комментарий..." value={fbMessage} onChange={(e) => setFbMessage(e.target.value)} />
                   <div className="flex justify-end">
-                    <Button
-                      size="sm"
-                      disabled={fbSending || !fbMessage.trim()}
-                      onClick={async () => {
-                        setFbSending(true);
-                        try {
-                          const res = await fetch("/api/feedback", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ type: fbType, message: fbMessage }),
-                          });
-                          if (res.ok) {
-                            setFbSent(true);
-                            setFbMessage("");
-                          }
-                        } catch { /* ignore */ }
-                        finally { setFbSending(false); }
-                      }}
-                    >
+                    <Button size="sm" disabled={fbSending || !fbMessage.trim()} onClick={async () => {
+                      setFbSending(true);
+                      try {
+                        const res = await fetch("/api/feedback", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: fbType, message: fbMessage }) });
+                        if (res.ok) { setFbSent(true); setFbMessage(""); }
+                      } catch { /* ignore */ }
+                      finally { setFbSending(false); }
+                    }}>
                       {fbSending ? "Отправка..." : "Отправить"}
                     </Button>
                   </div>
