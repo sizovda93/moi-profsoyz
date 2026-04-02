@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Shield, ArrowRight } from "lucide-react";
+import { Shield, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -17,6 +17,7 @@ interface UnionData {
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({ fullName: "", email: "", phone: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [consents, setConsents] = useState({ offer: false, personal_data: false });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -136,14 +137,24 @@ export default function RegisterPage() {
           </div>
           <div>
             <label className="text-sm text-muted-foreground mb-1.5 block">Пароль</label>
-            <Input
-              type="password"
-              placeholder="Минимум 8 символов"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required
-              minLength={8}
-            />
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Минимум 8 символов"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                required
+                minLength={8}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((p) => !p)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           {/* Профсоюз — предвыбран, если один */}
