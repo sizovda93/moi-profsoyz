@@ -283,6 +283,9 @@ export default function HomePage() {
             <Link href="/privacy" className="hover:text-[#374151] transition-colors">
               Политика конфиденциальности
             </Link>
+            <Link href="/cookies" className="hover:text-[#374151] transition-colors">
+              Куки
+            </Link>
           </div>
         </div>
       </footer>
