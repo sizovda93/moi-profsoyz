@@ -28,6 +28,10 @@ export async function GET(request: NextRequest) {
       conditions.push(`l.assigned_agent_id = $${idx}`);
       params.push(user.agentId);
       idx++;
+    } else if (user.role === 'manager') {
+      conditions.push(`l.assigned_manager_id = $${idx}`);
+      params.push(user.id);
+      idx++;
     }
 
     // Division filter (manager/admin only)

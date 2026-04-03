@@ -41,6 +41,16 @@ export default function ManagerLeadsPage() {
       .finally(() => setLoading(false));
   }, [divisionFilter]);
 
+  const handleDelete = async (lead: Lead) => {
+    if (!confirm(`Удалить обращение от ${lead.fullName}?`)) return;
+    try {
+      const res = await fetch(`/api/leads/${lead.id}`, { method: "DELETE" });
+      if (res.ok) {
+        setLeads((prev) => prev.filter((l) => l.id !== lead.id));
+      }
+    } catch { /* ignore */ }
+  };
+
   if (loading) return <CardSkeleton />;
 
   const filtered = leads.filter(
@@ -107,20 +117,20 @@ export default function ManagerLeadsPage() {
         </TabsList>
         {conflictLeads.length > 0 && (
           <TabsContent value="conflicts">
-            <LeadTable leads={conflictLeads} onRowClick={(lead: Lead) => router.push(`/manager/leads/${lead.id}`)} />
+            <LeadTable leads={conflictLeads} onRowClick={(lead: Lead) => router.push(`/manager/leads/${lead.id}`)} onDelete={handleDelete} />
           </TabsContent>
         )}
         <TabsContent value="new">
-          <LeadTable leads={newLeads} onRowClick={(lead: Lead) => router.push(`/manager/leads/${lead.id}`)} />
+          <LeadTable leads={newLeads} onRowClick={(lead: Lead) => router.push(`/manager/leads/${lead.id}`)} onDelete={handleDelete} />
         </TabsContent>
         <TabsContent value="active">
-          <LeadTable leads={activeLeads} onRowClick={(lead: Lead) => router.push(`/manager/leads/${lead.id}`)} />
+          <LeadTable leads={activeLeads} onRowClick={(lead: Lead) => router.push(`/manager/leads/${lead.id}`)} onDelete={handleDelete} />
         </TabsContent>
         <TabsContent value="closed">
-          <LeadTable leads={closedLeads} onRowClick={(lead: Lead) => router.push(`/manager/leads/${lead.id}`)} />
+          <LeadTable leads={closedLeads} onRowClick={(lead: Lead) => router.push(`/manager/leads/${lead.id}`)} onDelete={handleDelete} />
         </TabsContent>
         <TabsContent value="all">
-          <LeadTable leads={filtered} onRowClick={(lead: Lead) => router.push(`/manager/leads/${lead.id}`)} />
+          <LeadTable leads={filtered} onRowClick={(lead: Lead) => router.push(`/manager/leads/${lead.id}`)} onDelete={handleDelete} />
         </TabsContent>
       </Tabs>
     </div>

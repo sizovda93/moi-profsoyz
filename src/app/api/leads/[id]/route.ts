@@ -266,3 +266,36 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     return Response.json({ error: 'Внутренняя ошибка сервера' }, { status: 500 });
   }
 }
+
+export async function DELETE(_request: NextRequest, { params }: RouteContext) {
+  try {
+    const auth = await requireAuth();
+    if (auth.error) return auth.error;
+    const { user } = auth;
+    const { id } = await params;
+
+    if (user.role !== 'manager' && user.role !== 'admin') {
+      return Response.json({ error: 'Нет доступа' }, { status: 403 });
+    }
+
+    // Verify this lead belongs to this manager
+    if (user.role === 'manager') {
+      const { rows } = await pool.query(
+        `SELECT id FROM leads WHERE id = $1 AND assigned_manager_id = $2`,
+        [id, user.id]
+      );
+      if (rows.length === 0) {
+        return Response.json({ error: 'Обращение не найдено' }, { status: 404 });
+      }
+    }
+
+    // Delete related records first
+    await pool.query(`DELETE FROM lead_events WHERE lead_id = $1`, [id]);
+    await pool.query(`DELETE FROM leads WHERE id = $1`, [id]);
+
+    return Response.json({ success: true });
+  } catch (err) {
+    console.error('DELETE /api/leads/[id] error:', err);
+    return Response.json({ error: 'Ошибка сервера' }, { status: 500 });
+  }
+}
