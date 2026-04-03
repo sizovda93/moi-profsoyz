@@ -244,6 +244,11 @@ export default function AdminUsersPage() {
       title: "Тир",
       render: (a: UserRow) => a.tier ? <TierBadge tier={a.tier as AgentTier} /> : <span>—</span>,
     },
+    {
+      key: "created",
+      title: "Регистрация",
+      render: (a: UserRow) => <span className="text-muted-foreground">{formatDate(a.createdAt)}</span>,
+    },
   ];
 
   return (
