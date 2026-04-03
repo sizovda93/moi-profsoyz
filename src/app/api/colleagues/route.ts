@@ -21,10 +21,16 @@ export async function GET() {
     }
     const managerId = agentRows[0].manager_id;
 
+    // Get manager name
+    const { rows: managerRows } = await pool.query(
+      `SELECT full_name FROM profiles WHERE id = $1`, [managerId]
+    );
+    const managerName = managerRows[0]?.full_name || "Руководитель";
+
     // Get colleagues assigned to the same manager (excluding self)
     const { rows } = await pool.query(`
       SELECT p.id, p.full_name, p.email, p.phone, p.status,
-             a.id as agent_id, a.profession,
+             a.id as agent_id, a.profession, a.manager_id,
              ud.name as division_name
       FROM agents a
       JOIN profiles p ON p.id = a.user_id
@@ -33,7 +39,11 @@ export async function GET() {
       ORDER BY p.full_name
     `, [managerId, user.id]);
 
-    return Response.json(toCamelCase(rows));
+    return Response.json({
+      managerId,
+      managerName,
+      colleagues: toCamelCase(rows),
+    });
   } catch (err) {
     console.error("GET /api/colleagues error:", err);
     return Response.json({ error: "Ошибка сервера" }, { status: 500 });

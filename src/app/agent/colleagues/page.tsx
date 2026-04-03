@@ -57,7 +57,7 @@ export default function AgentColleaguesPage() {
   useEffect(() => {
     fetch("/api/colleagues")
       .then((r) => r.json())
-      .then((data) => setColleagues(Array.isArray(data) ? data : []))
+      .then((data) => setColleagues(Array.isArray(data?.colleagues) ? data.colleagues : Array.isArray(data) ? data : []))
       .catch(() => {})
       .finally(() => setColleaguesLoading(false));
 
