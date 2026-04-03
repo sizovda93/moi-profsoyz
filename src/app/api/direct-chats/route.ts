@@ -55,15 +55,15 @@ export async function POST(request: NextRequest) {
       return Response.json({ chatId: existing[0].id });
     }
 
-    // Verify recipient is in same union
+    // Verify recipient has the same manager
     const { rows: check } = await pool.query(`
-      SELECT a1.union_id as my_union, a2.union_id as their_union
+      SELECT a1.manager_id as my_manager, a2.manager_id as their_manager
       FROM agents a1, agents a2
       WHERE a1.user_id = $1 AND a2.user_id = $2
     `, [user.id, recipientId]);
 
-    if (check.length === 0 || !check[0].my_union || check[0].my_union !== check[0].their_union) {
-      return Response.json({ error: "Можно переписываться только с коллегами из вашего профсоюза" }, { status: 403 });
+    if (check.length === 0 || !check[0].my_manager || check[0].my_manager !== check[0].their_manager) {
+      return Response.json({ error: "Можно переписываться только с коллегами, закреплёнными за одним руководителем" }, { status: 403 });
     }
 
     const { rows } = await pool.query(

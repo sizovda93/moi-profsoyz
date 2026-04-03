@@ -12,16 +12,16 @@ export async function GET() {
       return Response.json([]);
     }
 
-    // Get current user's union
+    // Get current user's manager
     const { rows: agentRows } = await pool.query(
-      `SELECT union_id FROM agents WHERE id = $1`, [user.agentId]
+      `SELECT manager_id FROM agents WHERE id = $1`, [user.agentId]
     );
-    if (agentRows.length === 0 || !agentRows[0].union_id) {
+    if (agentRows.length === 0 || !agentRows[0].manager_id) {
       return Response.json([]);
     }
-    const unionId = agentRows[0].union_id;
+    const managerId = agentRows[0].manager_id;
 
-    // Get all colleagues in same union (excluding self)
+    // Get colleagues assigned to the same manager (excluding self)
     const { rows } = await pool.query(`
       SELECT p.id, p.full_name, p.email, p.phone, p.status,
              a.id as agent_id, a.profession,
@@ -29,9 +29,9 @@ export async function GET() {
       FROM agents a
       JOIN profiles p ON p.id = a.user_id
       LEFT JOIN union_divisions ud ON ud.id = a.division_id
-      WHERE a.union_id = $1 AND p.id != $2 AND p.status = 'active'
+      WHERE a.manager_id = $1 AND p.id != $2 AND p.status = 'active'
       ORDER BY p.full_name
-    `, [unionId, user.id]);
+    `, [managerId, user.id]);
 
     return Response.json(toCamelCase(rows));
   } catch (err) {
