@@ -99,12 +99,6 @@ export default function HomePage() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="hidden sm:inline-flex items-center gap-1.5 text-base font-semibold text-[#6b7280] hover:text-[#0a0a0a] transition-colors"
-            >
-              Войти
-            </Link>
-            <Link
-              href="/login"
               className="inline-flex items-center gap-2 rounded-xl bg-[#3b82f6] px-5 py-2.5 text-base font-bold text-white hover:bg-[#2563eb] transition-colors shadow-sm"
             >
               <LogIn className="h-4 w-4" />
