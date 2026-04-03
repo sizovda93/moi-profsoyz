@@ -15,6 +15,7 @@ import {
   Loader2,
   UserRound,
   MessagesSquare,
+  ArrowLeft,
 } from "lucide-react";
 
 function getInit(name: string) {
@@ -179,10 +180,13 @@ export default function AgentColleaguesPage() {
 
       <div
         className="grid grid-cols-1 lg:grid-cols-12 gap-0 rounded-xl border border-border overflow-hidden"
-        style={{ height: 600 }}
+        style={{ minHeight: 400, maxHeight: "calc(100dvh - 200px)" }}
       >
-        {/* Contacts panel - 3 cols */}
-        <div className="lg:col-span-3 border-r border-border overflow-y-auto">
+        {/* Contacts panel - hidden on mobile when chat is open */}
+        <div className={cn(
+          "lg:col-span-3 border-r border-border overflow-y-auto",
+          activeChatId ? "hidden lg:block" : "block"
+        )}>
           <div className="sticky top-0 z-10 bg-card px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -263,7 +267,10 @@ export default function AgentColleaguesPage() {
         </div>
 
         {/* Chat window - 9 cols */}
-        <div className="lg:col-span-9 flex flex-col">
+        <div className={cn(
+          "lg:col-span-9 flex flex-col",
+          !activeChatId ? "hidden lg:flex" : "flex"
+        )}>
           {!activeChatId ? (
             <div className="flex flex-col items-center justify-center h-full text-center px-4">
               <MessagesSquare className="h-10 w-10 text-muted-foreground mb-3" />
@@ -275,6 +282,12 @@ export default function AgentColleaguesPage() {
             <>
               {/* Chat header */}
               <div className="sticky top-0 z-10 bg-card px-4 py-3 border-b border-border flex items-center gap-3">
+                <button
+                  className="lg:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground"
+                  onClick={() => { setActiveChatId(null); setContactName(""); }}
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
                 <Avatar className="h-8 w-8 shrink-0">
                   <AvatarFallback className="bg-primary/10 text-primary text-xs">
                     {getInit(contactName || "")}

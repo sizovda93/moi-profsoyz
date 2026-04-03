@@ -308,11 +308,11 @@ export default function AiChatPage() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Cat panel */}
+        {/* Cat panel — compact on mobile */}
         <div className="lg:col-span-3">
           <Card className="overflow-hidden !bg-[#2a2a2f] !border-[#3a3a42]">
             <CardContent className="p-0">
-              <div className="relative bg-[#2a2a2f]" style={{ height: 280 }}>
+              <div className="relative bg-[#2a2a2f] h-[180px] lg:h-[280px]">
                 <video
                   ref={catVideoRef}
                   src={idleVariant.video}
@@ -348,7 +348,7 @@ export default function AiChatPage() {
 
         {/* Chat window */}
         <div className="lg:col-span-9">
-          <Card className="flex flex-col" style={{ height: 600 }}>
+          <Card className="flex flex-col h-[calc(100dvh-250px)] lg:h-[600px]">
             {/* Header */}
             <div className="p-4 border-b border-border flex items-center gap-3">
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-blue-500/20 flex items-center justify-center">

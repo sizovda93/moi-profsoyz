@@ -142,7 +142,7 @@ export default function AgentLeadsPage() {
                 <div className="flex items-center gap-3 mt-2">
                   <RequestTypeBadge type={(lead as any).requestType} />
                   <LeadStatusBadge status={lead.status} />
-                  <span className="text-[11px] text-muted-foreground">{formatDate(lead.createdAt)}</span>
+                  <span className="text-xs text-muted-foreground">{formatDate(lead.createdAt)}</span>
                 </div>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-1" />
@@ -169,7 +169,7 @@ export default function AgentLeadsPage() {
             Создать первое обращение
           </Button>
           <div className="w-full space-y-2">
-            <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2">Примеры тем</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Примеры тем</p>
             {["Вопрос по членству в профсоюзе", "Вопрос по условиям труда", "Предложение для профсоюза"].map((t) => (
               <button
                 key={t}
@@ -228,7 +228,7 @@ export default function AgentLeadsPage() {
               </div>
               <div className="px-3 py-2 bg-[#2a2a2f]">
                 <p className="text-xs font-semibold text-[#fafafa]">Котофей Петрович</p>
-                <p className="text-[9px] text-[#a0a0a8] leading-snug">Помощник по обращениям</p>
+                <p className="text-[11px] text-[#a0a0a8] leading-snug">Помощник по обращениям</p>
               </div>
             </CardContent>
           </Card>
@@ -252,19 +252,19 @@ export default function AgentLeadsPage() {
                   <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                     <Send className="h-2.5 w-2.5 text-primary" />
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-snug">Вы создаёте обращение с описанием вопроса</p>
+                  <p className="text-xs text-muted-foreground leading-snug">Вы создаёте обращение с описанием вопроса</p>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                     <Eye className="h-2.5 w-2.5 text-primary" />
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-snug">Руководитель получает и рассматривает обращение</p>
+                  <p className="text-xs text-muted-foreground leading-snug">Руководитель получает и рассматривает обращение</p>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                     <MessageSquare className="h-2.5 w-2.5 text-primary" />
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-snug">Ответ появится в этом разделе</p>
+                  <p className="text-xs text-muted-foreground leading-snug">Ответ появится в этом разделе</p>
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t border-border">

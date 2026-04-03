@@ -260,15 +260,15 @@ export default function AgentLegalPage() {
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant={st.variant}>{st.label}</Badge>
               <Badge variant="outline">{categoryLabels[req.category] ?? req.category}</Badge>
-              <span className="text-[11px] text-muted-foreground">{formatDate(req.createdAt)}</span>
+              <span className="text-xs text-muted-foreground">{formatDate(req.createdAt)}</span>
               {req.attachmentCount && Number(req.attachmentCount) > 0 && (
-                <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground">
+                <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground">
                   <Paperclip className="h-3 w-3" />
                   {req.attachmentCount}
                 </span>
               )}
               {req.answerText && (
-                <span className="inline-flex items-center gap-1 text-[11px] text-green-600">
+                <span className="inline-flex items-center gap-1 text-xs text-green-600">
                   <MessageSquare className="h-3 w-3" />
                   Есть ответ
                 </span>
@@ -378,7 +378,7 @@ export default function AgentLegalPage() {
               </div>
               <div className="px-3 py-2 bg-[#2a2a2f]">
                 <p className="text-xs font-semibold text-[#fafafa]">Котофей Петрович</p>
-                <p className="text-[9px] text-[#a0a0a8] leading-snug">Помощник по юридическим вопросам</p>
+                <p className="text-[11px] text-[#a0a0a8] leading-snug">Помощник по юридическим вопросам</p>
               </div>
             </CardContent>
           </Card>
@@ -402,23 +402,23 @@ export default function AgentLegalPage() {
                   <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                     <Send className="h-2.5 w-2.5 text-primary" />
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-snug">Вы задаёте вопрос юристу с описанием ситуации</p>
+                  <p className="text-xs text-muted-foreground leading-snug">Вы задаёте вопрос юристу с описанием ситуации</p>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                     <Eye className="h-2.5 w-2.5 text-primary" />
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-snug">Юрист профсоюза получает и рассматривает обращение</p>
+                  <p className="text-xs text-muted-foreground leading-snug">Юрист профсоюза получает и рассматривает обращение</p>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                     <MessageSquare className="h-2.5 w-2.5 text-primary" />
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-snug">Ответ появится в этом разделе</p>
+                  <p className="text-xs text-muted-foreground leading-snug">Ответ появится в этом разделе</p>
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t border-border">
-                <p className="text-[10px] text-muted-foreground">Среднее время ответа — до 3 часов</p>
+                <p className="text-xs text-muted-foreground">Среднее время ответа — до 3 часов</p>
               </div>
             </CardContent>
           </Card>
@@ -432,7 +432,7 @@ export default function AgentLegalPage() {
             <CardContent className="p-5">
               <div className="mb-4">
                 <h3 className="text-sm font-semibold">Задать вопрос юристу</h3>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Опишите ситуацию — ответ появится в истории обращений ниже</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Опишите ситуацию — ответ появится в истории обращений ниже</p>
               </div>
 
               {submitSuccess && (
@@ -521,7 +521,7 @@ export default function AgentLegalPage() {
                       {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                       {uploading ? "Загрузка..." : "Прикрепить файл"}
                     </Button>
-                    <span className="text-[10px] text-muted-foreground">PDF, JPG, PNG, DOC — при необходимости</span>
+                    <span className="text-xs text-muted-foreground">PDF, JPG, PNG, DOC — при необходимости</span>
                   </div>
                 </div>
 
@@ -534,7 +534,7 @@ export default function AgentLegalPage() {
                     {saving && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
                     Отправить вопрос
                   </Button>
-                  <span className="text-[10px] text-muted-foreground">Среднее время ответа — до 3 часов</span>
+                  <span className="text-xs text-muted-foreground">Среднее время ответа — до 3 часов</span>
                 </div>
               </div>
             </CardContent>
@@ -557,7 +557,7 @@ export default function AgentLegalPage() {
                     </p>
                     <div className="flex flex-wrap justify-center gap-1.5">
                       {["Трудовые вопросы", "Документы", "Права работника", "Консультация"].map((chip) => (
-                        <span key={chip} className="px-2.5 py-1 rounded-full bg-muted text-[10px] text-muted-foreground">
+                        <span key={chip} className="px-2.5 py-1 rounded-full bg-muted text-xs text-muted-foreground">
                           {chip}
                         </span>
                       ))}
@@ -570,19 +570,19 @@ export default function AgentLegalPage() {
                 <TabsList className="mb-3">
                   <TabsTrigger value="all">
                     Все
-                    {requests.length > 0 && <span className="ml-1.5 text-[10px] opacity-70">({requests.length})</span>}
+                    {requests.length > 0 && <span className="ml-1.5 text-xs opacity-70">({requests.length})</span>}
                   </TabsTrigger>
                   <TabsTrigger value="in_progress">
                     В работе
-                    {inProgressRequests.length > 0 && <span className="ml-1.5 text-[10px] opacity-70">({inProgressRequests.length})</span>}
+                    {inProgressRequests.length > 0 && <span className="ml-1.5 text-xs opacity-70">({inProgressRequests.length})</span>}
                   </TabsTrigger>
                   <TabsTrigger value="answered">
                     Отвечено
-                    {answeredRequests.length > 0 && <span className="ml-1.5 text-[10px] opacity-70">({answeredRequests.length})</span>}
+                    {answeredRequests.length > 0 && <span className="ml-1.5 text-xs opacity-70">({answeredRequests.length})</span>}
                   </TabsTrigger>
                   <TabsTrigger value="closed">
                     Закрыто
-                    {closedRequests.length > 0 && <span className="ml-1.5 text-[10px] opacity-70">({closedRequests.length})</span>}
+                    {closedRequests.length > 0 && <span className="ml-1.5 text-xs opacity-70">({closedRequests.length})</span>}
                   </TabsTrigger>
                 </TabsList>
 

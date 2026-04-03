@@ -166,7 +166,7 @@ export default function AgentManagerChatPage() {
               </p>
             </Card>
           ) : (
-            <Card className="flex flex-col overflow-hidden" style={{ height: 600 }}>
+            <Card className="flex flex-col overflow-hidden h-[calc(100dvh-250px)] lg:h-[600px]">
               {/* Header */}
               <div className="px-4 py-3 border-b border-border flex items-center gap-3">
                 <Avatar className="h-9 w-9 shrink-0">
