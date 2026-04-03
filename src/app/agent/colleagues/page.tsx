@@ -207,8 +207,8 @@ export default function AgentColleaguesPage() {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{manager.name}</p>
-                <p className="text-[11px] text-primary truncate">Руководитель</p>
+                <p className="text-sm font-medium">{manager.name}</p>
+                <p className="text-[11px] text-primary">Руководитель</p>
               </div>
               <MessageSquare className="h-4 w-4 text-primary shrink-0" />
             </div>
@@ -238,7 +238,8 @@ export default function AgentColleaguesPage() {
               {colleagues.map((colleague) => (
                 <div
                   key={colleague.id}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => startChat(colleague.id)}
                 >
                   <Avatar className="h-9 w-9 shrink-0">
                     <AvatarFallback className="bg-primary/10 text-primary text-xs">
@@ -246,24 +247,15 @@ export default function AgentColleaguesPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
+                    <p className="text-sm font-medium">
                       {colleague.fullName}
                     </p>
                     {colleague.divisionName && (
-                      <p className="text-xs text-muted-foreground truncate">
+                      <p className="text-xs text-muted-foreground">
                         {colleague.divisionName}
                       </p>
                     )}
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="shrink-0 text-xs"
-                    onClick={() => startChat(colleague.id)}
-                  >
-                    <MessageSquare className="h-3.5 w-3.5 mr-1" />
-                    Написать
-                  </Button>
                 </div>
               ))}
             </div>
