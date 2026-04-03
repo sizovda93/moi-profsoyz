@@ -26,6 +26,9 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Мой Профсоюз — профсоюзная платформа",
   description: "Платформа для взаимодействия участников профсоюза",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
