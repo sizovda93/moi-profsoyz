@@ -77,12 +77,13 @@ async function buildSummary(managerId: string | null) {
     managerId ? [managerId] : []
   );
 
-  // Agent count
+  // Agent count — only agents assigned to this manager
   const { rows: agentRows } = await pool.query(
     `SELECT COUNT(DISTINCT a.id)::int AS total_agents
      FROM agents a
      JOIN profiles p ON p.id = a.user_id
-     WHERE p.status = 'active'`
+     WHERE p.status = 'active'${managerId ? ' AND a.manager_id = $1' : ''}`,
+    managerId ? [managerId] : []
   );
 
   return {
