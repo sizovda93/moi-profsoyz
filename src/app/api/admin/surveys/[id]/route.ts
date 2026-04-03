@@ -5,7 +5,7 @@ import { toCamelCase } from "@/lib/api-utils";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const auth = await requireRole("admin");
+    const auth = await requireRole("admin", "manager");
     if (auth.error) return auth.error;
     const { id } = await params;
 

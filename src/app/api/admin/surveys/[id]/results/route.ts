@@ -4,7 +4,7 @@ import { requireRole } from "@/lib/auth-server";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const auth = await requireRole("admin");
+    const auth = await requireRole("admin", "manager");
     if (auth.error) return auth.error;
     const { id } = await params;
 

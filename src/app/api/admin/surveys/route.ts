@@ -5,7 +5,7 @@ import { toCamelCase } from "@/lib/api-utils";
 
 export async function GET() {
   try {
-    const auth = await requireRole("admin");
+    const auth = await requireRole("admin", "manager");
     if (auth.error) return auth.error;
 
     const { rows } = await pool.query(`
@@ -23,7 +23,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requireRole("admin");
+    const auth = await requireRole("admin", "manager");
     if (auth.error) return auth.error;
     const { user } = auth;
 
