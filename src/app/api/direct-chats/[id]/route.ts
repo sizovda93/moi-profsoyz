@@ -39,7 +39,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       contactName: chat.user1_id === user.id
         ? (await pool.query(`SELECT full_name FROM profiles WHERE id = $1`, [chat.user2_id])).rows[0]?.full_name
         : (await pool.query(`SELECT full_name FROM profiles WHERE id = $1`, [chat.user1_id])).rows[0]?.full_name,
-      messages: messages.map((m) => toCamelCase(m)),
+      messages: messages.map((m) => ({ ...(toCamelCase(m) as Record<string, unknown>), isOwn: m.sender_id === user.id })),
     });
   } catch (err) {
     console.error("GET /api/direct-chats/[id] error:", err);
