@@ -190,14 +190,16 @@ export default function AgentManagerChatPage() {
                     </p>
                   </div>
                 ) : (
-                  messages.map((msg) => (
+                  messages.map((msg) => {
+                    const isOwn = msg.senderType === "agent";
+                    return (
                     <div
                       key={msg.id}
-                      className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}
+                      className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
                     >
                       <div
                         className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
-                          msg.isOwn
+                          isOwn
                             ? "bg-primary text-primary-foreground rounded-br-sm"
                             : "bg-muted rounded-bl-sm"
                         }`}
@@ -205,14 +207,15 @@ export default function AgentManagerChatPage() {
                         <p className="text-sm whitespace-pre-wrap break-words">{msg.text}</p>
                         <p
                           className={`text-[10px] mt-1 ${
-                            msg.isOwn ? "text-primary-foreground/60" : "text-muted-foreground"
+                            isOwn ? "text-primary-foreground/60" : "text-muted-foreground"
                           }`}
                         >
                           {msg.createdAt ? formatTime(msg.createdAt) : ""}
                         </p>
                       </div>
                     </div>
-                  ))
+                    );
+                  })
                 )}
                 <div ref={messagesEndRef} />
               </div>
