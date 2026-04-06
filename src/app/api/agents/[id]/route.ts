@@ -229,3 +229,47 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     return Response.json({ error: 'Внутренняя ошибка сервера' }, { status: 500 });
   }
 }
+
+// DELETE — deactivate/remove member (block their account)
+export async function DELETE(request: NextRequest, { params }: RouteContext) {
+  try {
+    const auth = await requireRole('manager', 'admin');
+    if (auth.error) return auth.error;
+    const { user } = auth;
+
+    const { id } = await params;
+
+    const { rows } = await pool.query(
+      `SELECT a.id, a.user_id, a.manager_id, p.full_name, p.email
+       FROM agents a JOIN profiles p ON p.id = a.user_id WHERE a.id = $1`,
+      [id]
+    );
+    if (rows.length === 0) {
+      return Response.json({ error: 'Не найдено' }, { status: 404 });
+    }
+
+    const agent = rows[0];
+
+    // Manager can only delete unassigned members
+    if (user.role === 'manager' && agent.manager_id !== null) {
+      return Response.json({ error: 'Можно удалять только незакреплённых участников' }, { status: 403 });
+    }
+
+    // Block the user account
+    await pool.query(
+      `UPDATE profiles SET status = 'blocked', updated_at = now() WHERE id = $1`,
+      [agent.user_id]
+    );
+
+    await pool.query(
+      `INSERT INTO audit_logs (action, user_email, details)
+       VALUES ('agent.removed', $1, $2)`,
+      [user.email, `Removed agent ${id} (${agent.full_name}, ${agent.email})`]
+    );
+
+    return Response.json({ success: true });
+  } catch (err) {
+    console.error('DELETE /api/agents/[id] error:', err);
+    return Response.json({ error: 'Внутренняя ошибка сервера' }, { status: 500 });
+  }
+}

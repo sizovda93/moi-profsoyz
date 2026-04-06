@@ -47,6 +47,12 @@ export async function GET(request: NextRequest) {
     // Scope: manager sees own, admin sees all, unassigned override
     if (showUnassigned) {
       conditions.push(`a.manager_id IS NULL`);
+      // Don't show self in unassigned list
+      conditions.push(`a.user_id != $${idx}`);
+      params.push(user.id);
+      idx++;
+      // Don't show blocked users
+      conditions.push(`p.status != 'blocked'`);
     } else if (user.role === 'manager') {
       conditions.push(`a.manager_id = $${idx}`);
       params.push(user.id);

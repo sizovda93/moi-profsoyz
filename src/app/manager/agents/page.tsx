@@ -278,13 +278,30 @@ export default function ManagerAgentsPage() {
                     <p className="text-sm font-medium">{a.fullName}</p>
                     <p className="text-xs text-muted-foreground">{a.email}</p>
                   </div>
-                  <Button
-                    size="sm"
-                    onClick={() => handleClaim(a.id)}
-                    disabled={claiming === a.id}
-                  >
-                    {claiming === a.id ? "..." : "Закрепить за собой"}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => handleClaim(a.id)}
+                      disabled={claiming === a.id}
+                    >
+                      {claiming === a.id ? "..." : "Закрепить за собой"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                      onClick={async () => {
+                        if (!confirm(`Удалить ${a.fullName} из списка?`)) return;
+                        try {
+                          const res = await fetch(`/api/agents/${a.id}`, { method: "DELETE" });
+                          if (res.ok) await loadData();
+                          else alert("Ошибка удаления");
+                        } catch { /* ignore */ }
+                      }}
+                    >
+                      Удалить
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
