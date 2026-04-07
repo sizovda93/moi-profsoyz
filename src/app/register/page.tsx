@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Shield, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Shield, ArrowRight, Eye, EyeOff, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -19,6 +19,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ fullName: "", email: "", phone: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [consents, setConsents] = useState({ offer: false, personal_data: false });
+  const [modalContent, setModalContent] = useState<"offer" | "pd" | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -198,7 +199,7 @@ export default function RegisterPage() {
               />
               <span className="text-xs text-muted-foreground">
                 Принимаю{" "}
-                <Link href="/offer" className="text-primary hover:underline" target="_blank">условия оферты</Link>
+                <button type="button" onClick={() => setModalContent("offer")} className="text-primary hover:underline">условия оферты</button>
               </span>
             </label>
             <label className="flex items-start gap-2 cursor-pointer">
@@ -210,7 +211,7 @@ export default function RegisterPage() {
               />
               <span className="text-xs text-muted-foreground">
                 Даю{" "}
-                <Link href="/consent" className="text-primary hover:underline" target="_blank">согласие на обработку ПД</Link>
+                <button type="button" onClick={() => setModalContent("pd")} className="text-primary hover:underline">согласие на обработку ПД</button>
               </span>
             </label>
           </div>
@@ -226,6 +227,44 @@ export default function RegisterPage() {
           <Link href="/login" className="text-primary hover:underline">Войти</Link>
         </div>
       </div>
+
+      {/* Modal for offer / PD */}
+      {modalContent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setModalContent(null)}>
+          <div className="bg-card border border-border rounded-xl w-full max-w-2xl max-h-[80vh] overflow-y-auto mx-4 p-6 relative" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setModalContent(null)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+              <X className="h-5 w-5" />
+            </button>
+            {modalContent === "offer" ? (
+              <>
+                <h2 className="text-lg font-semibold mb-4">Пользовательское соглашение (Публичная оферта)</h2>
+                <div className="prose prose-sm dark:prose-invert max-w-none text-sm text-muted-foreground space-y-3">
+                  <p>Настоящее Пользовательское соглашение определяет условия использования платформы «Мой Профсоюз».</p>
+                  <p><strong className="text-foreground">1. Общие положения.</strong> Платформа предоставляет цифровой сервис для взаимодействия участников профсоюза, подачи обращений, обмена документами, получения юридических консультаций и прохождения обучения. Регистрируясь, Пользователь принимает условия в полном объёме.</p>
+                  <p><strong className="text-foreground">2. Предмет соглашения.</strong> Администрация предоставляет доступ к функциональности: подача обращений, вопросы юристу, обмен документами, получение новостей, обучение, обмен сообщениями с руководителем.</p>
+                  <p><strong className="text-foreground">3. Обязанности Пользователя.</strong> Предоставлять достоверные данные, не передавать доступ третьим лицам, соблюдать законодательство РФ, не использовать Платформу для распространения запрещённого контента.</p>
+                  <p><strong className="text-foreground">4. Ответственность.</strong> Администрация не несёт ответственности за действия третьих лиц, технические сбои провайдеров, содержание сообщений Пользователей.</p>
+                  <p><strong className="text-foreground">5. Прочие условия.</strong> Соглашение действует бессрочно. Споры решаются путём переговоров, при недостижении согласия — в суде по месту нахождения Администрации.</p>
+                  <p>Контакт: 410029, г. Саратов, ул. Сакко и Ванцетти, 55, тел. 8 (8452) 26-33-56.</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-lg font-semibold mb-4">Согласие на обработку персональных данных</h2>
+                <div className="prose prose-sm dark:prose-invert max-w-none text-sm text-muted-foreground space-y-3">
+                  <p>Регистрируясь на платформе «Мой Профсоюз», вы даёте согласие на обработку персональных данных в соответствии с ФЗ-152 «О персональных данных».</p>
+                  <p><strong className="text-foreground">1. Оператор.</strong> Саратовская областная организация «Всероссийский Электропрофсоюз», 410029, г. Саратов, ул. Сакко и Ванцетти, 55.</p>
+                  <p><strong className="text-foreground">2. Категории данных.</strong> ФИО, email, телефон, город, должность, профессия, пол, год рождения, данные о членстве в профсоюзе.</p>
+                  <p><strong className="text-foreground">3. Цели обработки.</strong> Обеспечение работы Платформы, идентификация Пользователя, обработка обращений, юридическое сопровождение, информирование о деятельности профсоюза.</p>
+                  <p><strong className="text-foreground">4. Способы обработки.</strong> Сбор, запись, хранение, уточнение, использование, передача (руководителю профсоюза), удаление — с использованием средств автоматизации.</p>
+                  <p><strong className="text-foreground">5. Срок.</strong> Согласие действует до момента отзыва. Отзыв направляется письменно по адресу Оператора или через Платформу.</p>
+                  <p><strong className="text-foreground">6. Права субъекта.</strong> Вы имеете право на доступ, уточнение, блокирование и удаление персональных данных, обратившись к Оператору.</p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
