@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { PageHeader } from "@/components/dashboard/page-header";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CardSkeleton } from "@/components/dashboard/loading-skeleton";
 import { getInitials } from "@/lib/utils";
-import { Send, Unlink, MessageCircle, Check } from "lucide-react";
+import { Send, Unlink, MessageCircle, Check, Link2, HelpCircle, Building2, Star, FileText, User, Phone, MapPin, Briefcase } from "lucide-react";
 
 interface ProfileData {
   id: string;
@@ -73,17 +73,11 @@ export default function AgentProfilePage() {
   const [fbSent, setFbSent] = useState(false);
 
   const loadTgStatus = useCallback(() => {
-    fetch("/api/telegram/status")
-      .then((r) => r.json())
-      .then((data) => setTgStatus(data))
-      .catch(() => {});
+    fetch("/api/telegram/status").then((r) => r.json()).then((data) => setTgStatus(data)).catch(() => {});
   }, []);
 
   const loadMaxStatus = useCallback(() => {
-    fetch("/api/max/status")
-      .then((r) => r.json())
-      .then((data) => setMaxStatus(data))
-      .catch(() => {});
+    fetch("/api/max/status").then((r) => r.json()).then((data) => setMaxStatus(data)).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -92,14 +86,9 @@ export default function AgentProfilePage() {
       .then((data) => {
         setProfile(data);
         setForm({
-          fullName: data.fullName || "",
-          phone: data.phone || "",
-          gender: data.gender || "not_specified",
-          birthYear: data.birthYear ? String(data.birthYear) : "",
-          profession: data.profession || "",
-          preferredMessenger: data.preferredMessenger || "telegram",
-          city: data.city || "",
-          specialization: data.specialization || "",
+          fullName: data.fullName || "", phone: data.phone || "", gender: data.gender || "not_specified",
+          birthYear: data.birthYear ? String(data.birthYear) : "", profession: data.profession || "",
+          preferredMessenger: data.preferredMessenger || "telegram", city: data.city || "", specialization: data.specialization || "",
         });
       })
       .catch(() => {})
@@ -110,88 +99,130 @@ export default function AgentProfilePage() {
 
   const handleTgConnect = async () => {
     setTgLoading(true);
-    try {
-      const res = await fetch("/api/telegram/link", { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
-        setTgDeepLink(data.deepLink);
-      }
-    } catch { /* ignore */ }
-    finally { setTgLoading(false); }
+    try { const res = await fetch("/api/telegram/link", { method: "POST" }); if (res.ok) { const data = await res.json(); setTgDeepLink(data.deepLink); } } catch {} finally { setTgLoading(false); }
   };
-
   const handleTgDisconnect = async () => {
     setTgLoading(true);
-    try {
-      const res = await fetch("/api/telegram/link", { method: "DELETE" });
-      if (res.ok) {
-        setTgStatus({ connected: false });
-        setTgDeepLink(null);
-      }
-    } catch { /* ignore */ }
-    finally { setTgLoading(false); }
+    try { const res = await fetch("/api/telegram/link", { method: "DELETE" }); if (res.ok) { setTgStatus({ connected: false }); setTgDeepLink(null); } } catch {} finally { setTgLoading(false); }
   };
-
   const handleMaxConnect = async () => {
     setMaxLoading(true);
-    try {
-      const res = await fetch("/api/max/link", { method: "POST" });
-      if (res.ok) {
-        const data = await res.json();
-        setMaxDeepLink(data.deepLink);
-      }
-    } catch { /* ignore */ }
-    finally { setMaxLoading(false); }
+    try { const res = await fetch("/api/max/link", { method: "POST" }); if (res.ok) { const data = await res.json(); setMaxDeepLink(data.deepLink); } } catch {} finally { setMaxLoading(false); }
   };
-
   const handleMaxDisconnect = async () => {
     setMaxLoading(true);
-    try {
-      const res = await fetch("/api/max/link", { method: "DELETE" });
-      if (res.ok) {
-        setMaxStatus({ connected: false });
-        setMaxDeepLink(null);
-      }
-    } catch { /* ignore */ }
-    finally { setMaxLoading(false); }
+    try { const res = await fetch("/api/max/link", { method: "DELETE" }); if (res.ok) { setMaxStatus({ connected: false }); setMaxDeepLink(null); } } catch {} finally { setMaxLoading(false); }
   };
 
   const handleSave = async () => {
     if (!profile) return;
-    setSaving(true);
-    setMessage(null);
+    setSaving(true); setMessage(null);
     try {
       const res = await fetch(`/api/users/${profile.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: form.fullName,
-          phone: form.phone,
-          gender: form.gender,
-          birthYear: form.birthYear ? Number(form.birthYear) : null,
-          profession: form.profession || null,
-          preferredMessenger: form.preferredMessenger,
-          city: form.city,
-          specialization: form.specialization,
-        }),
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName: form.fullName, phone: form.phone, gender: form.gender, birthYear: form.birthYear ? Number(form.birthYear) : null, profession: form.profession || null, preferredMessenger: form.preferredMessenger, city: form.city, specialization: form.specialization }),
       });
-      if (res.ok) {
-        const updated = await res.json();
-        setProfile((prev) => (prev ? { ...prev, ...updated } : prev));
-        setMessage("Сохранено");
-      } else {
-        const err = await res.json();
-        setMessage(err.error || "Ошибка сохранения");
-      }
-    } catch {
-      setMessage("Ошибка сети");
-    } finally {
-      setSaving(false);
-    }
+      if (res.ok) { const updated = await res.json(); setProfile((prev) => (prev ? { ...prev, ...updated } : prev)); setMessage("Сохранено"); }
+      else { const err = await res.json(); setMessage(err.error || "Ошибка сохранения"); }
+    } catch { setMessage("Ошибка сети"); } finally { setSaving(false); }
   };
 
   if (loading) return <CardSkeleton />;
   if (!profile) return <div className="p-8 text-muted-foreground">Профиль не найден</div>;
+
+  /* ---- Telegram inline render ---- */
+  const renderTg = () => {
+    if (tgStatus?.connected) return (
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-lg bg-[#2AABEE]/10 flex items-center justify-center"><Send className="h-4 w-4 text-[#2AABEE]" /></div>
+          <div>
+            <p className="text-sm font-medium">Telegram</p>
+            <p className="text-xs text-muted-foreground">{tgStatus.telegramUsername ? `@${tgStatus.telegramUsername}` : tgStatus.telegramFirstName || "Подключён"}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="success" className="text-[10px]">Подключён</Badge>
+          <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={handleTgDisconnect} disabled={tgLoading}><Unlink className="h-3 w-3" /></Button>
+        </div>
+      </div>
+    );
+    if (tgDeepLink) return (
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-lg bg-[#2AABEE]/10 flex items-center justify-center"><Send className="h-4 w-4 text-[#2AABEE]" /></div>
+          <div>
+            <p className="text-sm font-medium">Telegram</p>
+            <p className="text-xs text-muted-foreground">Ожидание привязки</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <a href={tgDeepLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2AABEE] text-white text-xs font-medium hover:bg-[#229ED9] transition-colors"><Send className="h-3 w-3" />Открыть</a>
+          <Button variant="ghost" size="sm" className="text-xs" onClick={() => { setTgDeepLink(null); loadTgStatus(); }}>Обновить</Button>
+        </div>
+      </div>
+    );
+    return (
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center"><Send className="h-4 w-4 text-muted-foreground" /></div>
+          <div>
+            <p className="text-sm font-medium">Telegram</p>
+            <p className="text-xs text-muted-foreground">Не подключён</p>
+          </div>
+        </div>
+        <Button size="sm" variant="outline" onClick={handleTgConnect} disabled={tgLoading}>{tgLoading ? "..." : "Подключить"}</Button>
+      </div>
+    );
+  };
+
+  /* ---- MAX inline render ---- */
+  const renderMax = () => {
+    if (maxStatus?.connected) return (
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-lg bg-[#5B2EFF]/10 flex items-center justify-center"><MessageCircle className="h-4 w-4 text-[#5B2EFF]" /></div>
+          <div>
+            <p className="text-sm font-medium">MAX</p>
+            <p className="text-xs text-muted-foreground">{maxStatus.maxUsername ? `@${maxStatus.maxUsername}` : maxStatus.maxFirstName || "Подключён"}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="success" className="text-[10px]">Подключён</Badge>
+          <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={handleMaxDisconnect} disabled={maxLoading}><Unlink className="h-3 w-3" /></Button>
+        </div>
+      </div>
+    );
+    if (maxDeepLink) return (
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-lg bg-[#5B2EFF]/10 flex items-center justify-center"><MessageCircle className="h-4 w-4 text-[#5B2EFF]" /></div>
+          <div>
+            <p className="text-sm font-medium">MAX</p>
+            <p className="text-xs text-muted-foreground">Ожидание привязки</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <a href={maxDeepLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#5B2EFF] text-white text-xs font-medium hover:bg-[#4A1FE6] transition-colors"><MessageCircle className="h-3 w-3" />Открыть</a>
+          <Button variant="ghost" size="sm" className="text-xs" onClick={() => { setMaxDeepLink(null); loadMaxStatus(); }}>Обновить</Button>
+        </div>
+      </div>
+    );
+    return (
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center"><MessageCircle className="h-4 w-4 text-muted-foreground" /></div>
+          <div>
+            <p className="text-sm font-medium">MAX</p>
+            <p className="text-xs text-muted-foreground">Не подключён</p>
+          </div>
+        </div>
+        <Button size="sm" variant="outline" onClick={handleMaxConnect} disabled={maxLoading}>{maxLoading ? "..." : "Подключить"}</Button>
+      </div>
+    );
+  };
+
+  const roleLabel = profile.role === "manager" ? "Руководитель" : "Участник профсоюза";
 
   return (
     <div>
@@ -199,269 +230,199 @@ export default function AgentProfilePage() {
         title="Профиль"
         description="Ваши данные и настройки"
         breadcrumbs={[
-          { title: "Платформа", href: "/agent/dashboard" },
+          { title: "Платформа", href: `/${profile.role === "manager" ? "manager" : "agent"}/dashboard` },
           { title: "Профиль" },
         ]}
       />
 
-      {/* Row 1: Profile + Personal data */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <Card>
-          <CardContent className="p-6 flex flex-col items-center text-center">
-            <Avatar className="h-20 w-20 mb-4">
-              <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
-                {getInitials(profile.fullName)}
-              </AvatarFallback>
-            </Avatar>
-            <h2 className="text-lg font-semibold">{profile.fullName}</h2>
-            {(profile as any).memberNumber && (
-              <p className="text-xs font-mono text-primary mt-1">{(profile as any).memberNumber}</p>
-            )}
-            <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
-            <div className="flex items-center gap-2 mt-3">
-              <Badge variant="info">Участник профсоюза</Badge>
-              <Badge variant="success">{profile.status === "active" ? "Активен" : profile.status}</Badge>
-            </div>
-            {(profile.unionName || profile.divisionName) && (
-              <div className="w-full mt-4 pt-4 border-t border-border space-y-2 text-sm">
-                {profile.unionShortName && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Профсоюз</span>
-                    <span className="text-right max-w-[180px]">{profile.unionShortName}</span>
-                  </div>
-                )}
-                {profile.divisionName && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Подразделение</span>
-                    <span className="text-right max-w-[180px]">{profile.divisionName}</span>
-                  </div>
-                )}
-              </div>
-            )}
-            <div className="w-full mt-6 pt-6 border-t border-border space-y-3 text-sm">
-              {profile.city && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Город</span>
-                  <span>{profile.city}</span>
-                </div>
-              )}
-              {profile.specialization && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Должность</span>
-                  <span>{profile.specialization}</span>
-                </div>
-              )}
-              {profile.profession && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Профессия</span>
-                  <span>{profile.profession}</span>
-                </div>
-              )}
-              {profile.birthYear && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Возраст</span>
-                  <span>{new Date().getFullYear() - profile.birthYear} лет</span>
-                </div>
-              )}
-              {profile.rating !== undefined && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Рейтинг</span>
-                  <span>⭐ {profile.rating}</span>
-                </div>
-              )}
-              {profile.totalLeads !== undefined && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Обращений</span>
-                  <span>{profile.totalLeads}</span>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="lg:col-span-2">
+        {/* ===== LEFT: Profile Card ===== */}
+        <div className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Личные данные</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">ФИО</label>
-                  <Input value={form.fullName} onChange={(e) => setForm((f) => ({ ...f, fullName: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Email</label>
-                  <Input value={profile.email} disabled />
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Телефон</label>
-                  <Input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Город</label>
-                  <Input value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Должность</label>
-                  <Input value={form.specialization} onChange={(e) => setForm((f) => ({ ...f, specialization: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Профессия</label>
-                  <Input value={form.profession} onChange={(e) => setForm((f) => ({ ...f, profession: e.target.value }))} placeholder="Например: инженер, электрик..." />
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Пол</label>
-                  <select className="w-full h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}>
-                    <option value="not_specified">Не указан</option>
-                    <option value="male">Мужской</option>
-                    <option value="female">Женский</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Год рождения</label>
-                  <Input type="number" min={1940} max={2010} placeholder="Например: 1990" value={form.birthYear} onChange={(e) => setForm((f) => ({ ...f, birthYear: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Предпочтительный мессенджер</label>
-                  <select className="w-full h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground" value={form.preferredMessenger} onChange={(e) => setForm((f) => ({ ...f, preferredMessenger: e.target.value }))}>
-                    <option value="telegram">Telegram</option>
-                    <option value="max">MAX</option>
-                    <option value="vk">VK</option>
-                  </select>
+            <CardContent className="p-6">
+              {/* Header */}
+              <div className="flex flex-col items-center text-center mb-5">
+                <Avatar className="h-20 w-20 mb-3">
+                  <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
+                    {getInitials(profile.fullName)}
+                  </AvatarFallback>
+                </Avatar>
+                <h2 className="text-lg font-semibold leading-tight">{profile.fullName}</h2>
+                {(profile as any).memberNumber && (
+                  <p className="text-xs font-mono text-primary mt-0.5">{(profile as any).memberNumber}</p>
+                )}
+                <p className="text-sm text-muted-foreground mt-0.5">{profile.email}</p>
+                <div className="flex items-center gap-2 mt-2.5">
+                  <Badge variant="info">{roleLabel}</Badge>
+                  <Badge variant="success">{profile.status === "active" ? "Активен" : profile.status}</Badge>
                 </div>
               </div>
-              {message && <p className="text-sm text-muted-foreground">{message}</p>}
-              <div className="flex justify-end">
-                <Button onClick={handleSave} disabled={saving}>{saving ? "Сохранение..." : "Сохранить"}</Button>
+
+              {/* Organization */}
+              {(profile.unionShortName || profile.divisionName) && (
+                <div className="border-t border-border pt-4 space-y-2.5">
+                  <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Организация</p>
+                  {profile.unionShortName && (
+                    <div className="flex items-center gap-2.5">
+                      <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-sm">{profile.unionShortName}</span>
+                    </div>
+                  )}
+                  {profile.divisionName && (
+                    <div className="flex items-center gap-2.5">
+                      <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-sm">{profile.divisionName}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Stats */}
+              <div className="border-t border-border pt-4 mt-4 grid grid-cols-2 gap-3">
+                <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                  <div className="flex items-center justify-center gap-1 mb-0.5">
+                    <Star className="h-3.5 w-3.5 text-yellow-500" />
+                    <span className="text-lg font-bold">{profile.rating ?? "0.0"}</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">Рейтинг</p>
+                </div>
+                <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                  <div className="flex items-center justify-center gap-1 mb-0.5">
+                    <FileText className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-lg font-bold">{profile.totalLeads ?? 0}</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">Обращений</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Connections */}
+          <Card>
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Link2 className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-sm font-semibold">Подключения</h3>
+              </div>
+              <div className="space-y-4">
+                {renderTg()}
+                <div className="border-t border-border" />
+                {renderMax()}
               </div>
             </CardContent>
           </Card>
         </div>
-      </div>
 
-      {/* Row 2: Telegram + MAX + Feedback */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start mt-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Send className="h-4 w-4" /> Telegram
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {tgStatus?.connected ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Badge variant="success">Подключён</Badge>
-                  {tgStatus.telegramUsername && <span className="text-sm text-muted-foreground">@{tgStatus.telegramUsername}</span>}
-                  {!tgStatus.telegramUsername && tgStatus.telegramFirstName && <span className="text-sm text-muted-foreground">{tgStatus.telegramFirstName}</span>}
+        {/* ===== RIGHT: Personal Data + Support ===== */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-base font-semibold mb-5">Личные данные</h3>
+
+              {/* Section: Basic */}
+              <div className="mb-5">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Основная информация</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">ФИО</label>
+                    <Input value={form.fullName} onChange={(e) => setForm((f) => ({ ...f, fullName: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Email</label>
+                    <Input value={profile.email} disabled className="opacity-60" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Пол</label>
+                    <select className="w-full h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground" value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}>
+                      <option value="not_specified">Не указан</option>
+                      <option value="male">Мужской</option>
+                      <option value="female">Женский</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Год рождения</label>
+                    <Input type="number" min={1940} max={2010} placeholder="1990" value={form.birthYear} onChange={(e) => setForm((f) => ({ ...f, birthYear: e.target.value }))} />
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Вы получаете уведомления и сообщения руководителя в Telegram.</p>
-                <Button variant="outline" size="sm" onClick={handleTgDisconnect} disabled={tgLoading}>
-                  <Unlink className="h-3.5 w-3.5 mr-1" />
-                  {tgLoading ? "Отключение..." : "Отключить"}
-                </Button>
               </div>
-            ) : tgDeepLink ? (
-              <div className="space-y-3">
-                <p className="text-sm">Откройте ссылку и нажмите Start в боте:</p>
-                <a href={tgDeepLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2AABEE] text-white text-sm font-medium hover:bg-[#229ED9] transition-colors">
-                  <Send className="h-4 w-4" /> Открыть Telegram
-                </a>
-                <p className="text-xs text-muted-foreground">Ссылка действительна 15 минут. После привязки обновите страницу.</p>
-                <Button variant="ghost" size="sm" onClick={() => { setTgDeepLink(null); loadTgStatus(); }}>Я уже привязал — обновить статус</Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">Подключите Telegram, чтобы получать уведомления и отвечать руководителю прямо из мессенджера.</p>
-                <Button onClick={handleTgConnect} disabled={tgLoading}>
-                  <Send className="h-4 w-4 mr-1" />
-                  {tgLoading ? "Генерация ссылки..." : "Подключить Telegram"}
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
-        {/* MAX card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <MessageCircle className="h-4 w-4" /> MAX
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {maxStatus?.connected ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Badge variant="success">Подключён</Badge>
-                  {maxStatus.maxUsername && <span className="text-sm text-muted-foreground">@{maxStatus.maxUsername}</span>}
-                  {!maxStatus.maxUsername && maxStatus.maxFirstName && <span className="text-sm text-muted-foreground">{maxStatus.maxFirstName}</span>}
+              {/* Section: Contacts */}
+              <div className="mb-5 border-t border-border pt-5">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Контакты</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Телефон</label>
+                    <Input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Город</label>
+                    <Input value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Предпочтительный мессенджер</label>
+                    <select className="w-full h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground" value={form.preferredMessenger} onChange={(e) => setForm((f) => ({ ...f, preferredMessenger: e.target.value }))}>
+                      <option value="telegram">Telegram</option>
+                      <option value="max">MAX</option>
+                      <option value="vk">VK</option>
+                    </select>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Вы получаете уведомления в MAX.</p>
-                <Button variant="outline" size="sm" onClick={handleMaxDisconnect} disabled={maxLoading}>
-                  <Unlink className="h-3.5 w-3.5 mr-1" />
-                  {maxLoading ? "Отключение..." : "Отключить"}
-                </Button>
               </div>
-            ) : maxDeepLink ? (
-              <div className="space-y-3">
-                <p className="text-sm">Откройте ссылку и нажмите Start в боте:</p>
-                <a href={maxDeepLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5B2EFF] text-white text-sm font-medium hover:bg-[#4A1FE6] transition-colors">
-                  <MessageCircle className="h-4 w-4" /> Открыть MAX
-                </a>
-                <p className="text-xs text-muted-foreground">Ссылка действительна 15 минут. После привязки обновите страницу.</p>
-                <Button variant="ghost" size="sm" onClick={() => { setMaxDeepLink(null); loadMaxStatus(); }}>Я уже привязал — обновить статус</Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">Подключите MAX, чтобы получать уведомления в мессенджере.</p>
-                <Button onClick={handleMaxConnect} disabled={maxLoading}>
-                  <MessageCircle className="h-4 w-4 mr-1" />
-                  {maxLoading ? "Генерация ссылки..." : "Подключить MAX"}
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
-        <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <MessageCircle className="h-4 w-4" /> Обратная связь
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+              {/* Section: Work */}
+              <div className="mb-5 border-t border-border pt-5">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Работа</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Должность</label>
+                    <Input value={form.specialization} onChange={(e) => setForm((f) => ({ ...f, specialization: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Профессия</label>
+                    <Input value={form.profession} onChange={(e) => setForm((f) => ({ ...f, profession: e.target.value }))} placeholder="Например: инженер, электрик..." />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action bar */}
+              <div className="border-t border-border pt-4 flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">{message || "Изменения сохраняются вручную"}</p>
+                <Button onClick={handleSave} disabled={saving}>{saving ? "Сохранение..." : "Сохранить изменения"}</Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Support / Feedback — compact */}
+          <Card>
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-sm font-semibold">Поддержка</h3>
+              </div>
               {fbSent ? (
                 <div className="flex items-center gap-2 text-sm text-green-600">
                   <Check className="h-4 w-4" /> Спасибо за обратную связь!
                 </div>
               ) : (
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">Расскажите, что можно улучшить или что мешает работе</p>
-                  <select className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" value={fbType} onChange={(e) => setFbType(e.target.value)}>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select className="h-9 rounded-lg border border-border bg-muted px-3 text-sm text-foreground sm:w-40 shrink-0" value={fbType} onChange={(e) => setFbType(e.target.value)}>
                     <option value="platform">О платформе</option>
                     <option value="onboarding">Об обучении</option>
                     <option value="suggestion">Предложение</option>
                     <option value="problem">Проблема</option>
                   </select>
-                  <textarea className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[48px]" placeholder="Ваш комментарий..." value={fbMessage} onChange={(e) => setFbMessage(e.target.value)} />
-                  <div className="flex justify-end">
-                    <Button size="sm" disabled={fbSending || !fbMessage.trim()} onClick={async () => {
-                      setFbSending(true);
-                      try {
-                        const res = await fetch("/api/feedback", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: fbType, message: fbMessage }) });
-                        if (res.ok) { setFbSent(true); setFbMessage(""); }
-                      } catch { /* ignore */ }
-                      finally { setFbSending(false); }
-                    }}>
-                      {fbSending ? "Отправка..." : "Отправить"}
-                    </Button>
-                  </div>
+                  <Input placeholder="Ваш комментарий..." value={fbMessage} onChange={(e) => setFbMessage(e.target.value)} className="flex-1" />
+                  <Button size="sm" className="shrink-0" disabled={fbSending || !fbMessage.trim()} onClick={async () => {
+                    setFbSending(true);
+                    try { const res = await fetch("/api/feedback", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: fbType, message: fbMessage }) }); if (res.ok) { setFbSent(true); setFbMessage(""); } } catch {} finally { setFbSending(false); }
+                  }}>
+                    {fbSending ? "..." : "Отправить"}
+                  </Button>
                 </div>
               )}
             </CardContent>
-        </Card>
+          </Card>
+        </div>
       </div>
     </div>
   );
