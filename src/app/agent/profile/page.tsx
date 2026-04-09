@@ -268,7 +268,7 @@ export default function AgentProfilePage() {
                       <span className="text-sm">{profile.unionShortName}</span>
                     </div>
                   )}
-                  {profile.divisionName && (
+                  {profile.divisionName && profile.role !== "manager" && (
                     <div className="flex items-center gap-2.5">
                       <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                       <span className="text-sm">{profile.divisionName}</span>
