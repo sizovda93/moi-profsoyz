@@ -26,6 +26,7 @@ export const managerNav: NavItem[] = [
   { title: "Опросы", href: "/manager/surveys", icon: "ClipboardList" },
   { title: "Чат с ИИ", href: "/manager/ai-chat", icon: "Bot"},
   { title: "Обучение", href: "/manager/learning", icon: "GraduationCap" },
+  { title: "Профиль", href: "/agent/profile", icon: "User" },
 ];
 
 export const adminNav: NavItem[] = [
