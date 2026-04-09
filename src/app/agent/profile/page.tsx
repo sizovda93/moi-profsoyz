@@ -61,6 +61,11 @@ export default function AgentProfilePage() {
   const [tgLoading, setTgLoading] = useState(false);
   const [tgDeepLink, setTgDeepLink] = useState<string | null>(null);
 
+  // MAX state
+  const [maxStatus, setMaxStatus] = useState<{ connected: boolean; maxUsername?: string; maxFirstName?: string } | null>(null);
+  const [maxLoading, setMaxLoading] = useState(false);
+  const [maxDeepLink, setMaxDeepLink] = useState<string | null>(null);
+
   // Feedback state
   const [fbType, setFbType] = useState("platform");
   const [fbMessage, setFbMessage] = useState("");
@@ -71,6 +76,13 @@ export default function AgentProfilePage() {
     fetch("/api/telegram/status")
       .then((r) => r.json())
       .then((data) => setTgStatus(data))
+      .catch(() => {});
+  }, []);
+
+  const loadMaxStatus = useCallback(() => {
+    fetch("/api/max/status")
+      .then((r) => r.json())
+      .then((data) => setMaxStatus(data))
       .catch(() => {});
   }, []);
 
@@ -93,7 +105,8 @@ export default function AgentProfilePage() {
       .catch(() => {})
       .finally(() => setLoading(false));
     loadTgStatus();
-  }, [loadTgStatus]);
+    loadMaxStatus();
+  }, [loadTgStatus, loadMaxStatus]);
 
   const handleTgConnect = async () => {
     setTgLoading(true);
@@ -117,6 +130,30 @@ export default function AgentProfilePage() {
       }
     } catch { /* ignore */ }
     finally { setTgLoading(false); }
+  };
+
+  const handleMaxConnect = async () => {
+    setMaxLoading(true);
+    try {
+      const res = await fetch("/api/max/link", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setMaxDeepLink(data.deepLink);
+      }
+    } catch { /* ignore */ }
+    finally { setMaxLoading(false); }
+  };
+
+  const handleMaxDisconnect = async () => {
+    setMaxLoading(true);
+    try {
+      const res = await fetch("/api/max/link", { method: "DELETE" });
+      if (res.ok) {
+        setMaxStatus({ connected: false });
+        setMaxDeepLink(null);
+      }
+    } catch { /* ignore */ }
+    finally { setMaxLoading(false); }
   };
 
   const handleSave = async () => {
@@ -303,7 +340,7 @@ export default function AgentProfilePage() {
         </div>
       </div>
 
-      {/* Row 2: Telegram + Feedback — same 3-col grid */}
+      {/* Row 2: Telegram + MAX + Feedback */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start mt-6">
         <Card>
           <CardHeader>
@@ -346,7 +383,48 @@ export default function AgentProfilePage() {
           </CardContent>
         </Card>
 
-        <div className="lg:col-span-2">
+        {/* MAX card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <MessageCircle className="h-4 w-4" /> MAX
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {maxStatus?.connected ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Badge variant="success">Подключён</Badge>
+                  {maxStatus.maxUsername && <span className="text-sm text-muted-foreground">@{maxStatus.maxUsername}</span>}
+                  {!maxStatus.maxUsername && maxStatus.maxFirstName && <span className="text-sm text-muted-foreground">{maxStatus.maxFirstName}</span>}
+                </div>
+                <p className="text-xs text-muted-foreground">Вы получаете уведомления в MAX.</p>
+                <Button variant="outline" size="sm" onClick={handleMaxDisconnect} disabled={maxLoading}>
+                  <Unlink className="h-3.5 w-3.5 mr-1" />
+                  {maxLoading ? "Отключение..." : "Отключить"}
+                </Button>
+              </div>
+            ) : maxDeepLink ? (
+              <div className="space-y-3">
+                <p className="text-sm">Откройте ссылку и нажмите Start в боте:</p>
+                <a href={maxDeepLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5B2EFF] text-white text-sm font-medium hover:bg-[#4A1FE6] transition-colors">
+                  <MessageCircle className="h-4 w-4" /> Открыть MAX
+                </a>
+                <p className="text-xs text-muted-foreground">Ссылка действительна 15 минут. После привязки обновите страницу.</p>
+                <Button variant="ghost" size="sm" onClick={() => { setMaxDeepLink(null); loadMaxStatus(); }}>Я уже привязал — обновить статус</Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">Подключите MAX, чтобы получать уведомления в мессенджере.</p>
+                <Button onClick={handleMaxConnect} disabled={maxLoading}>
+                  <MessageCircle className="h-4 w-4 mr-1" />
+                  {maxLoading ? "Генерация ссылки..." : "Подключить MAX"}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
@@ -384,7 +462,6 @@ export default function AgentProfilePage() {
               )}
             </CardContent>
         </Card>
-        </div>
       </div>
     </div>
   );
