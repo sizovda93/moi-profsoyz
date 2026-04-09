@@ -71,6 +71,18 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
       aIdx++;
     }
 
+    if (body.birthDay !== undefined) {
+      agentUpdates.push(`birth_day = $${aIdx}`);
+      agentValues.push(body.birthDay === null ? null : Number(body.birthDay));
+      aIdx++;
+    }
+
+    if (body.birthMonth !== undefined) {
+      agentUpdates.push(`birth_month = $${aIdx}`);
+      agentValues.push(body.birthMonth === null ? null : Number(body.birthMonth));
+      aIdx++;
+    }
+
     if (body.birthYear !== undefined) {
       const year = body.birthYear === null ? null : Number(body.birthYear);
       if (year !== null && (isNaN(year) || year < 1940 || year > 2010)) {
@@ -153,7 +165,7 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
     // If only agent fields changed, return fresh profile data
     const { rows: fresh } = await pool.query(
       `SELECT p.id, p.role, p.full_name, p.email, p.phone, p.avatar_url, p.status, p.created_at,
-              a.city, a.specialization, a.gender, a.birth_year, a.profession, a.preferred_messenger
+              a.city, a.specialization, a.gender, a.birth_day, a.birth_month, a.birth_year, a.profession, a.preferred_messenger
        FROM profiles p
        LEFT JOIN agents a ON a.user_id = p.id
        WHERE p.id = $1`,

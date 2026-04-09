@@ -48,6 +48,8 @@ export default function AgentProfilePage() {
     fullName: "",
     phone: "",
     gender: "not_specified",
+    birthDay: "" as string,
+    birthMonth: "" as string,
     birthYear: "" as string,
     profession: "",
     preferredMessenger: "telegram",
@@ -87,6 +89,7 @@ export default function AgentProfilePage() {
         setProfile(data);
         setForm({
           fullName: data.fullName || "", phone: data.phone || "", gender: data.gender || "not_specified",
+          birthDay: data.birthDay ? String(data.birthDay) : "", birthMonth: data.birthMonth ? String(data.birthMonth) : "",
           birthYear: data.birthYear ? String(data.birthYear) : "", profession: data.profession || "",
           preferredMessenger: data.preferredMessenger || "telegram", city: data.city || "", specialization: data.specialization || "",
         });
@@ -120,7 +123,7 @@ export default function AgentProfilePage() {
     try {
       const res = await fetch(`/api/users/${profile.id}`, {
         method: "PUT", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName: form.fullName, phone: form.phone, gender: form.gender, birthYear: form.birthYear ? Number(form.birthYear) : null, profession: form.profession || null, preferredMessenger: form.preferredMessenger, city: form.city, specialization: form.specialization }),
+        body: JSON.stringify({ fullName: form.fullName, phone: form.phone, gender: form.gender, birthDay: form.birthDay ? Number(form.birthDay) : null, birthMonth: form.birthMonth ? Number(form.birthMonth) : null, birthYear: form.birthYear ? Number(form.birthYear) : null, profession: form.profession || null, preferredMessenger: form.preferredMessenger, city: form.city, specialization: form.specialization }),
       });
       if (res.ok) { const updated = await res.json(); setProfile((prev) => (prev ? { ...prev, ...updated } : prev)); setMessage("Сохранено"); }
       else { const err = await res.json(); setMessage(err.error || "Ошибка сохранения"); }
@@ -340,8 +343,18 @@ export default function AgentProfilePage() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground mb-1 block">Год рождения</label>
-                    <Input type="number" min={1940} max={2010} placeholder="1990" value={form.birthYear} onChange={(e) => setForm((f) => ({ ...f, birthYear: e.target.value }))} />
+                    <label className="text-xs text-muted-foreground mb-1 block">Дата рождения</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Input type="number" min={1} max={31} placeholder="День" value={form.birthDay} onChange={(e) => setForm((f) => ({ ...f, birthDay: e.target.value }))} />
+                      <select className="h-9 rounded-lg border border-border bg-muted px-2 text-sm text-foreground" value={form.birthMonth} onChange={(e) => setForm((f) => ({ ...f, birthMonth: e.target.value }))}>
+                        <option value="">Месяц</option>
+                        <option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option>
+                        <option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option>
+                        <option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option>
+                        <option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option>
+                      </select>
+                      <Input type="number" min={1940} max={2010} placeholder="Год" value={form.birthYear} onChange={(e) => setForm((f) => ({ ...f, birthYear: e.target.value }))} />
+                    </div>
                   </div>
                 </div>
               </div>
