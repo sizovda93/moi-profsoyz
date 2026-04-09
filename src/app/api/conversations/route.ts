@@ -20,6 +20,9 @@ export async function GET() {
     if (user.role === 'agent' && user.agentId) {
       query += ` WHERE c.agent_id = $1`;
       params.push(user.agentId);
+    } else if (user.role === 'manager') {
+      query += ` WHERE c.manager_id = $1`;
+      params.push(user.id);
     }
 
     query += ` ORDER BY c.last_message_at DESC`;
