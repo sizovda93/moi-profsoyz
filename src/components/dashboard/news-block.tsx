@@ -99,7 +99,7 @@ export function NewsBlock() {
                         <video src={item.mediaUrl} controls className="w-full max-h-80" />
                       </div>
                     )}
-                    <div className="text-sm whitespace-pre-line leading-relaxed">
+                    <div className="text-sm whitespace-pre-line leading-relaxed font-normal">
                       {item.content}
                     </div>
                   </div>

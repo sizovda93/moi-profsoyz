@@ -38,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="dark" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${montserrat.variable} antialiased font-extrabold`} style={{ fontFamily: "var(--font-manrope), sans-serif" }}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${montserrat.variable} antialiased`} style={{ fontFamily: "var(--font-manrope), sans-serif" }}>
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('profsoyz-theme');if(t==='light'){document.documentElement.classList.remove('dark')};}catch(e){}})();`,

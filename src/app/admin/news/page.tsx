@@ -349,16 +349,56 @@ export default function AdminNewsPage() {
               />
             </div>
 
-            {/* Content */}
+            {/* Content with toolbar */}
             <div>
               <label className="text-sm font-medium">Текст новости *</label>
-              <textarea
-                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                style={{ minHeight: "120px" }}
-                placeholder="Полный текст новости..."
-                value={form.content}
-                onChange={(e) => setForm({ ...form, content: e.target.value })}
-              />
+              <div className="mt-1 border border-border rounded-md overflow-hidden">
+                <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-border bg-muted/30">
+                  <button type="button" className="px-2 py-1 rounded text-xs hover:bg-muted transition-colors font-bold" onClick={() => {
+                    const ta = document.getElementById('news-content') as HTMLTextAreaElement;
+                    if (!ta) return;
+                    const start = ta.selectionStart; const end = ta.selectionEnd;
+                    const text = form.content;
+                    const selected = text.substring(start, end);
+                    setForm({ ...form, content: text.substring(0, start) + `**${selected || 'текст'}**` + text.substring(end) });
+                  }}>Ж</button>
+                  <button type="button" className="px-2 py-1 rounded text-xs hover:bg-muted transition-colors italic" onClick={() => {
+                    const ta = document.getElementById('news-content') as HTMLTextAreaElement;
+                    if (!ta) return;
+                    const start = ta.selectionStart; const end = ta.selectionEnd;
+                    const text = form.content;
+                    const selected = text.substring(start, end);
+                    setForm({ ...form, content: text.substring(0, start) + `_${selected || 'текст'}_` + text.substring(end) });
+                  }}>К</button>
+                  <div className="w-px h-4 bg-border mx-1" />
+                  <button type="button" className="px-2 py-1 rounded text-xs hover:bg-muted transition-colors" onClick={() => {
+                    setForm({ ...form, content: form.content + '\n\n— ' });
+                  }}>— Список</button>
+                  <button type="button" className="px-2 py-1 rounded text-xs hover:bg-muted transition-colors" onClick={() => {
+                    const url = prompt('Вставьте ссылку:');
+                    if (url) {
+                      const ta = document.getElementById('news-content') as HTMLTextAreaElement;
+                      const start = ta?.selectionStart || form.content.length;
+                      const end = ta?.selectionEnd || form.content.length;
+                      const selected = form.content.substring(start, end) || 'ссылка';
+                      setForm({ ...form, content: form.content.substring(0, start) + selected + ' (' + url + ')' + form.content.substring(end) });
+                    }
+                  }}>🔗 Ссылка</button>
+                  <div className="w-px h-4 bg-border mx-1" />
+                  <button type="button" className="px-2 py-1 rounded text-xs hover:bg-muted transition-colors" onClick={() => {
+                    setForm({ ...form, content: form.content + '\n\n---\n\n' });
+                  }}>— Разделитель</button>
+                </div>
+                <textarea
+                  id="news-content"
+                  className="w-full bg-background px-3 py-2 text-sm resize-y focus:outline-none"
+                  style={{ minHeight: "200px" }}
+                  placeholder="Полный текст новости..."
+                  value={form.content}
+                  onChange={(e) => setForm({ ...form, content: e.target.value })}
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-1">Используйте панель для форматирования. Переносы строк сохраняются автоматически.</p>
             </div>
 
             {/* Media */}
