@@ -4,7 +4,31 @@ import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
-import { Newspaper, Star, Play } from "lucide-react";
+import { Newspaper, Star, Play, ExternalLink } from "lucide-react";
+
+function linkify(text: string) {
+  const urlRegex = /(https?:\/\/[^\s<]+)/g;
+  const parts = text.split(urlRegex);
+  return parts.map((part, i) => {
+    if (urlRegex.test(part)) {
+      urlRegex.lastIndex = 0;
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+          <ExternalLink className="h-3 w-3 shrink-0" />
+        </a>
+      );
+    }
+    return part;
+  });
+}
 
 interface NewsItem {
   id: string;
@@ -81,7 +105,7 @@ export function NewsBlock() {
                       {formatDate(item.publishedAt)}
                     </p>
                     {!isExpanded && item.excerpt && (
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.excerpt}</p>
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{linkify(item.excerpt)}</p>
                     )}
                   </div>
                 </div>
@@ -100,7 +124,7 @@ export function NewsBlock() {
                       </div>
                     )}
                     <div className="text-sm whitespace-pre-line leading-relaxed font-normal">
-                      {item.content}
+                      {linkify(item.content)}
                     </div>
                   </div>
                 )}
