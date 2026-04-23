@@ -35,7 +35,6 @@ export const adminNav: NavItem[] = [
   { title: "Платформа", href: "/admin/dashboard", icon: "LayoutDashboard" },
   { title: "Пользователи", href: "/admin/users", icon: "Users" },
   { title: "Обращения", href: "/admin/leads", icon: "UserPlus" },
-  { title: "Финансы", href: "/admin/finance", icon: "Wallet" },
   { title: "Роли", href: "/admin/roles", icon: "Shield" },
   { title: "Настройки", href: "/admin/settings", icon: "Settings" },
   { title: "Интеграции", href: "/admin/integrations", icon: "Plug" },
