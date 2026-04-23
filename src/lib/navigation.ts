@@ -22,6 +22,8 @@ export const managerNav: NavItem[] = [
   { title: "Обращения", href: "/manager/leads", icon: "UserPlus" },
   { title: "Диалоги", href: "/manager/conversations", icon: "MessageSquare" },
   { title: "Объявления", href: "/manager/broadcasts", icon: "Send" },
+  { title: "Новости", href: "/manager/news", icon: "FileText" },
+  { title: "Мероприятия", href: "/manager/events", icon: "Target" },
   { title: "Документы", href: "/manager/documents", icon: "FileText" },
   { title: "Опросы", href: "/manager/surveys", icon: "ClipboardList" },
   { title: "Чат с ИИ", href: "/manager/ai-chat", icon: "Bot"},

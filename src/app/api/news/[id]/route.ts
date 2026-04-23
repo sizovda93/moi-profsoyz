@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const auth = await requireRole("admin");
+    const auth = await requireRole("admin", "manager");
     if (auth.error) return auth.error;
     const { id } = await params;
 
@@ -79,7 +79,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const auth = await requireRole("admin");
+    const auth = await requireRole("admin", "manager");
     if (auth.error) return auth.error;
     const { id } = await params;
 

@@ -5,7 +5,7 @@ import { toCamelCase } from "@/lib/api-utils";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const auth = await requireRole("admin");
+    const auth = await requireRole("admin", "manager");
     if (auth.error) return auth.error;
     const { id } = await params;
     const body = await request.json();
@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const auth = await requireRole("admin");
+    const auth = await requireRole("admin", "manager");
     if (auth.error) return auth.error;
     const { id } = await params;
     await pool.query(`UPDATE union_events SET status = 'archived', updated_at = now() WHERE id = $1`, [id]);

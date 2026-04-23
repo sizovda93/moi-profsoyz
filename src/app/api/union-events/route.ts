@@ -9,7 +9,7 @@ export async function GET() {
     if (auth.error) return auth.error;
     const { user } = auth;
 
-    const condition = user.role === "admin" ? "" : "WHERE e.status = 'published'";
+    const condition = user.role === "admin" || user.role === "manager" ? "" : "WHERE e.status = 'published'";
     const { rows } = await pool.query(`
       SELECT e.*, p.full_name as author_name
       FROM union_events e
@@ -26,7 +26,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requireRole("admin");
+    const auth = await requireRole("admin", "manager");
     if (auth.error) return auth.error;
     const { user } = auth;
 

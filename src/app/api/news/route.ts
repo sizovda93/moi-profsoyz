@@ -9,8 +9,8 @@ export async function GET() {
     if (auth.error) return auth.error;
     const { user } = auth;
 
-    // Admin sees all, others see only published
-    const condition = user.role === "admin"
+    // Admin and manager see all (incl. drafts), agents — only published
+    const condition = user.role === "admin" || user.role === "manager"
       ? ""
       : "WHERE n.status = 'published'";
 
@@ -31,7 +31,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requireRole("admin");
+    const auth = await requireRole("admin", "manager");
     if (auth.error) return auth.error;
     const { user } = auth;
 
