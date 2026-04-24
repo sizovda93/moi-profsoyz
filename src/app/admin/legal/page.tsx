@@ -430,7 +430,7 @@ export default function AdminLegalPage() {
                     {detail.attachments.map((att) => (
                       <a
                         key={att.id}
-                        href={att.fileUrl}
+                        href={`/api/legal-requests/${detail.id}/attachments/${att.id}/download`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm hover:bg-muted/50 transition-colors"

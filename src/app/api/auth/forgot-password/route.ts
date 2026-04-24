@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import pool from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { sendMail, renderTempPasswordEmail } from "@/lib/mail";
+import { rateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,6 +12,13 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
+
+    // Лимиты: 3 попытки на email за час + 10 с одного IP за час (защита от спама)
+    const emailCheck = rateLimit(`forgot:email:${normalizedEmail}`, 3, 60 * 60 * 1000);
+    if (!emailCheck.allowed) return rateLimitResponse(emailCheck.retryAfter);
+
+    const ipCheck = rateLimit(`forgot:ip:${getClientIp(request)}`, 10, 60 * 60 * 1000);
+    if (!ipCheck.allowed) return rateLimitResponse(ipCheck.retryAfter);
 
     const { rows } = await pool.query(
       `SELECT id, full_name, email FROM profiles WHERE email = $1`,
@@ -25,15 +33,11 @@ export async function POST(request: NextRequest) {
     const tempPassword =
       Math.random().toString(36).slice(-8) +
       Math.random().toString(36).slice(-4).toUpperCase();
-    const hash = await bcrypt.hash(tempPassword, 10);
-
-    await pool.query(`UPDATE profiles SET password_hash = $1 WHERE id = $2`, [
-      hash,
-      rows[0].id,
-    ]);
 
     const { html, text } = renderTempPasswordEmail(rows[0].full_name, tempPassword);
 
+    // Сначала отправляем письмо — и только при успехе меняем пароль в БД.
+    // Иначе при сбое SMTP пользователь окажется заблокирован с паролем, который не знает.
     try {
       await sendMail({
         to: rows[0].email,
@@ -48,6 +52,12 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    const hash = await bcrypt.hash(tempPassword, 10);
+    await pool.query(`UPDATE profiles SET password_hash = $1 WHERE id = $2`, [
+      hash,
+      rows[0].id,
+    ]);
 
     return Response.json({ success: true });
   } catch (err) {

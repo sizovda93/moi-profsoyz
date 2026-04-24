@@ -544,7 +544,7 @@ export default function AgentAboutPage() {
                               {sectionDocs.map((doc) => (
                                 <a
                                   key={doc.id}
-                                  href={doc.fileUrl}
+                                  href={`/api/union-documents/${doc.id}/download`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors"
@@ -605,7 +605,7 @@ export default function AgentAboutPage() {
                     </div>
 
                     <a
-                      href={doc.fileUrl}
+                      href={`/api/union-documents/${doc.id}/download`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="shrink-0 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/5"

@@ -301,7 +301,7 @@ export default function AgentLegalPage() {
                       {detail.attachments.map((att, idx) => (
                         <a
                           key={att.id ?? idx}
-                          href={att.fileUrl}
+                          href={`/api/legal-requests/${req.id}/attachments/${att.id}/download`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-sm text-primary hover:underline"

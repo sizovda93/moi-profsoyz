@@ -2,9 +2,14 @@ import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import pool from "@/lib/db";
 import { setAuthCookie } from "@/lib/auth-server";
+import { rateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // 10 попыток логина с одного IP за 15 минут
+    const ipCheck = rateLimit(`login:ip:${getClientIp(request)}`, 10, 15 * 60 * 1000);
+    if (!ipCheck.allowed) return rateLimitResponse(ipCheck.retryAfter);
+
     const rawText = await request.text();
     let body;
     try {

@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CardSkeleton } from "@/components/dashboard/loading-skeleton";
 import { getInitials } from "@/lib/utils";
-import { Send, Unlink, MessageCircle, Check, Link2, HelpCircle, Building2, Star, FileText, User, Phone, MapPin, Briefcase } from "lucide-react";
+import { Send, Unlink, MessageCircle, Check, Link2, HelpCircle, Building2, Star, FileText, User, Phone, MapPin, Briefcase, Lock, Eye, EyeOff } from "lucide-react";
 
 interface ProfileData {
   id: string;
@@ -73,6 +73,52 @@ export default function AgentProfilePage() {
   const [fbMessage, setFbMessage] = useState("");
   const [fbSending, setFbSending] = useState(false);
   const [fbSent, setFbSent] = useState(false);
+
+  // Change password state
+  const [pwCurrent, setPwCurrent] = useState("");
+  const [pwNew, setPwNew] = useState("");
+  const [pwConfirm, setPwConfirm] = useState("");
+  const [pwShow, setPwShow] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwSuccess, setPwSuccess] = useState(false);
+
+  async function handleChangePassword() {
+    setPwError(null);
+    setPwSuccess(false);
+
+    if (pwNew.length < 8) {
+      setPwError("Новый пароль должен быть не короче 8 символов");
+      return;
+    }
+    if (pwNew !== pwConfirm) {
+      setPwError("Пароли не совпадают");
+      return;
+    }
+
+    setPwLoading(true);
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: pwCurrent, newPassword: pwNew }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPwError(data.error || "Не удалось сменить пароль");
+        return;
+      }
+      setPwSuccess(true);
+      setPwCurrent("");
+      setPwNew("");
+      setPwConfirm("");
+      setTimeout(() => setPwSuccess(false), 4000);
+    } catch {
+      setPwError("Ошибка соединения с сервером");
+    } finally {
+      setPwLoading(false);
+    }
+  }
 
   const loadTgStatus = useCallback(() => {
     fetch("/api/telegram/status").then((r) => r.json()).then((data) => setTgStatus(data)).catch(() => {});
@@ -401,6 +447,78 @@ export default function AgentProfilePage() {
               <div className="border-t border-border pt-4 flex items-center justify-between">
                 <p className="text-xs text-muted-foreground">{message || "Изменения сохраняются вручную"}</p>
                 <Button onClick={handleSave} disabled={saving}>{saving ? "Сохранение..." : "Сохранить изменения"}</Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Security — change password */}
+          <Card>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="text-sm font-semibold">Безопасность</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPwShow((v) => !v)}
+                  className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                >
+                  {pwShow ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  {pwShow ? "Скрыть" : "Показать"}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1.5 block">Текущий пароль</label>
+                  <Input
+                    type={pwShow ? "text" : "password"}
+                    value={pwCurrent}
+                    onChange={(e) => setPwCurrent(e.target.value)}
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1.5 block">Новый пароль</label>
+                  <Input
+                    type={pwShow ? "text" : "password"}
+                    value={pwNew}
+                    onChange={(e) => setPwNew(e.target.value)}
+                    autoComplete="new-password"
+                    placeholder="Минимум 8 символов"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1.5 block">Повторите новый</label>
+                  <Input
+                    type={pwShow ? "text" : "password"}
+                    value={pwConfirm}
+                    onChange={(e) => setPwConfirm(e.target.value)}
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+
+              {pwError && (
+                <div className="mt-3 text-sm text-destructive">{pwError}</div>
+              )}
+              {pwSuccess && (
+                <div className="mt-3 text-sm text-green-600 flex items-center gap-1.5">
+                  <Check className="h-4 w-4" /> Пароль успешно изменён
+                </div>
+              )}
+
+              <div className="mt-4 flex justify-end">
+                <Button
+                  size="sm"
+                  onClick={handleChangePassword}
+                  disabled={pwLoading || !pwCurrent || !pwNew || !pwConfirm}
+                >
+                  {pwLoading ? "Сохранение..." : "Сменить пароль"}
+                </Button>
               </div>
             </CardContent>
           </Card>
