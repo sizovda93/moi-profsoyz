@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Shield, ArrowLeft, Copy, Check } from "lucide-react";
+import { Shield, ArrowLeft, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -10,8 +10,7 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [tempPassword, setTempPassword] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,22 +30,12 @@ export default function ForgotPasswordPage() {
         return;
       }
 
-      if (data.tempPassword) {
-        setTempPassword(data.tempPassword);
-      } else {
-        setError("Если аккаунт существует, новый пароль будет отправлен на email.");
-      }
+      setSent(true);
     } catch {
       setError("Ошибка соединения с сервером");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(tempPassword);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -66,29 +55,25 @@ export default function ForgotPasswordPage() {
           </div>
         )}
 
-        {tempPassword ? (
+        {sent ? (
           <div className="space-y-4">
-            <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-center space-y-3">
-              <p className="text-sm font-medium text-green-700">Новый временный пароль:</p>
-              <div className="flex items-center justify-center gap-2">
-                <code className="text-lg font-mono font-bold bg-background px-4 py-2 rounded-lg border border-border">
-                  {tempPassword}
-                </code>
-                <button
-                  onClick={handleCopy}
-                  className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                >
-                  {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
-                </button>
+            <div className="p-5 rounded-lg bg-green-500/10 border border-green-500/20 text-center space-y-3">
+              <div className="flex justify-center">
+                <div className="h-12 w-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                  <Mail className="h-6 w-6 text-green-600" />
+                </div>
               </div>
+              <p className="text-sm font-medium text-green-700">
+                Письмо отправлено
+              </p>
               <p className="text-xs text-muted-foreground">
-                Используйте этот пароль для входа. Рекомендуем сменить его в профиле.
+                Если аккаунт с таким email существует, на него придёт письмо с временным паролем. Проверьте «Входящие» и папку «Спам».
               </p>
             </div>
             <Link href="/login">
               <Button className="w-full">
                 <ArrowLeft className="h-4 w-4 mr-1" />
-                Войти с новым паролем
+                Вернуться к входу
               </Button>
             </Link>
           </div>
@@ -103,19 +88,24 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+              <p className="text-xs text-muted-foreground mt-2">
+                Мы отправим временный пароль на указанный email.
+              </p>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Обработка..." : "Сбросить пароль"}
+              {loading ? "Отправка..." : "Отправить письмо"}
             </Button>
           </form>
         )}
 
-        <div className="mt-6 text-center text-sm text-muted-foreground">
-          <Link href="/login" className="text-primary hover:underline flex items-center justify-center gap-1">
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Вернуться к входу
-          </Link>
-        </div>
+        {!sent && (
+          <div className="mt-6 text-center text-sm text-muted-foreground">
+            <Link href="/login" className="text-primary hover:underline flex items-center justify-center gap-1">
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Вернуться к входу
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
