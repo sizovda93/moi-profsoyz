@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     try {
       await sendMail({
         to: rows[0].email,
-        subject: "Восстановление пароля — Мой Профсоюз",
+        subject: "Мой Профсоюз — временный пароль для входа",
         html,
         text,
       });

@@ -45,46 +45,24 @@ export async function sendMail(params: {
 
 export function renderTempPasswordEmail(fullName: string | null, tempPassword: string) {
   const name = fullName?.trim() || "участник профсоюза";
-  const html = `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><title>Восстановление пароля</title></head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:40px 20px;">
-    <tr><td align="center">
-      <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e7;">
-        <tr><td style="padding:32px 40px 16px;">
-          <div style="font-size:18px;font-weight:600;color:#18181b;">Мой Профсоюз</div>
-        </td></tr>
-        <tr><td style="padding:8px 40px 16px;">
-          <h1 style="margin:0 0 16px;font-size:22px;color:#18181b;">Восстановление пароля</h1>
-          <p style="margin:0 0 16px;color:#3f3f46;font-size:15px;line-height:1.6;">Здравствуйте, ${escapeHtml(name)}!</p>
-          <p style="margin:0 0 16px;color:#3f3f46;font-size:15px;line-height:1.6;">Вы запросили восстановление пароля. Ниже — ваш временный пароль для входа:</p>
-          <div style="margin:24px 0;padding:20px;background:#f4f4f5;border-radius:8px;text-align:center;">
-            <code style="font-size:22px;font-weight:700;font-family:'Courier New',monospace;color:#18181b;letter-spacing:1px;">${escapeHtml(tempPassword)}</code>
-          </div>
-          <p style="margin:0 0 8px;color:#3f3f46;font-size:14px;line-height:1.6;">Используйте его для входа, а затем смените пароль в профиле.</p>
-          <p style="margin:0;color:#71717a;font-size:13px;line-height:1.6;">Если вы не запрашивали восстановление, просто проигнорируйте это письмо.</p>
-        </td></tr>
-        <tr><td style="padding:24px 40px;border-top:1px solid #e4e4e7;color:#71717a;font-size:12px;">
-          Мой Профсоюз · <a href="https://profsouz.info" style="color:#2563eb;text-decoration:none;">profsouz.info</a>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
 
-  const text = `Здравствуйте, ${name}!
+  // Максимально простой HTML без таблиц, фонов и сложной разметки —
+  // чтобы Yandex не бракнул письмо как спам.
+  const html =
+    `<p>Здравствуйте, ${escapeHtml(name)}!</p>` +
+    `<p>Вы запросили сброс пароля на платформе «Мой Профсоюз».</p>` +
+    `<p>Ваш временный пароль: <b>${escapeHtml(tempPassword)}</b></p>` +
+    `<p>Войдите с ним в кабинет и смените пароль в разделе «Профиль → Безопасность».</p>` +
+    `<p>Если вы не запрашивали сброс, просто проигнорируйте это письмо.</p>` +
+    `<p>—<br>Мой Профсоюз</p>`;
 
-Вы запросили восстановление пароля. Ваш временный пароль:
-
-${tempPassword}
-
-Используйте его для входа, а затем смените пароль в профиле.
-
-Если вы не запрашивали восстановление, проигнорируйте это письмо.
-
-Мой Профсоюз — https://profsouz.info`;
+  const text =
+    `Здравствуйте, ${name}!\n\n` +
+    `Вы запросили сброс пароля на платформе «Мой Профсоюз».\n\n` +
+    `Ваш временный пароль: ${tempPassword}\n\n` +
+    `Войдите с ним в кабинет и смените пароль в разделе «Профиль → Безопасность».\n\n` +
+    `Если вы не запрашивали сброс, просто проигнорируйте это письмо.\n\n` +
+    `—\nМой Профсоюз`;
 
   return { html, text };
 }
