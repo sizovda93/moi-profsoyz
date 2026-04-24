@@ -73,7 +73,14 @@ export async function getMe(): Promise<TgResponse> {
 
 export function validateWebhookSecret(headerValue: string | null): boolean {
   const secret = getWebhookSecret();
-  if (!secret) return true; // if not configured, skip validation
+  // В production секрет обязателен — если не задан, проверка не проходит
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('TELEGRAM_WEBHOOK_SECRET is not configured in production');
+      return false;
+    }
+    return true; // dev-режим без секрета — разрешаем
+  }
   return headerValue === secret;
 }
 

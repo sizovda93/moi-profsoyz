@@ -33,6 +33,11 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
       return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
 
+    // Менеджер видит только лиды, закреплённые за ним
+    if (user.role === 'manager' && rows[0].assigned_manager_id !== user.id) {
+      return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
+    }
+
     return Response.json(toCamelCase(rows[0]));
   } catch (err) {
     console.error('GET /api/leads/[id] error:', err);
@@ -60,6 +65,11 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       if (lead.assigned_agent_id !== user.agentId) {
         return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
       }
+    }
+
+    // Менеджер может менять только свои закреплённые лиды
+    if (user.role === 'manager' && lead.assigned_manager_id !== user.id) {
+      return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
 
     const body = await request.json();

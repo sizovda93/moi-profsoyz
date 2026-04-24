@@ -15,13 +15,16 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
 
     const { id: conversationId } = await params;
 
-    // Verify conversation exists
+    // Verify conversation exists + ownership for manager
     const { rows: convRows } = await pool.query(
-      `SELECT id FROM conversations WHERE id = $1`,
+      `SELECT id, manager_id FROM conversations WHERE id = $1`,
       [conversationId]
     );
     if (convRows.length === 0) {
       return Response.json({ error: 'Диалог не найден' }, { status: 404 });
+    }
+    if (user.role === 'manager' && convRows[0].manager_id !== user.id) {
+      return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
 
     const result = await generateDraft(conversationId, user.id);
@@ -53,6 +56,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   try {
     const auth = await requireRole('manager', 'admin');
     if (auth.error) return auth.error;
+    const { user } = auth;
 
     const { id: conversationId } = await params;
     const body = await request.json();
@@ -64,6 +68,17 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
         { error: `Допустимые статусы: ${validStatuses.join(', ')}` },
         { status: 400 }
       );
+    }
+
+    // Verify ownership for manager
+    if (user.role === 'manager') {
+      const { rows: convRows } = await pool.query(
+        `SELECT manager_id FROM conversations WHERE id = $1`,
+        [conversationId]
+      );
+      if (convRows.length === 0 || convRows[0].manager_id !== user.id) {
+        return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
+      }
     }
 
     const { rows } = await pool.query(

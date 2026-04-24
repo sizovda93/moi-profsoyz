@@ -18,6 +18,18 @@ async function sendMaxMessage(chatId: number, text: string) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Webhook secret — передаётся в query при регистрации у MAX (?secret=xxx)
+    const expectedSecret = process.env.MAX_WEBHOOK_SECRET;
+    if (expectedSecret) {
+      const providedSecret = request.nextUrl.searchParams.get('secret');
+      if (providedSecret !== expectedSecret) {
+        return Response.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    } else if (process.env.NODE_ENV === 'production') {
+      console.error('MAX webhook: MAX_WEBHOOK_SECRET not set in production');
+      return Response.json({ error: 'Webhook secret not configured' }, { status: 500 });
+    }
+
     const body = await request.json();
     const updateType = body.update_type;
 

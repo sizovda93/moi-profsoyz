@@ -13,7 +13,6 @@ interface AvatarQuestion {
 }
 
 const IDLE_VIDEO = "/avatar/idle.webm";
-const ELEVENLABS_VOICE_ID = "yl2ZDV1MzN4HbQJbMihG";
 
 const questions: AvatarQuestion[] = [
   {
@@ -56,28 +55,17 @@ const questions: AvatarQuestion[] = [
 type AvatarState = "idle" | "loading" | "answering";
 
 async function fetchTTS(text: string): Promise<Blob | null> {
-  const apiKey = process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY;
-  if (!apiKey) return null;
-
-  const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`,
-    {
+  try {
+    const res = await fetch("/api/avatar/tts", {
       method: "POST",
-      headers: {
-        "xi-api-key": apiKey,
-        "Content-Type": "application/json",
-        Accept: "audio/mpeg",
-      },
-      body: JSON.stringify({
-        text,
-        model_id: "eleven_multilingual_v2",
-        voice_settings: { stability: 0.5, similarity_boost: 0.75 },
-      }),
-    }
-  );
-
-  if (!res.ok) return null;
-  return res.blob();
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok) return null;
+    return res.blob();
+  } catch {
+    return null;
+  }
 }
 
 export function AvatarHelper() {

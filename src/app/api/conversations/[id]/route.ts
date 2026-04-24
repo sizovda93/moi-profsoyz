@@ -31,6 +31,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
 
+    // Менеджер видит только закреплённые за ним диалоги
+    if (user.role === 'manager' && conversation.rows[0].manager_id !== user.id) {
+      return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
+    }
+
     const messages = await pool.query(
       `SELECT * FROM messages WHERE conversation_id = $1 ORDER BY created_at ASC`,
       [id]
@@ -65,6 +70,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const conv = convResult.rows[0];
 
     if (user.role === 'agent' && conv.agent_id !== user.agentId) {
+      return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
+    }
+
+    // Менеджер может писать только в свои закреплённые диалоги
+    if (user.role === 'manager' && conv.manager_id !== user.id) {
       return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
     }
 

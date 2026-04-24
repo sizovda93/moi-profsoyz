@@ -11,6 +11,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
   try {
     const auth = await requireRole('manager', 'admin');
     if (auth.error) return auth.error;
+    const { user } = auth;
 
     const { id } = await params;
     const { rows } = await pool.query(
@@ -21,6 +22,11 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
       [id]
     );
     if (rows.length === 0) return Response.json({ error: 'Не найдено' }, { status: 404 });
+
+    // Менеджер видит только своих агентов или незакреплённых (для возможности взять себе)
+    if (user.role === 'manager' && rows[0].manager_id !== null && rows[0].manager_id !== user.id) {
+      return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
+    }
 
     const row = rows[0];
     const lifecycle = computeLifecycle(
@@ -59,6 +65,21 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       return Response.json({ error: 'Агент не найден' }, { status: 404 });
     }
     const agent = agentRows[0];
+
+    // Менеджер может менять поля только у закреплённых за собой агентов.
+    // Исключение: назначение себя менеджером (managerId) у незакреплённого агента — уже проверяется ниже.
+    if (user.role === 'manager') {
+      const isClaimingUnassigned =
+        body.managerId !== undefined &&
+        agent.manager_id === null &&
+        (body.managerId === 'self' || body.managerId === user.id);
+
+      const isOwnAgent = agent.manager_id === user.id;
+
+      if (!isOwnAgent && !isClaimingUnassigned) {
+        return Response.json({ error: 'Доступ запрещён' }, { status: 403 });
+      }
+    }
 
     const changes: string[] = [];
 

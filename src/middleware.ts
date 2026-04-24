@@ -22,6 +22,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/avatar/") ||
     pathname === "/api/telegram/webhook" ||
+    pathname === "/api/max/webhook" ||
     pathname === "/api/leads/public" ||
     pathname === "/api/unions" ||
     (pathname === "/api/referral" && request.method === "POST") ||
