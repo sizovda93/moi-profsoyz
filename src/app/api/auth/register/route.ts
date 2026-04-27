@@ -97,10 +97,12 @@ export async function POST(request: NextRequest) {
       );
       const memberNumber = "MP-" + String(maxRows[0].next_num).padStart(6, "0");
 
-      // 3. Агент
+      // 3. Агент — все новые юзеры автоматически закрепляются за дефолтным руководителем
+      const defaultManagerId = process.env.DEFAULT_MANAGER_ID || null;
       await client.query(
-        `INSERT INTO agents (user_id, union_id, division_id, member_number) VALUES ($1, $2, $3, $4)`,
-        [profileId, unionId, divisionId, memberNumber]
+        `INSERT INTO agents (user_id, union_id, division_id, member_number, manager_id)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [profileId, unionId, divisionId, memberNumber, defaultManagerId]
       );
 
       // 4. Согласия
